@@ -13,3 +13,9 @@ server_scripts {
 client_scripts {
 	'client.lua'
 }
+
+--dont touch
+version '1.1'
+vorp_checker 'yes'
+vorp_name '^4Resource version Check^3'
+vorp_github 'https://github.com/VORPCORE/vorp_banking'
