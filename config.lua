@@ -10,7 +10,10 @@ Config.banks = {
 Config.adminwebhook = ""
 Config.webhookavatar = "https://www.pngmart.com/files/5/Bank-PNG-Transparent-Picture.png"
 Config.gold = true
-Config.invspace = 8 -- DON'T DECREASE AFTER RUN
+
+Config.invspace = 8 -- DON'T CHANGE AFTER RUN
+Config.UpSlot   = 5 -- CHANGE SPACE FOR EVERY UPGRADE
+Config.CostSlot = 10 -- COST FOR UPGRADE SLOT (Config.invspace + Config.UpSlot = Config.invspace)
 
 Config.keys = {
     G = 0x760A9C6F,
@@ -32,7 +35,7 @@ Config.language = {
     takegold2 = "Withdraw Your Gold",
     depogold2 = "Deposit Your Gold",
     depoitem = "Use your Safebox",
-    depoitem2 = "Default = " .. Config.invspace,
+    depoitem2 = "Space Available: ",
     confirm = "Confirm",
     amount = "Amount",
     youdepo = "You Deposited $",
@@ -47,4 +50,8 @@ Config.language = {
     namebank = "Bank Inventory",
     limit = "You cannot carry other items",
     maxlimit = "You have reached the max of the item",
+    upgradeitem = "Upgrade Slot Safe Box",
+    upgradeitem2 = "Cost for " .. Config.UpSlot .. " slots: " .. Config.CostSlot .. " $",
+    nomoney = "You haven't money",
+    success = "You upgraded Safe Box by paying" .. Config.CostSlot .. " $"
 }
