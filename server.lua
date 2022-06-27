@@ -5,7 +5,7 @@ end)
 
 local VorpInv = exports.vorp_inventory:vorp_inventoryApi()
 
-local invspace = Config.invspace
+local invspace = 8 -- DON'T TOUCH IF YOU DON'T KNOW WHAT YOU DOING
 
 RegisterServerEvent('vorp_bank:getinfo')
 AddEventHandler('vorp_bank:getinfo', function(name)

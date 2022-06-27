@@ -11,7 +11,6 @@ Config.adminwebhook = ""
 Config.webhookavatar = "https://www.pngmart.com/files/5/Bank-PNG-Transparent-Picture.png"
 Config.gold = true
 
-Config.invspace = 8 -- DON'T CHANGE AFTER RUN
 Config.UpSlot   = 5 -- CHANGE SPACE FOR EVERY UPGRADE
 Config.CostSlot = 10 -- COST FOR UPGRADE SLOT (Config.invspace + Config.UpSlot = Config.invspace)
 
