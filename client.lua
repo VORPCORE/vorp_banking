@@ -3,7 +3,6 @@ local openmenu
 local inmenu = false
 local bank
 local bankinfo
-local maxlimit = 0
 local blips = {}
 
 TriggerEvent("menuapi:getData", function(call)
@@ -62,11 +61,6 @@ AddEventHandler("vorp_bank:recinfo", function(data)
     bankinfo = data
 end)
 
-RegisterNetEvent("vorp_bank:spazio")
-AddEventHandler("vorp_bank:spazio", function(data)
-    maxlimit = data
-end)
-
 RegisterNetEvent("vorp_bank:ready")
 AddEventHandler("vorp_bank:ready", function()
     inmenu = false
@@ -108,12 +102,6 @@ Citizen.CreateThread(function()
     end
 end)
 
--- not used
---[[RegisterNetEvent("vorp_bank:findbank")
-AddEventHandler("vorp_bank:findbank", function(banklocations)
-    houses = banklocations
-end)]]
-
 function Openbank(bankName)
     MenuData.CloseAll()
 
@@ -121,7 +109,9 @@ function Openbank(bankName)
         { label = Config.language.cashbalance .. bankinfo.money, value = 'nothing', desc = Config.language.cashbalance2 },
         { label = Config.language.depocash, value = 'dcash', desc = Config.language.depocash2 },
         { label = Config.language.takecash, value = 'wcash', desc = Config.language.takecash2 },
-        { label = Config.language.depoitem, value = 'bitem', desc = Config.language.depoitem2 }
+        { label = Config.language.depoitem, value = 'bitem', desc = Config.language.depoitem2 .. bankinfo.invspace },
+        { label = Config.language.upgradeitem, value = 'upitem', desc = Config.language.upgradeitem2 }
+
     }
     if Config.gold then
         elements[#elements + 1] = { label = Config.language.goldbalance .. bankinfo.gold, value = 'nothing',
@@ -133,79 +123,86 @@ function Openbank(bankName)
 
 
     MenuData.Open('default', GetCurrentResourceName(), 'menuapi',
-        {
-            title    = bankName,
-            subtext  = Config.language.welcome,
-            align    = 'top-left',
-            elements = elements,
-        },
-        function(data, menu)
-            if (data.current.value == 'dcash') then
-                TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
-                    local amount = tonumber(cb)
-                    if amount and amount > 0 then
-                        TriggerServerEvent("vorp_bank:depositcash", amount, bank)
-                    else
-                        TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
-                        inmenu = false
-                    end
-                end)
-                MenuData.CloseAll()
-                bankinfo = nil
-                ClearPedTasks(PlayerPedId())
-            end
-            if (data.current.value == 'dgold') then
-                TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
-                    local amount = tonumber(cb)
-                    if amount and amount > 0 then
-                        TriggerServerEvent("vorp_bank:depositgold", amount, bank)
-                    else
-                        TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
-                        inmenu = false
-                    end
-                end)
-                MenuData.CloseAll()
-                bankinfo = nil
-                ClearPedTasks(PlayerPedId())
-            end
-            if (data.current.value == 'wcash') then
-                TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
-                    local amount = tonumber(cb)
-                    if amount and amount > 0 then
-                        TriggerServerEvent("vorp_bank:withcash", amount, bank)
-                    else
-                        TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
-                        inmenu = false
-                    end
-                end)
-                MenuData.CloseAll()
-                bankinfo = nil
-                ClearPedTasks(PlayerPedId())
-            end
-            if (data.current.value == 'wgold') then
-                TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
-                    local amount = tonumber(cb)
-                    if amount and amount > 0 then
-                        TriggerServerEvent("vorp_bank:withgold", amount, bank)
-                    else
-                        TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
-                        inmenu = false
-                    end
-                end)
-                MenuData.CloseAll()
-                bankinfo = nil
-                ClearPedTasks(PlayerPedId())
-            end
-            if (data.current.value == 'bitem') then
-                TriggerServerEvent("vorp_bank:ReloadBankInventory", bank)
-                TriggerEvent("vorp_inventory:OpenBankInventory", Config.language.namebank, bank, maxlimit)
-                MenuData.CloseAll()
-                bankinfo = nil
-                ClearPedTasks(PlayerPedId())
-                inmenu = false
-            end
-        end,
-        function(data, menu)
-            menu.close()
-        end)
+    {
+        title    = bankName,
+        subtext  = Config.language.welcome,
+        align    = 'top-left',
+        elements = elements,
+    },
+    function(data, menu)
+        if (data.current.value == 'dcash') then
+            TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
+                local amount = tonumber(cb)
+                if amount and amount > 0 then
+                    TriggerServerEvent("vorp_bank:depositcash", amount, bank)
+                else
+                    TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
+                    inmenu = false
+                end
+            end)
+            MenuData.CloseAll()
+            bankinfo = nil
+            ClearPedTasks(PlayerPedId())
+        end
+        if (data.current.value == 'dgold') then
+            TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
+                local amount = tonumber(cb)
+                if amount and amount > 0 then
+                    TriggerServerEvent("vorp_bank:depositgold", amount, bank)
+                else
+                    TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
+                    inmenu = false
+                end
+            end)
+            MenuData.CloseAll()
+            bankinfo = nil
+            ClearPedTasks(PlayerPedId())
+        end
+        if (data.current.value == 'wcash') then
+            TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
+                local amount = tonumber(cb)
+                if amount and amount > 0 then
+                    TriggerServerEvent("vorp_bank:withcash", amount, bank)
+                else
+                    TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
+                    inmenu = false
+                end
+            end)
+            MenuData.CloseAll()
+            bankinfo = nil
+            ClearPedTasks(PlayerPedId())
+        end
+        if (data.current.value == 'wgold') then
+            TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
+                local amount = tonumber(cb)
+                if amount and amount > 0 then
+                    TriggerServerEvent("vorp_bank:withgold", amount, bank)
+                else
+                    TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
+                    inmenu = false
+                end
+            end)
+            MenuData.CloseAll()
+            bankinfo = nil
+            ClearPedTasks(PlayerPedId())
+        end
+        if (data.current.value == 'bitem') then
+            TriggerServerEvent("vorp_bank:ReloadBankInventory", bank)
+            TriggerEvent("vorp_inventory:OpenBankInventory", Config.language.namebank, bank, bankinfo.invspace)
+            MenuData.CloseAll()
+            bankinfo = nil
+            ClearPedTasks(PlayerPedId())
+            inmenu = false
+        end
+        if (data.current.value == 'upitem') then
+            TriggerServerEvent("vorp_bank:UpgradeSafeBox", bank, bankinfo.invspace)
+            MenuData.CloseAll()
+            bankinfo = nil
+            ClearPedTasks(PlayerPedId())
+            inmenu = false
+        end
+    end,
+    function(data, menu)
+        menu.close()
+    end)
 end
