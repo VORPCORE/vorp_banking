@@ -1,198 +1,212 @@
 local VorpCore = {}
-TriggerEvent("getCore",function(core)
-    VorpCore = core
+TriggerEvent("getCore", function(core)
+  VorpCore = core
 end)
+
 local VorpInv = exports.vorp_inventory:vorp_inventoryApi()
 
 local invspace = Config.invspace
 
-RegisterServerEvent('vorp_bank:getinfo') 
+RegisterServerEvent('vorp_bank:getinfo')
 AddEventHandler('vorp_bank:getinfo', function(name)
-    local _source = source
-    local Character = VorpCore.getUser(_source).getUsedCharacter
-    local charidentifier = Character.charIdentifier
-    local identifier = Character.identifier
+  local _source = source
+  local Character = VorpCore.getUser(_source).getUsedCharacter
+  local charidentifier = Character.charIdentifier
+  local identifier = Character.identifier
 
-    exports["ghmattimysql"]:execute("SELECT money, gold FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier,["@name"] = name }, function(result)
-        money = 0
-        gold = 0
-        if result[1] ~= nil then
-            money = result[1].money
-            gold = result[1].gold
-            -- TO DO UPDATE INVSPACE IF CHANGE IT
-        else
-            local Parameters = { ['name'] = name, ['identifier'] = identifier, ['charidentifier'] = charidentifier,['money'] = money,['gold'] = gold, ['invspace'] = invspace}
-            exports.ghmattimysql:execute("INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)", Parameters)
-        end
-        local bankinfo = {money = money, gold = gold}
-        TriggerClientEvent("vorp_bank:recinfo",_source,bankinfo)
-        TriggerClientEvent("vorp_bank:spazio", _source, invspace)
-    end)
-end)
-
-RegisterServerEvent('vorp_bank:depositcash') 
-AddEventHandler('vorp_bank:depositcash', function(amount,name)
-    local _source = source
-	local Character = VorpCore.getUser(_source).getUsedCharacter
-    local charidentifier = Character.charIdentifier
-    local money = Character.money
-    if money >= amount then 
-        Character.removeCurrency(0, amount)
-        local Parameters = { ['charidentifier'] = charidentifier,['money'] = amount,['name'] = name}
-        exports.ghmattimysql:execute("UPDATE bank_users Set money=money+@money WHERE charidentifier=@charidentifier AND name = @name", Parameters)
-        TriggerClientEvent("vorp:TipRight", _source, Config.language.youdepo..amount, 10000) 
-        Discord(Config.language.depoc,GetPlayerName(_source),amount,name)
+  exports["ghmattimysql"]:execute("SELECT money, gold FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
+    , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
+    local money = 0
+    local gold = 0
+    if result[1] then
+      money = result[1].money
+      gold = result[1].gold
+      -- TO DO UPDATE INVSPACE IF CHANGE IT
     else
-        TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 10000) 
+      local Parameters = { ['name'] = name, ['identifier'] = identifier, ['charidentifier'] = charidentifier,
+        ['money'] = money, ['gold'] = gold, ['invspace'] = invspace }
+      exports.ghmattimysql:execute("INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)"
+        , Parameters)
     end
-    TriggerClientEvent("vorp_bank:ready",_source)
+    local bankinfo = { money = money, gold = gold }
+    TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo)
+    TriggerClientEvent("vorp_bank:spazio", _source, invspace)
+  end)
 end)
 
-RegisterServerEvent('vorp_bank:depositgold') 
-AddEventHandler('vorp_bank:depositgold', function(amount,name)
-    local _source = source
-	local Character = VorpCore.getUser(_source).getUsedCharacter
-    local charidentifier = Character.charIdentifier
-    local money = Character.gold
-    if money >= amount then 
-        Character.removeCurrency(1, amount)
-        local Parameters = { ['charidentifier'] = charidentifier,['gold'] = amount,['name'] = name}
-        exports.ghmattimysql:execute("UPDATE bank_users Set gold=gold+@gold WHERE charidentifier=@charidentifier AND name = @name", Parameters)
-        TriggerClientEvent("vorp:TipRight", _source, Config.language.youdepog..amount, 10000) 
-        Discord(Config.language.depog,GetPlayerName(_source),amount,name)
+RegisterServerEvent('vorp_bank:depositcash')
+AddEventHandler('vorp_bank:depositcash', function(amount, name)
+  local _source = source
+  local Character = VorpCore.getUser(_source).getUsedCharacter
+  local charidentifier = Character.charIdentifier
+  local money = Character.money
+  if money >= amount then
+    Character.removeCurrency(0, amount)
+    local Parameters = { ['charidentifier'] = charidentifier, ['money'] = amount, ['name'] = name }
+    exports.ghmattimysql:execute("UPDATE bank_users Set money=money+@money WHERE charidentifier=@charidentifier AND name = @name"
+      , Parameters)
+    TriggerClientEvent("vorp:TipRight", _source, Config.language.youdepo .. amount, 10000)
+    Discord(Config.language.depoc, GetPlayerName(_source), amount, name)
+  else
+    TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 10000)
+  end
+  TriggerClientEvent("vorp_bank:ready", _source)
+end)
+
+RegisterServerEvent('vorp_bank:depositgold')
+AddEventHandler('vorp_bank:depositgold', function(amount, name)
+  local _source = source
+  local Character = VorpCore.getUser(_source).getUsedCharacter
+  local charidentifier = Character.charIdentifier
+  local money = Character.gold
+  if money >= amount then
+    Character.removeCurrency(1, amount)
+    local Parameters = { ['charidentifier'] = charidentifier, ['gold'] = amount, ['name'] = name }
+    exports.ghmattimysql:execute("UPDATE bank_users Set gold=gold+@gold WHERE charidentifier=@charidentifier AND name = @name"
+      , Parameters)
+    TriggerClientEvent("vorp:TipRight", _source, Config.language.youdepog .. amount, 10000)
+    Discord(Config.language.depog, GetPlayerName(_source), amount, name)
+  else
+    TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 10000)
+  end
+  TriggerClientEvent("vorp_bank:ready", _source)
+end)
+
+RegisterServerEvent('vorp_bank:withcash')
+AddEventHandler('vorp_bank:withcash', function(amount, name)
+  local _source = source
+  local Character = VorpCore.getUser(_source).getUsedCharacter
+  local charidentifier = Character.charIdentifier
+  exports["ghmattimysql"]:execute("SELECT money FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
+    , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
+    local money = result[1].money
+    if money >= amount then
+      local Parameters = { ['charidentifier'] = charidentifier, ['money'] = amount, ['name'] = name }
+      exports.ghmattimysql:execute("UPDATE bank_users Set money=money-@money WHERE charidentifier=@charidentifier AND name = @name"
+        , Parameters)
+      Character.addCurrency(0, amount)
+      TriggerClientEvent("vorp:TipRight", _source, Config.language.withdrew .. amount, 10000)
+      Discord(Config.language.withc, GetPlayerName(_source), amount, name)
     else
-        TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 10000) 
+      TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 10000)
     end
-    TriggerClientEvent("vorp_bank:ready",_source)
+    TriggerClientEvent("vorp_bank:ready", _source)
+  end)
 end)
 
-RegisterServerEvent('vorp_bank:withcash') 
-AddEventHandler('vorp_bank:withcash', function(amount,name)
-    local _source = source
-	local Character = VorpCore.getUser(_source).getUsedCharacter
-    local charidentifier = Character.charIdentifier
-    exports["ghmattimysql"]:execute("SELECT money FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier,["@name"] = name }, function(result)
-        local money = result[1].money
-        if money >= amount then 
-            local Parameters = { ['charidentifier'] = charidentifier,['money'] = amount,['name'] = name}
-            exports.ghmattimysql:execute("UPDATE bank_users Set money=money-@money WHERE charidentifier=@charidentifier AND name = @name", Parameters)
-            Character.addCurrency(0, amount)
-            TriggerClientEvent("vorp:TipRight", _source, Config.language.withdrew..amount, 10000)
-            Discord(Config.language.withc,GetPlayerName(_source),amount,name)
-        else
-            TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 10000) 
-        end
-        TriggerClientEvent("vorp_bank:ready",_source)
-    end)
-end)
-
-RegisterServerEvent('vorp_bank:withgold') 
-AddEventHandler('vorp_bank:withgold', function(amount,name)
-    local _source = source
-	local Character = VorpCore.getUser(_source).getUsedCharacter
-    local charidentifier = Character.charIdentifier
-    exports["ghmattimysql"]:execute("SELECT gold FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier,["@name"] = name }, function(result)
-        local gold = result[1].gold
-        if gold >= amount then 
-            local Parameters = { ['charidentifier'] = charidentifier,['gold'] = amount,['name'] = name}
-            exports.ghmattimysql:execute("UPDATE bank_users Set gold=gold-@gold WHERE charidentifier=@charidentifier AND name = @name", Parameters)
-            Character.addCurrency(1, amount)
-            TriggerClientEvent("vorp:TipRight", _source, Config.language.withdrewg..amount, 10000)
-            Discord(Config.language.withg,GetPlayerName(_source),amount,name)
-        else
-            TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 10000) 
-        end
-        TriggerClientEvent("vorp_bank:ready",_source)
-    end)
+RegisterServerEvent('vorp_bank:withgold')
+AddEventHandler('vorp_bank:withgold', function(amount, name)
+  local _source = source
+  local Character = VorpCore.getUser(_source).getUsedCharacter
+  local charidentifier = Character.charIdentifier
+  exports["ghmattimysql"]:execute("SELECT gold FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
+    { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
+    local gold = result[1].gold
+    if gold >= amount then
+      local Parameters = { ['charidentifier'] = charidentifier, ['gold'] = amount, ['name'] = name }
+      exports.ghmattimysql:execute("UPDATE bank_users Set gold=gold-@gold WHERE charidentifier=@charidentifier AND name = @name"
+        , Parameters)
+      Character.addCurrency(1, amount)
+      TriggerClientEvent("vorp:TipRight", _source, Config.language.withdrewg .. amount, 10000)
+      Discord(Config.language.withg, GetPlayerName(_source), amount, name)
+    else
+      TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 10000)
+    end
+    TriggerClientEvent("vorp_bank:ready", _source)
+  end)
 end)
 
 RegisterServerEvent("vorp_bank:find")
 AddEventHandler("vorp_bank:find", function(name)
-    local _source = source
-    exports.ghmattimysql:execute('SELECT * FROM bank_users', {}, function(result)
-        local banklocations = {}
-        if result[1] ~= nil then 
-            for i=1, #result, 1 do
-                table.insert(banklocations, {
-                    id        = result[i].id,
-                    name        = result[i].name,
-                    identifier  = result[i].identifier,
-                    charidentifier  = result[i].charidentifier,
-                    money        = result[i].money,
-                    gold        = result[i].gold,
-                    invspace         = result[i].invspace,
-                })
-            end
-            TriggerClientEvent("vorp_bank:findbank", _source, banklocations)
-        end
-    end)
+  local _source = source
+  exports.ghmattimysql:execute('SELECT * FROM bank_users', {}, function(result)
+    local banklocations = {}
+    if result[1] then
+      for i = 1, #result, 1 do
+        banklocations[#banklocations + 1] = {
+          id             = result[i].id,
+          name           = result[i].name,
+          identifier     = result[i].identifier,
+          charidentifier = result[i].charidentifier,
+          money          = result[i].money,
+          gold           = result[i].gold,
+          invspace       = result[i].invspace,
+        }
+      end
+      TriggerClientEvent("vorp_bank:findbank", _source, banklocations)
+    end
+  end)
 end)
 
 local processinguser = {}
 
 function inprocessing(id)
-    for k,v in pairs(processinguser) do 
-        if v == id then 
-            return true
-        end
-    end
-    return false 
-end
-function trem(id)
-    for k,v in pairs(processinguser) do 
-        if v == id then 
-            table.remove(processinguser,k)
-        end
-    end
-end
-function AnIndexOf(t,val)
-    for k,v in ipairs(t) do 
-      if v == val then return k end
-    end
-end
-function ToInteger(number)
-    _source = source
-    number = tonumber(number)
-    if number ~= nil then 
-        if 0 >  number then 
-            number = number * -1
-        elseif number == 0 then 
-            return nil
-        end
-        return math.floor(number or error("Could not cast '" .. tostring(number) .. "' to number.'"))
-    else
-        return nil
+  for k, v in pairs(processinguser) do
+    if v == id then
+      return true
     end
   end
+  return false
+end
+
+function trem(id)
+  for k, v in pairs(processinguser) do
+    if v == id then
+      table.remove(processinguser, k)
+    end
+  end
+end
+
+function AnIndexOf(t, val)
+  for k, v in ipairs(t) do
+    if v == val then return k end
+  end
+end
+
+function ToInteger(number)
+  _source = source
+  number = tonumber(number)
+  if number then
+    if 0 > number then
+      number = number * -1
+    elseif number == 0 then
+      return nil
+    end
+    return math.floor(number or error("Could not cast '" .. tostring(number) .. "' to number.'"))
+  else
+    return nil
+  end
+end
 
 RegisterNetEvent("vorp_bank:ReloadBankInventory") -- inventory system
 AddEventHandler("vorp_bank:ReloadBankInventory", function(bankid)
-    local _source = source
-    local name = bankid
-    local Character = VorpCore.getUser(_source).getUsedCharacter
-    local charidentifier = Character.charIdentifier
-    exports["ghmattimysql"]:execute("SELECT items, id FROM bank_users WHERE charidentifier = @charidentifier AND name = @name ", { ["@charidentifier"] = charidentifier,["@name"] = name }, function(result)
-        if result[1].items ~= nil then
-            local items = {}
-            local inv = json.decode(result[1].items)
-            if not inv then
-                items.itemList = {}
-                items.action = "setSecondInventoryItems"
-                TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
-            else 
-                items.itemList = inv
-                items.action = "setSecondInventoryItems"
-                TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
-            end
-        end
-    end)
+  local _source = source
+  local name = bankid
+  local Character = VorpCore.getUser(_source).getUsedCharacter
+  local charidentifier = Character.charIdentifier
+  exports["ghmattimysql"]:execute("SELECT items, id FROM bank_users WHERE charidentifier = @charidentifier AND name = @name "
+    , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
+    if result[1].items then
+      local items = {}
+      local inv = json.decode(result[1].items)
+      if not inv then
+        items.itemList = {}
+        items.action = "setSecondInventoryItems"
+        TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
+      else
+        items.itemList = inv
+        items.action = "setSecondInventoryItems"
+        TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
+      end
+    end
+  end)
 end)
 
 RegisterServerEvent("vorp_bank:TakeFromBank") -- inventory system
 AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
   local _source = source
-  if not inprocessing(_source) then 
-    table.insert(processinguser,_source)
+  if not inprocessing(_source) then
+    processinguser[#processinguser + 1] = _source
     local notpass = false
     local User = VorpCore.getUser(_source)
     local Character = User.getUsedCharacter
@@ -203,115 +217,114 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
     local item = data.item
     local itemCount = ToInteger(data["number"])
     local itemType = data.type
-    if itemCount ~= nil and itemCount ~= 0 then
-        if item.count < itemCount then
-            TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
-            return
-            trem(_source)
-        end
-    else
+    if itemCount and itemCount ~= 0 then
+      if item.count < itemCount then
         TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
-        return
-        trem(_source)
+        return trem(_source)
+      end
+    else
+      TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
+      return trem(_source)
     end
     if itemType == "item_weapon" then
-        TriggerEvent("vorpCore:canCarryWeapons", tonumber(_source), itemCount, function(canCarry)
-          if canCarry then
-            exports["ghmattimysql"]:execute("SELECT items FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier,["@name"] = name }, function(result)
-              notpass = true 
-              if result[1] ~= nil then
-                local items = {}
-                local inv = json.decode(result[1].items)
-                local foundItem, foundIndex = nil, nil
-                for k,v in pairs(inv) do 
-                  if v.name == item.name then
-                    foundItem = v
-                    if #foundItem > 1 then 
-                      if k ==1 then 
-                        foundItem = v
-                      end
+      TriggerEvent("vorpCore:canCarryWeapons", tonumber(_source), itemCount, function(canCarry)
+        if canCarry then
+          exports["ghmattimysql"]:execute("SELECT items FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
+            , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
+            notpass = true
+            if result[1] then
+              local items = {}
+              local inv = json.decode(result[1].items)
+              local foundItem, foundIndex = nil, nil
+              for k, v in pairs(inv) do
+                if v.name == item.name then
+                  foundItem = v
+                  if #foundItem > 1 then
+                    if k == 1 then
+                      foundItem = v
                     end
                   end
                 end
-                if foundItem then
-                  local foundIndex2 =  AnIndexOf( inv, foundItem )
-                  foundItem.count = foundItem.count - itemCount
-                  if 0 >= foundItem.count then
-                    table.remove(inv, foundIndex2)
-                  end                              
-                  items.itemList = inv
-                  items.action = "setSecondInventoryItems"
-                  local weapId = foundItem.id
-                  VorpInv.giveWeapon(_source, weapId, 0)
-                  TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
-                  exports["ghmattimysql"]:execute("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name",{["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = name})
-                
-                end        
               end
-              notpass = false 
-            end)
-            while notpass do 
-              Wait(500)
+              if foundItem then
+                local foundIndex2 = AnIndexOf(inv, foundItem)
+                foundItem.count = foundItem.count - itemCount
+                if 0 >= foundItem.count then
+                  table.remove(inv, foundIndex2)
+                end
+                items.itemList = inv
+                items.action = "setSecondInventoryItems"
+                local weapId = foundItem.id
+                VorpInv.giveWeapon(_source, weapId, 0)
+                TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
+                exports["ghmattimysql"]:execute("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name"
+                  , { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = name })
+
+              end
+            end
+            notpass = false
+          end)
+          while notpass do
+            Wait(500)
           end
-          else
-            TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
-          end
+        else
+          TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
+        end
       end)
     else
-      if itemCount ~= nil and itemCount ~= 0 then
+      if itemCount and itemCount ~= 0 then
         if item.count < itemCount then
-            TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
-            return
-            trem(_source)
+          TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
+          return trem(_source)
         end
       else
         TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
-        return
-        trem(_source)
+        return trem(_source)
       end
       local count = VorpInv.getItemCount(_source, item.name)
-      
+
       if (count + itemCount) > item.limit then
-          TriggerClientEvent("vorp:TipRight", _source, Config.language.maxlimit, 5000)
-          return
-          trem(_source)
+        TriggerClientEvent("vorp:TipRight", _source, Config.language.maxlimit, 5000)
+        return trem(_source)
       end
       TriggerEvent("vorpCore:canCarryItems", tonumber(_source), itemCount, function(canCarry)
-        TriggerEvent("vorpCore:canCarryItem", tonumber(_source), item.name,itemCount, function(canCarry2)
+        TriggerEvent("vorpCore:canCarryItem", tonumber(_source), item.name, itemCount, function(canCarry2)
           if canCarry and canCarry2 then
-            exports["ghmattimysql"]:execute("SELECT items FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", {["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
+            exports["ghmattimysql"]:execute("SELECT items FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
+              , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
               notpass = true
-              if result[1] ~= nil then
+              if result[1] then
                 local items = {}
                 local inv = json.decode(result[1].items)
                 local foundItem, foundIndex = nil, nil
-                for k,v in pairs(inv) do 
-                    if v.name == item.name then
-                        foundItem = v
-                    end
+                for k, v in pairs(inv) do
+                  if v.name == item.name then
+                    foundItem = v
+                  end
                 end
                 if foundItem then
-                  local foundIndex2 =  AnIndexOf( inv, foundItem )
+                  local foundIndex2 = AnIndexOf(inv, foundItem)
                   foundItem.count = foundItem.count - itemCount
-                   if 0 >= foundItem.count then
-                      table.remove(inv, foundIndex2)
-                  end  
-                  
+                  if 0 >= foundItem.count then
+                    table.remove(inv, foundIndex2)
+                  end
+
                   items.itemList = inv
                   items.action = "setSecondInventoryItems"
-                  
+
                   VorpInv.addItem(_source, item.name, itemCount)
                   TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
-                  exports["ghmattimysql"]:execute("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name",{["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = name})
-                end        
+                  exports["ghmattimysql"]:execute("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name"
+                    , { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = name })
+                end
               end
               notpass = false
             end)
-            while notpass do 
+            while notpass do
               Wait(500)
             end
           else
-              TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
+            TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
           end
         end)
       end)
@@ -323,9 +336,9 @@ end)
 RegisterServerEvent("vorp_bank:MoveToBank") -- inventory system
 AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
   local _source = source
-  if not inprocessing(_source) then 
-    table.insert(processinguser,_source)
-    local notpass = false 
+  if not inprocessing(_source) then
+    processinguser[#processinguser + 1] = _source
+    local notpass = false
     local User = VorpCore.getUser(_source)
     local Character = User.getUsedCharacter
     local identifier = Character.identifier
@@ -335,63 +348,64 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
     local item = data.item
     local itemCount = ToInteger(data["number"]) -- modificare local itemCount = ToInteger(data["number"])
     local itemType = data["type"]
-    print("CHECK", charidentifier, data, name, item, itemCount, itemType)
+
     if itemType ~= "item_weapon" then
       local countin = VorpInv.getItemCount(_source, item.name)
-      if itemCount > countin then 
-          TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
-          return
-          trem(_source)
+      if itemCount > countin then
+        TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
+        return trem(_source)
       end
     end
     if itemType == "item_weapon" then
-        itemCount = 1
-        item.count = 1
+      itemCount = 1
+      item.count = 1
     end
-    if itemCount ~= nil and itemCount ~= 0 then
-        if item.count < itemCount then
-            TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
-            return
-            trem(_source)
-        end
-    else
+    if itemCount and itemCount ~= 0 then
+      if item.count < itemCount then
         TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
-        return
-        trem(_source)
-    end   
-    exports["ghmattimysql"]:execute("SELECT items, invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier,["@name"] = name }, function(result)
+        return trem(_source)
+      end
+    else
+      TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
+      return trem(_source)
+    end
+    exports["ghmattimysql"]:execute("SELECT items, invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
+      , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
       notpass = true
-      if result[1].items ~= nil then
+      if result[1].items then
         local space = result[1].invspace
         local items = {}
         local sum = 0
         local inv = json.decode(result[1].items)
         local foundItem = nil
-        for k,v in pairs(inv) do 
-            if v.name == item.name then
-                if itemType == "item_standard" then
-                 foundItem = v
-                end
+        for k, v in pairs(inv) do
+          if v.name == item.name then
+            if itemType == "item_standard" then
+              foundItem = v
             end
+          end
         end
-        for k,v in pairs(inv) do
+        for k, v in pairs(inv) do
           sum = sum + v.count
         end
         sum = sum + itemCount
-        if sum > space then 
+        if sum > space then
           TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
         else
           if foundItem then
             foundItem.count = foundItem.count + itemCount
           else
             if itemType == "item_standard" then
-              foundItem = {name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit }
-              table.insert(inv, foundItem)
+              foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit }
+
+              inv[#inv + 1] = foundItem
             else
-              foundItem = {name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit, id = item.id }
-              table.insert(inv, foundItem)
+              foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit,
+                id = item.id }
+
+              inv[#inv + 1] = foundItem
             end
-          
+
           end
           items.itemList = inv
           items.action = "setSecondInventoryItems"
@@ -403,31 +417,34 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
             VorpInv.subWeapon(_source, weapId)
           end
           TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
-          exports["ghmattimysql"]:execute("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name",{["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = name})
-        end 
+          exports["ghmattimysql"]:execute("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name"
+            , { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = name })
+        end
       end
-      notpass = false 
-    end)  
-    while notpass do 
+      notpass = false
+    end)
+    while notpass do
       Wait(500)
     end
-    trem(_source) 
-  end 
-end) 
+    trem(_source)
+  end
+end)
 
-function Discord(title,name,description,location)
-    local logs = ""
-    local webhook = Config.adminwebhook
-    local avatar = Config.webhookavatar
-    local color = 3447003
-    local title = title
-    logs = {
-        {
-            ["color"] = color,
-            ["title"] = title,
-            ["description"] = description,
-            ["footer"] = {["text"]=location}
-        }
+function Discord(title, name, description, location)
+  local logs = ""
+  local webhook = Config.adminwebhook
+  local avatar = Config.webhookavatar
+  local color = 3447003
+  local title = title
+  logs = {
+    {
+      ["color"] = color,
+      ["title"] = title,
+      ["description"] = description,
+      ["footer"] = { ["text"] = location }
     }
-    PerformHttpRequest(webhook, function(err, text, headers) end, 'POST', json.encode({["username"] = name ,["avatar_url"] = avatar ,embeds = logs}), { ['Content-Type'] = 'application/json' })
+  }
+  PerformHttpRequest(webhook, function(err, text, headers) end, 'POST',
+    json.encode({ ["username"] = name, ["avatar_url"] = avatar, embeds = logs }),
+    { ['Content-Type'] = 'application/json' })
 end
