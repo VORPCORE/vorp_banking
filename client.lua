@@ -195,7 +195,16 @@ function Openbank(bankName)
             inmenu = false
         end
         if (data.current.value == 'upitem') then
-            TriggerServerEvent("vorp_bank:UpgradeSafeBox", bank, bankinfo.invspace)
+            local invspace = bankinfo.invspace
+            TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
+                local amount = tonumber(cb)
+                if amount and amount > 0 then
+                    TriggerServerEvent("vorp_bank:UpgradeSafeBox", amount, bank, invspace)
+                else
+                    TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
+                    inmenu = false
+                end
+            end)
             MenuData.CloseAll()
             bankinfo = nil
             ClearPedTasks(PlayerPedId())
