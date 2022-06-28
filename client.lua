@@ -127,7 +127,7 @@ Citizen.CreateThread(function()
             for index, bankConfig in pairs(Config.banks) do
                 if bankConfig.StoreHoursAllowed then
 
-                    if hour >= bankConfig.StoreClose then
+                    if hour >= bankConfig.StoreClose or hour <= bankConfig.StoreOpen then
                         if Config.banks[index].BlipHandle then
                             RemoveBlip(Config.banks[index].BlipHandle)
                             Config.banks[index].BlipHandle = nil
