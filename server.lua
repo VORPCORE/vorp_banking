@@ -25,27 +25,25 @@ AddEventHandler('vorp_bank:getinfo', function(name)
       invspac = result[1].invspace
     else
       local Parameters = { ['name'] = name, ['identifier'] = identifier, ['charidentifier'] = charidentifier,
-        ['money'] = money, ['gold'] = gold, ['invspace'] = invspac }
+        ['money'] = money, ['gold'] = gold, ['invspace'] = invspace }
       exports.ghmattimysql:execute("INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)"
         , Parameters)
     end
-    local bankinfo = { money = money, gold = gold, invspace = invspac }
+    local bankinfo = { money = money, gold = gold, invspace = invspace, name = name }
     TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo)
   end)
 end)
 
-
 RegisterServerEvent('vorp_bank:UpgradeSafeBox')
-AddEventHandler('vorp_bank:UpgradeSafeBox', function(amount, name, invspac)
+AddEventHandler('vorp_bank:UpgradeSafeBox', function(costlot, maxslots, amount, name, invspac)
   local _source = source
   local Character = VorpCore.getUser(_source).getUsedCharacter
   local charidentifier = Character.charIdentifier
-  local money = Character.money - Config.CostSlot
+  local money = Character.money - costlot
   local nextslot = invspac + amount
   if money >= 0 then
-   
-    if nextslot <= Config.MaxSlots then
-      Character.removeCurrency(0, Config.CostSlot)
+    if nextslot <= maxslots then
+      Character.removeCurrency(0, costlot)
       exports["ghmattimysql"]:execute("SELECT invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
         , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
         local Parameters = { ['charidentifier'] = charidentifier, ['invspace'] = amount, ['name'] = name }
@@ -53,13 +51,12 @@ AddEventHandler('vorp_bank:UpgradeSafeBox', function(amount, name, invspac)
           , Parameters)
       end)
       TriggerClientEvent("vorp:TipRight", _source,
-        Config.language.success .. (Config.CostSlot * amount) .. " | " .. nextslot .. " / " .. Config.MaxSlots, 10000)
+        Config.language.success .. (costlot * amount) .. " | " .. nextslot .. " / " .. maxslots, 10000)
     else
       TriggerClientEvent("vorp:TipRight", _source,
-        Config.language.maxslots .. " | " .. invspac .. " / " .. Config.MaxSlots, 10000)
+        Config.language.maxslots .. " | " .. invspac .. " / " .. maxslots, 10000)
     end
   else
-
     TriggerClientEvent("vorp:TipRight", _source, Config.language.nomoney, 10000)
   end
 end)
