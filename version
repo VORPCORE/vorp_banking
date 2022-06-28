@@ -1,1 +1,7 @@
-<1.0>
+<1.2>
+- added npcs will be removed if banks are closed
+- added blips will remove if banks are closed
+- better config file
+- added opening hours and closing for each store
+- update all files
+<1.1>
