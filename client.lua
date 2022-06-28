@@ -88,7 +88,7 @@ function PromptSetUp()
 end
 
 function PromptSetUp2()
-    local str = "SubPrompt"
+    local str = "Closed"
     CloseBanks = PromptRegisterBegin()
     PromptSetControlAction(CloseBanks, Config.Key)
     str = CreateVarString(10, 'LITERAL_STRING', str)
@@ -145,13 +145,13 @@ Citizen.CreateThread(function()
                             sleep = false
 
                             local label2 = CreateVarString(10, 'LITERAL_STRING',
-                                "closed" .. bankConfig.StoreOpen .. "am" .. bankConfig.StoreClose .. "pm")
+                                "Opening Hours " .. bankConfig.StoreOpen .. "am - " .. bankConfig.StoreClose .. "pm")
                             PromptSetActiveGroupThisFrame(PromptGroup2, label2)
 
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, CloseBanks) then
                                 Wait(100)
                                 TriggerEvent("vorp:TipRight",
-                                    "closed" .. bankConfig.StoreOpen .. "am" .. bankConfig.StoreClose .. "pm", 3000)
+                                    "The bank is currently closed", 5000)
                             end
                         end
 
