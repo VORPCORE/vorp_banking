@@ -9,6 +9,7 @@ local invspace = 10
 
 RegisterServerEvent('vorp_bank:getinfo')
 AddEventHandler('vorp_bank:getinfo', function(name)
+
   local _source = source
   local Character = VorpCore.getUser(_source).getUsedCharacter
   local charidentifier = Character.charIdentifier
@@ -18,18 +19,20 @@ AddEventHandler('vorp_bank:getinfo', function(name)
     , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
     local money = 0
     local gold = 0
-    invspac = 0
+    invspace = 0
     if result[1] then
       money = result[1].money
       gold = result[1].gold
-      invspac = result[1].invspace
+      invspace = result[1].invspace
     else
       local Parameters = { ['name'] = name, ['identifier'] = identifier, ['charidentifier'] = charidentifier,
         ['money'] = money, ['gold'] = gold, ['invspace'] = invspace }
       exports.ghmattimysql:execute("INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)"
         , Parameters)
     end
+
     local bankinfo = { money = money, gold = gold, invspace = invspace, name = name }
+
     TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo)
   end)
 end)
