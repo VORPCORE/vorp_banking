@@ -40,16 +40,21 @@ AddEventHandler('vorp_bank:UpgradeSafeBox', function(name, invspace)
   local Character = VorpCore.getUser(_source).getUsedCharacter
   local charidentifier = Character.charIdentifier
   local money = Character.money - Config.CostSlot
+  local nextslot = invspace + Config.UpSlot
   if money >= 0 then 
-    Character.removeCurrency(0, Config.CostSlot)
-    TriggerClientEvent("vorp:TipRight", _source, Config.language.success, 10000)
-    exports["ghmattimysql"]:execute("SELECT invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
-      , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
-      local amount = Config.UpSlot
-      local Parameters = { ['charidentifier'] = charidentifier, ['invspace'] = amount, ['name'] = name }
-      exports.ghmattimysql:execute("UPDATE bank_users Set invspace=invspace+@invspace WHERE charidentifier=@charidentifier AND name = @name"
-      , Parameters)
-    end)
+    if nextslot <= Config.MaxSlots then
+      Character.removeCurrency(0, Config.CostSlot)
+      exports["ghmattimysql"]:execute("SELECT invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
+        , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
+        local amount = Config.UpSlot
+        local Parameters = { ['charidentifier'] = charidentifier, ['invspace'] = amount, ['name'] = name }
+        exports.ghmattimysql:execute("UPDATE bank_users Set invspace=invspace+@invspace WHERE charidentifier=@charidentifier AND name = @name"
+        , Parameters)
+      end)
+      TriggerClientEvent("vorp:TipRight", _source, Config.language.success .. " | " .. nextslot .. " / " .. Config.MaxSlots, 10000)
+    else
+      TriggerClientEvent("vorp:TipRight", _source, Config.language.maxslots .. " | " .. invspace .. " / " .. Config.MaxSlots, 10000)
+    end
   else
     TriggerClientEvent("vorp:TipRight", _source, Config.language.nomoney, 10000)
   end
