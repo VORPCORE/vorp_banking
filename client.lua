@@ -230,20 +230,25 @@ function Openbank(bankName)
     local elements = {
         { label = Config.language.cashbalance .. bankinfo.money, value = 'nothing', desc = Config.language.cashbalance2 },
         { label = Config.language.depocash, value = 'dcash', desc = Config.language.depocash2 },
-        { label = Config.language.takecash, value = 'wcash', desc = Config.language.takecash2 },
-        { label = Config.language.depoitem, value = 'bitem', desc = Config.language.depoitem2 .. bankinfo.invspace },
-        { label = Config.language.upgradeitem, value = 'upitem', desc = Config.language.upgradeitem2 }
-
+        { label = Config.language.takecash, value = 'wcash', desc = Config.language.takecash2 }
     }
-    if Config.gold then
-        elements[#elements + 1] = { label = Config.language.goldbalance .. bankinfo.gold, value = 'nothing',
-            desc = Config.language.cashbalance2 }
-        elements[#elements + 1] = { label = Config.language.depogold, value = 'dgold', desc = Config.language.depogold2 }
-        elements[#elements + 1] = { label = Config.language.takegold, value = 'wgold', desc = Config.language.takegold2 }
+    for index, bankConfig in pairs(Config.banks) do
+        if bankConfig.name == bankName then
+            if bankConfig.items then 
+                elements[#elements + 1] = { label = Config.language.depoitem, value = 'bitem', desc = Config.language.depoitem2 .. bankinfo.invspace }
+            end
+            if bankConfig.upgrade then 
+                elements[#elements + 1] = { label = Config.language.upgradeitem, value = 'upitem', desc = Config.language.upgradeitem2 .. bankConfig.costslot }
+            end
+            if bankConfig.gold then
+                elements[#elements + 1] = { label = Config.language.goldbalance .. bankinfo.gold, value = 'nothing',
+                    desc = Config.language.cashbalance2 }
+                elements[#elements + 1] = { label = Config.language.depogold, value = 'dgold', desc = Config.language.depogold2 }
+                elements[#elements + 1] = { label = Config.language.takegold, value = 'wgold', desc = Config.language.takegold2 }
+            end
+        end
     end
-
-
-
+    
     MenuData.Open('default', GetCurrentResourceName(), 'menuapi',
         {
             title    = bankName,
@@ -317,27 +322,32 @@ function Openbank(bankName)
                 inmenu = false
             end
             if (data.current.value == 'upitem') then
+                for index, bankConfig in pairs(Config.banks) do
+                    if bankConfig.name == bankName then
 
-                local invspace = bankinfo.invspace
+                        local invspace = bankinfo.invspace
+                        local maxslots = bankConfig.maxslots
+                        local costslot = bankConfig.costslot
 
-                TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
-                    local amount = tonumber(cb)
-                    if amount and amount > 0 then
-                        TriggerServerEvent("vorp_bank:UpgradeSafeBox", amount, bank, invspace)
-                    else
-                        TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
-                        inmenu = false
+                        TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
+                            local amount = tonumber(cb)
+                            if amount and amount > 0 then
+                                TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, amount, bank, invspace)
+                            else
+                                TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
+                                inmenu = false
+                            end
+                        end)
 
                     end
-
-                end)
+                end
                 MenuData.CloseAll()
                 bankinfo = nil
                 ClearPedTasks(PlayerPedId())
                 inmenu = false
             end
         end,
-        function(data, menu)
-            menu.close()
-        end)
+    function(data, menu)
+        menu.close()
+    end) 
 end
