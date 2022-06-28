@@ -11,10 +11,8 @@ Config.adminwebhook = ""
 Config.webhookavatar = "https://www.pngmart.com/files/5/Bank-PNG-Transparent-Picture.png"
 Config.gold = true
 
-Config.UpSlot   = 5 -- CHANGE SPACE FOR EVERY UPGRADE
-Config.CostSlot = 10 -- COST FOR UPGRADE SLOT (Config.invspace + Config.UpSlot = Config.invspace)
-Config.MaxSlots = 100 -- MAX SLOT FOR UPDATE (Better multiply of Config.UpSlot)
-
+Config.CostSlot = 10 -- COST FOR UPGRADE SLOT + 1
+Config.MaxSlots = 100 -- MAX SLOT FOR UPDATE
 Config.keys = {
     G = 0x760A9C6F,
 }
@@ -51,8 +49,8 @@ Config.language = {
     limit = "You cannot carry other items",
     maxlimit = "You have reached the max of the item",
     upgradeitem = "Upgrade Slot Safe Box",
-    upgradeitem2 = "Cost for " .. Config.UpSlot .. " slots: " .. Config.CostSlot .. " $",
+    upgradeitem2 = "Cost for upgrade slots: " .. Config.CostSlot .. " $/each",
     nomoney = "You haven't money",
-    success = "You upgraded Safe Box by paying " .. Config.CostSlot .. " $",
+    success = "You upgraded Safe Box by paying $ ",
     maxslots = "You have reached the maximum slots: "
 }
