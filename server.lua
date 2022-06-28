@@ -5,7 +5,7 @@ end)
 
 local VorpInv = exports.vorp_inventory:vorp_inventoryApi()
 
-local invspace = 8 -- DON'T TOUCH IF YOU DON'T KNOW WHAT YOU DOING
+local invspace = 10
 
 RegisterServerEvent('vorp_bank:getinfo')
 AddEventHandler('vorp_bank:getinfo', function(name)
@@ -18,43 +18,48 @@ AddEventHandler('vorp_bank:getinfo', function(name)
     , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
     local money = 0
     local gold = 0
-    local invspace = 0
+    invspac = 0
     if result[1] then
       money = result[1].money
       gold = result[1].gold
-      invspace = result[1].invspace
+      invspac = result[1].invspace
     else
       local Parameters = { ['name'] = name, ['identifier'] = identifier, ['charidentifier'] = charidentifier,
-        ['money'] = money, ['gold'] = gold, ['invspace'] = invspace }
+        ['money'] = money, ['gold'] = gold, ['invspace'] = invspac }
       exports.ghmattimysql:execute("INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)"
         , Parameters)
     end
-    local bankinfo = { money = money, gold = gold, invspace = invspace}
+    local bankinfo = { money = money, gold = gold, invspace = invspac }
     TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo)
   end)
 end)
 
+
 RegisterServerEvent('vorp_bank:UpgradeSafeBox')
-AddEventHandler('vorp_bank:UpgradeSafeBox', function(amount, name, invspace)
+AddEventHandler('vorp_bank:UpgradeSafeBox', function(amount, name, invspac)
   local _source = source
   local Character = VorpCore.getUser(_source).getUsedCharacter
   local charidentifier = Character.charIdentifier
   local money = Character.money - Config.CostSlot
-  local nextslot = invspace + amount
-  if money >= 0 then 
+  local nextslot = invspac + amount
+  if money >= 0 then
+   
     if nextslot <= Config.MaxSlots then
       Character.removeCurrency(0, Config.CostSlot)
       exports["ghmattimysql"]:execute("SELECT invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
         , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
         local Parameters = { ['charidentifier'] = charidentifier, ['invspace'] = amount, ['name'] = name }
         exports.ghmattimysql:execute("UPDATE bank_users Set invspace=invspace+@invspace WHERE charidentifier=@charidentifier AND name = @name"
-        , Parameters)
+          , Parameters)
       end)
-      TriggerClientEvent("vorp:TipRight", _source, Config.language.success .. (Config.CostSlot * amount) .. " | " .. nextslot .. " / " .. Config.MaxSlots, 10000)
+      TriggerClientEvent("vorp:TipRight", _source,
+        Config.language.success .. (Config.CostSlot * amount) .. " | " .. nextslot .. " / " .. Config.MaxSlots, 10000)
     else
-      TriggerClientEvent("vorp:TipRight", _source, Config.language.maxslots .. " | " .. invspace .. " / " .. Config.MaxSlots, 10000)
+      TriggerClientEvent("vorp:TipRight", _source,
+        Config.language.maxslots .. " | " .. invspac .. " / " .. Config.MaxSlots, 10000)
     end
   else
+
     TriggerClientEvent("vorp:TipRight", _source, Config.language.nomoney, 10000)
   end
 end)

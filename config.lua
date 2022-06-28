@@ -1,22 +1,82 @@
 Config = {}
 
 Config.banks = {
-    { name = "Valentine Bank", x = -308.50, y = 776.24, z = 118.75, city = "Valentine", blipsprite = -2128054417 },
-    { name = "Blackwater Bank", x = -813.18, y = -1277.60, z = 43.68, city = "Blackwater", blipsprite = -2128054417 },
-    { name = "Saint Denis Bank", x = 2644.08, y = -1292.21, z = 52.29, city = "Saint Denis", blipsprite = -2128054417 },
-    { name = "Rhodes Bank", x = 1294.14, y = -1303.06, z = 77.04, city = "Rhodes", blipsprite = -2128054417 },
+    valentine = {
+        name = "Valentine Bank",
+        x = -308.50, y = 776.24, z = 118.75,
+        city = "Valentine",
+        blipsprite = -2128054417,
+        blipAllowed = true,
+        NpcAllowed = true,
+        NpcModel = "S_M_M_BankClerk_01",
+        Nx = -308.02, Ny = 773.82, Nz = 116.7, Nh = 18.69, --npc positions {x = -308.02, y = 773.82, z = 118.7}
+        StoreHoursAllowed = true,
+        StoreOpen = 7, -- am
+        StoreClose = 22, -- pm
+        distOpen = 1.5,
+
+
+    },
+    Blackwater = {
+        name = "Blackwater Bank",
+        x = -813.18, y = -1277.60,
+        z = 43.68,
+        city = "Blackwater",
+        blipsprite = -2128054417,
+        blipAllowed = true,
+        NpcAllowed = true,
+        NpcModel = "S_M_M_BankClerk_01",
+        Nx = -813.18, Ny = -1275.42, Nz = 42.64, Nh = 176.86, --npc positions
+        StoreHoursAllowed = true,
+        StoreOpen = 7, -- am
+        StoreClose = 21, -- pm
+        distOpen = 1.5,
+
+    },
+    STdenis = {
+        name = "Saint Denis Bank",
+        x = 2644.08, y = -1292.21, z = 52.29,
+        city = "Saint Denis",
+        blipsprite = -2128054417,
+        blipAllowed = true,
+        NpcAllowed = true,
+        NpcModel = "S_M_M_BankClerk_01",
+        Nx = 2645.12, Ny = -1294.37, Nz = 51.25, Nh = 30.64, --npc positions
+        StoreHoursAllowed = true,
+        StoreOpen = 7, -- am
+        StoreClose = 23, -- pm
+        distOpen = 1.5,
+
+    },
+    Rhodes = {
+        name = "Rhodes Bank",
+        x = 1294.14, y = -1303.06, z = 77.04,
+        city = "Rhodes",
+        blipsprite = -2128054417,
+        blipAllowed = true,
+        NpcAllowed = true,
+        NpcModel = "S_M_M_BankClerk_01",
+        Nx = 1292.84, Ny = -1304.74, Nz = 76.04, Nh = 327.08, --npc positions
+        StoreHoursAllowed = true,
+        StoreOpen = 7, -- am
+        StoreClose = 21, -- pm
+        distOpen = 1.5,
+
+    },
 }
 
-Config.adminwebhook = ""
+
+
+Config.adminwebhook  = ""
 Config.webhookavatar = "https://www.pngmart.com/files/5/Bank-PNG-Transparent-Picture.png"
-Config.gold = true
 
-Config.CostSlot = 10 -- COST FOR UPGRADE SLOT + 1
-Config.MaxSlots = 100 -- MAX SLOT FOR UPDATE
-Config.keys = {
-    G = 0x760A9C6F,
-}
+Config.gold = true -->> this will be moved for each bank
+Config.Key  = 0x760A9C6F --[G]
 
+Config.MaxSlots = 100
+Config.CostSlot = 10
+
+-- this needs to be moved for langs folder
 Config.language = {
     openmenu = "Menu",
     bank = "Bank",
@@ -49,8 +109,8 @@ Config.language = {
     limit = "You cannot carry other items",
     maxlimit = "You have reached the max of the item",
     upgradeitem = "Upgrade Slot Safe Box",
-    upgradeitem2 = "Cost for upgrade slots: " .. Config.CostSlot .. " $/each",
-    nomoney = "You haven't money",
-    success = "You upgraded Safe Box by paying $ ",
+    upgradeitem2 = "Cost for upgrade slots: ",
+    nomoney = "You dont have money",
+    success = "You upgraded Safe Box by paying " .. Config.CostSlot .. " $each",
     maxslots = "You have reached the maximum slots: "
 }
