@@ -42,11 +42,12 @@ AddEventHandler('vorp_bank:UpgradeSafeBox', function(costlot, maxslots, amount, 
   local _source = source
   local Character = VorpCore.getUser(_source).getUsedCharacter
   local charidentifier = Character.charIdentifier
-  local money = Character.money - costlot
+  local money = Character.money 
+  local amountToPay = costlot * amount
   local nextslot = invspac + amount
-  if money >= 0 then
+  if money >= amountToPay then
     if nextslot <= maxslots then
-      Character.removeCurrency(0, costlot)
+      Character.removeCurrency(0, amountToPay)
       exports["ghmattimysql"]:execute("SELECT invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
         , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
         local Parameters = { ['charidentifier'] = charidentifier, ['invspace'] = amount, ['name'] = name }
