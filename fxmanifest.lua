@@ -6,15 +6,17 @@ author 'VORP edit by RobiZona#0001'
 description 'Bank system VORP'
 
 shared_scripts {
+    'language.lua',
+    'languages/*.lua',
     'config.lua'
-  }
+}
 
 server_scripts {
     'server.lua'
 }
 
 client_scripts {
-	'client.lua'
+    'client.lua'
 }
 
 --dont touch
