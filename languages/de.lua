@@ -13,6 +13,7 @@ Languages["de"] = {
     depocash2 = "Zahle Geld auf dein Konto ein",
     takegold2 = "Gold von deinem Konto auszahlen",
     depogold2 = "Zahle Gold auf dein Konto ein",
+    depoitem = "Benutzen Sie deinem Bankschließfach",
     depoitem2 = "Stauraum im Bankschließfach: ",
     confirm = "Bestätigen",
     amount = "Menge",
