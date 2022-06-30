@@ -38,6 +38,6 @@ Languages["fr"] = {
     depoitem3 = "Vous avez déposé ",
     of        = " de ",
     withitem = "Vous avez retiré ",
-    cant = "Vous ne pouvez pas déposer cet article"
+    cant = "Vous ne pouvez pas déposer cet article",
     closed = "The bank is currently closed"
 }
