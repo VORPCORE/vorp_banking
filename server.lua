@@ -390,6 +390,23 @@ function checkLimite(limit, nameitem)
   end
 end
 
+function checkDB(inv, itemName, itemType)
+  for k, v in pairs(inv) do
+    if v.name == itemName then
+      if itemType == "item_standard" then 
+        return v.count -- da quanti item c erano prima del deposito
+      else
+        for index, data in pairs(inv) do 
+          if v.name == itemName and itemType == "item_weapon" then 
+            count = count + 1
+            return count
+          end
+        end
+      end
+    end
+  end
+end
+
 RegisterServerEvent("vorp_bank:MoveToBank") -- inventory system
 AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
   local _source = source
@@ -405,28 +422,30 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
     local item = data.item
     local itemCount = ToInteger(data["number"])
     local itemType = data["type"]
+    local itemDBCount = 1
 
     for index, bankConfig in pairs(Config.banks) do
       if bankConfig.city == bankName then
-        local existItem = checkLimit(bankConfig.itemlimit, item.name)
-        if existItem then                                                                          
+        local existItem = checkLimit(bankConfig.itemlist, item.name)
+        if (existItem and bankConfig.useitemlimit) or (existItem and bankConfig.usespecificitem) then                        
           exports["ghmattimysql"]:execute("SELECT items FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
-            local itemDBCount = 0
             if result[1].items ~= "[]" then
               local inv = json.decode(result[1].items) 
-              for _, k in pairs(inv) do
-                if k.name == item.name then
-                  itemDBCount = k.count + itemCount
-                else
-                  itemDBCount = itemCount
+              for k, v in pairs(inv) do
+                if v.name == item.name then
+                  if itemType == "item_standard" then 
+                    itemDBCount = v.count + itemCount
+                  elseif itemType == "item_weapon" then 
+                    itemDBCount = itemDBCount + itemCount
+                  end
                 end
               end
             else
               itemDBCount = itemCount
             end 
-            local checkCount = checkCount(itemCount, itemDBCount, bankConfig.itemlimit, item.name)
+            local checkCount = checkCount(itemCount, itemDBCount, bankConfig.itemlist, item.name)
             if checkCount then
-              local limite = checkLimite(bankConfig.itemlimit, item.name)
+              local limite = checkLimite(bankConfig.itemlist, item.name)
               TriggerClientEvent("vorp:TipRight", _source, Config.language.maxitems .. limite, 5000)
               return trem(_source)
             else
@@ -508,7 +527,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
               trem(_source)
             end  
           end)
-        else                                                                                
+        elseif (bankConfig.useitemlimit and not bankConfig.usespecificitem) or (not bankConfig.useitemlimit and not bankConfig.usespecificitem) then                                                                                
           if itemType ~= "item_weapon" then
             local countin = VorpInv.getItemCount(_source, item.name)
             if itemCount > countin then
@@ -587,6 +606,9 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
           while notpass do
             Wait(500)
           end
+          trem(_source)
+        else
+          TriggerClientEvent("vorp:TipRight", _source, Config.language.cant, 5000)
           trem(_source)
         end
       end 

@@ -37,5 +37,6 @@ Languages["en"] = {
     maxitems = "The limit for this item is: ",
     depoitem3 = "You have deposited ",
     of        = " of ", 
-    withitem = "You have withdrawn "
+    withitem = "You have withdrawn ",
+    cant = "You cant deposit this item"
 }
