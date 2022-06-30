@@ -22,9 +22,10 @@ Config.banks = {
         costslot = 10, -- choose price for upgrade + 1 slot
         maxslots = 100, -- choose max slots for upgrade
 
-        --------------------- ONLY 1 MUST BE TRUE or ALL 2 FALSE(no limits in bank)
-        useitemlimit = false, -- if TRUE limit only items above
-        usespecificitem = false, -- if TRUE deposit only items above
+        --------------------- 
+        --ONLY ONE CAN BE TRUE 
+        useitemlimit = false, -- if TRUE you can store any items and the items in the list will have a limit. can be weapons too if false will use without limit and you can ignore the list
+        usespecificitem = false, -- if TRUE only the items in the list will work any other items not in the list wont be able to store in the safebox SET THE ABOVE TO FALSE
         -----------------------------------------
 
         itemlist = { 
