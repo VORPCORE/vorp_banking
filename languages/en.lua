@@ -38,5 +38,6 @@ Languages["en"] = {
     depoitem3 = "You have deposited ",
     of        = " of ", 
     withitem = "You have withdrawn ",
-    cant = "You cant deposit this item"
+    cant = "You cant deposit this item",
+    closed = "The bank is currently closed"
 }

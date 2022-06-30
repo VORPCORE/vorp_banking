@@ -150,7 +150,7 @@ Citizen.CreateThread(function()
 
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, CloseBanks) then
                                 Wait(100)
-                                TriggerEvent("vorp:TipRight", "The bank is currently closed", 5000)
+                                TriggerEvent("vorp:TipRight", Config.language.closed, 6000)
                             end
                         end
 

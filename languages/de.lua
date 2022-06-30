@@ -37,5 +37,7 @@ Languages["de"] = {
     maxitems = "Das Limit für diesen Gegenstand wurde erreicht: ",
     depoitem3 = "Du hast eingelagert ",
     of        = " von ", 
-    withitem = "Du hast rausgenommen "
+    withitem = "Du hast rausgenommen ",
+    cant = "Du kannst diesen Gegenstand hier nicht einlagern",
+    closed = "Die Bank ist aktuell geschlossen"
 }
