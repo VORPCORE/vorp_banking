@@ -37,5 +37,6 @@ Languages["nl"] = {
     maxitems = "Het limiet voor dit voorwerp is: ",
     depoitem3 = "Je hebt gestort: ",
     of        = "x ", 
-    withitem = "Je hebt opgenomen: "
+    withitem = "Je hebt opgenomen: ",
+    closed = "The bank is currently closed"
 }
