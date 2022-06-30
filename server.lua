@@ -364,6 +364,32 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
   end
 end)
 
+function checkLimit(limit, name)
+  for k, v in pairs(limit) do
+    if k == name then 
+      return true 
+    end
+  end
+end
+
+function checkCount(countinv, countdb, limit, nameitem)
+  for k, v in pairs(limit) do
+    if k == nameitem then 
+      if countinv > v or countdb > v then 
+        return true 
+      end
+    end
+  end
+end
+
+function checkLimite(limit, nameitem)
+  for index, countConfig in pairs(limit) do
+    if index == nameitem then
+      return countConfig
+    end
+  end
+end
+
 RegisterServerEvent("vorp_bank:MoveToBank") -- inventory system
 AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
   local _source = source
@@ -375,89 +401,196 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
     local identifier = Character.identifier
     local charidentifier = Character.charIdentifier
     local data = json.decode(jsonData)
-    local name = data["bank"]
+    local bankName = data["bank"]
     local item = data.item
-    local itemCount = ToInteger(data["number"]) -- modificare local itemCount = ToInteger(data["number"])
+    local itemCount = ToInteger(data["number"])
     local itemType = data["type"]
 
-    if itemType ~= "item_weapon" then
-      local countin = VorpInv.getItemCount(_source, item.name)
-      if itemCount > countin then
-        TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
-        return trem(_source)
-      end
-    end
-    if itemType == "item_weapon" then
-      itemCount = 1
-      item.count = 1
-    end
-    if itemCount and itemCount ~= 0 then
-      if item.count < itemCount then
-        TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
-        return trem(_source)
-      end
-    else
-      TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
-      return trem(_source)
-    end
-    exports["ghmattimysql"]:execute("SELECT items, invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
-      , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
-      notpass = true
-      if result[1].items then
-        local space = result[1].invspace
-        local items = {}
-        local sum = 0
-        local inv = json.decode(result[1].items)
-        local foundItem = nil
-        for k, v in pairs(inv) do
-          if v.name == item.name then
-            if itemType == "item_standard" then
-              foundItem = v
-            end
-          end
-        end
-        for k, v in pairs(inv) do
-          sum = sum + v.count
-        end
-        sum = sum + itemCount
-        if sum > space then
-          TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
-        else
-          if foundItem then
-            foundItem.count = foundItem.count + itemCount
-          else
-            if itemType == "item_standard" then
-              foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit }
-
-              inv[#inv + 1] = foundItem
+    for index, bankConfig in pairs(Config.banks) do
+      if bankConfig.city == bankName then
+        local existItem = checkLimit(bankConfig.itemlimit, item.name)
+        if existItem then                                                                          
+          exports["ghmattimysql"]:execute("SELECT items FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
+            local itemDBCount = 0
+            if result[1].items ~= "[]" then
+              local inv = json.decode(result[1].items) 
+              for _, k in pairs(inv) do
+                if k.name == item.name then
+                  itemDBCount = k.count + itemCount
+                else
+                  itemDBCount = itemCount
+                end
+              end
             else
-              foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit,
-                id = item.id }
+              itemDBCount = itemCount
+            end 
+            local checkCount = checkCount(itemCount, itemDBCount, bankConfig.itemlimit, item.name)
+            if checkCount then
+              local limite = checkLimite(bankConfig.itemlimit, item.name)
+              TriggerClientEvent("vorp:TipRight", _source, Config.language.maxitems .. limite, 5000)
+              return trem(_source)
+            else
+              if itemType ~= "item_weapon" then
+                local countin = VorpInv.getItemCount(_source, item.name)
+                if itemCount > countin then
+                  TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
+                  return trem(_source)
+                end
+              end
+              if itemType == "item_weapon" then
+                itemCount = 1
+                item.count = 1
+              end
+              if itemCount and itemCount ~= 0 then
+                if item.count < itemCount then
+                  TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
+                  return trem(_source)
+                end
+              else
+                TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
+                return trem(_source)
+              end
+              exports["ghmattimysql"]:execute("SELECT items, invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
+                notpass = true
+                if result[1].items then
+                  local space = result[1].invspace
+                  local items = {}
+                  local countDB = 0
+                  local inv = json.decode(result[1].items)
+                  local foundItem = nil
+                  for _, k in pairs(inv) do
+                    if k.name == item.name then
+                      if itemType == "item_standard" then
+                        foundItem = k
+                      end
+                    end
+                  end
+                  for _, k in pairs(inv) do
+                    countDB = countDB + k.count
+                  end
+                  countDB = countDB + itemCount
+                  if countDB > space then
+                    TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
+                  else
+                    if foundItem then
+                      foundItem.count = foundItem.count + itemCount
+                    else
+                      if itemType == "item_standard" then
+                        foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit }
 
-              inv[#inv + 1] = foundItem
+                        inv[#inv + 1] = foundItem
+                      else
+                        foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit, id = item.id }
+
+                        inv[#inv + 1] = foundItem
+                      end
+                    end
+                    items.itemList = inv
+                    items.action = "setSecondInventoryItems"
+                    if itemType == "item_standard" then
+                      VorpInv.subItem(_source, item.name, itemCount)
+                      TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. itemCount .. Config.language.of .. item.name, 5000)
+                    end
+                    if itemType == "item_weapon" then
+                      local weapId = item.id
+                      VorpInv.subWeapon(_source, weapId)
+                      TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. item.name, 5000)
+                    end
+                    TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
+                    exports["ghmattimysql"]:execute("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name", { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = bankName })
+                  end
+                end
+                notpass = false
+              end)
+              while notpass do
+              Wait(500)
+              end
+              trem(_source)
+            end  
+          end)
+        else                                                                                
+          if itemType ~= "item_weapon" then
+            local countin = VorpInv.getItemCount(_source, item.name)
+            if itemCount > countin then
+              TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
+              return trem(_source)
             end
-
-          end
-          items.itemList = inv
-          items.action = "setSecondInventoryItems"
-          if itemType == "item_standard" then
-            VorpInv.subItem(_source, item.name, itemCount)
           end
           if itemType == "item_weapon" then
-            local weapId = item.id
-            VorpInv.subWeapon(_source, weapId)
+            itemCount = 1
+            item.count = 1
           end
-          TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
-          exports["ghmattimysql"]:execute("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name"
-            , { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = name })
+          if itemCount and itemCount ~= 0 then
+            if item.count < itemCount then
+              TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
+              return trem(_source)
+            end
+          else
+            TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
+            return trem(_source)
+          end
+          exports["ghmattimysql"]:execute("SELECT items, invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
+            , { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
+            notpass = true
+            if result[1].items then
+              local space = result[1].invspace
+              local items = {}
+              local countDB = 0
+              local inv = json.decode(result[1].items)
+              local foundItem = nil
+              for k, v in pairs(inv) do
+                if v.name == item.name then
+                  if itemType == "item_standard" then
+                    foundItem = v
+                  end
+                end
+              end
+              for k, v in pairs(inv) do
+                countDB = countDB + v.count
+              end
+              countDB = countDB + itemCount
+              if countDB > space then
+                TriggerClientEvent("vorp:TipRight", _source, Config.language.limit, 5000)
+              else
+                if foundItem then
+                  foundItem.count = foundItem.count + itemCount
+                else
+                  if itemType == "item_standard" then
+                    foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit }
+      
+                    inv[#inv + 1] = foundItem
+                  else
+                    foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit,
+                      id = item.id }
+      
+                    inv[#inv + 1] = foundItem
+                  end
+                end
+                items.itemList = inv
+                items.action = "setSecondInventoryItems"
+                if itemType == "item_standard" then
+                  VorpInv.subItem(_source, item.name, itemCount)
+                  TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. itemCount .. Config.language.of .. item.name, 5000)
+                end
+                if itemType == "item_weapon" then
+                  local weapId = item.id
+                  VorpInv.subWeapon(_source, weapId)
+                  TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. item.name, 5000)
+                end
+                TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
+                exports["ghmattimysql"]:execute("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name"
+                  , { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = bankName })
+              end
+            end
+            notpass = false
+          end)
+          while notpass do
+            Wait(500)
+          end
+          trem(_source)
         end
-      end
-      notpass = false
-    end)
-    while notpass do
-      Wait(500)
+      end 
     end
-    trem(_source)
   end
 end)
 
