@@ -37,5 +37,6 @@ Languages["fr"] = {
     maxitems = "La limite pour cet article est: ",
     depoitem3 = "Vous avez déposé ",
     of        = " de ",
-    withitem = "Vous avez retiré "
+    withitem = "Vous avez retiré ",
+    cant = "Vous ne pouvez pas déposer cet article"
 }
