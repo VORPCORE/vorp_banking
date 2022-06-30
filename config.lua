@@ -19,12 +19,10 @@ Config.banks = {
         upgrade = true, -- if you want upgrade safebox
         costslot = 10, -- choose price for upgrade + 1 slot
         maxslots = 100, -- choose max slots for upgrade
-
         itemlimit = { -- (nameitem = limit) you can add other items for each bank
             ammorevolvernormal = 1,
             WEAPON_MELEE_KNIFE = 1
         },
-
 
     },
     Blackwater = {
@@ -102,8 +100,6 @@ Config.banks = {
     },
 }
 
-
-
 Config.adminwebhook  = ""
 Config.webhookavatar = "https://www.pngmart.com/files/5/Bank-PNG-Transparent-Picture.png"
 
@@ -145,7 +141,7 @@ Config.language = {
     upgradeitem2 = "Cost for each slot: $ ",
     nomoney = "You dont have money",
     success = "You upgraded Safe Box by paying $ ",
-    maxslots = "You have reached the maximum slots: "
+    maxslots = "You have reached the maximum slots: ",
     maxitems = "The limit for this item is: ",
     depoitem3 = "You have deposited ",
     of        = " of ", 
