@@ -88,7 +88,7 @@ function PromptSetUp()
 end
 
 function PromptSetUp2()
-    local str = "Colsed"
+    local str = "Closed"
     CloseBanks = PromptRegisterBegin()
     PromptSetControlAction(CloseBanks, Config.Key)
     str = CreateVarString(10, 'LITERAL_STRING', str)

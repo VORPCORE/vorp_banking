@@ -19,8 +19,11 @@ Config.banks = {
         upgrade = true, -- if you want upgrade safebox
         costslot = 10, -- choose price for upgrade + 1 slot
         maxslots = 100, -- choose max slots for upgrade
-        -- TO DO 
-        -- limit for weapon or item list
+
+        itemlimit = { -- (nameitem = limit) you can add other items for each bank
+            ammorevolvernormal = 1,
+            WEAPON_MELEE_KNIFE = 1
+        },
 
 
     },
@@ -43,6 +46,9 @@ Config.banks = {
         upgrade = true,
         costslot = 10,
         maxslots = 100,
+        itemlimit = {
+            ammoriflenormal    = 2
+        },
 
     },
     STdenis = {
@@ -63,6 +69,10 @@ Config.banks = {
         upgrade = true,
         costslot = 10,
         maxslots = 100,
+        itemlimit = {
+            iron = 5,
+            coal = 10
+        },
 
     },
     Rhodes = {
@@ -83,6 +93,11 @@ Config.banks = {
         upgrade = false,
         costslot = 10,
         maxslots = 50,
+        itemlimit = {
+            ammorevolvernormal = 1,
+            WEAPON_MELEE_KNIFE = 1,
+            ammoriflenormal    = 2
+        },
 
     },
 }
@@ -131,4 +146,8 @@ Config.language = {
     nomoney = "You dont have money",
     success = "You upgraded Safe Box by paying $ ",
     maxslots = "You have reached the maximum slots: "
+    maxitems = "The limit for this item is: ",
+    depoitem3 = "You have deposited ",
+    of        = " of ", 
+    withitem = "You have withdrawn "
 }
