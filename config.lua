@@ -21,8 +21,14 @@ Config.banks = {
         upgrade = true, -- if you want upgrade safebox
         costslot = 10, -- choose price for upgrade + 1 slot
         maxslots = 100, -- choose max slots for upgrade
-        itemlimit = { -- (nameitem = limit) you can add other items for each bank
-            ammorevolvernormal = 1,
+
+        --------------------- ONLY 1 MUST BE TRUE or ALL 2 FALSE(no limits in bank)
+        useitemlimit = false, -- if TRUE limit only items above
+        usespecificitem = false, -- if TRUE deposit only items above
+        -----------------------------------------
+
+        itemlist = { 
+            ammorevolvernormal = 3, -- name = count
             WEAPON_MELEE_KNIFE = 1
         },
 
@@ -46,8 +52,15 @@ Config.banks = {
         upgrade = true,
         costslot = 10,
         maxslots = 100,
-        itemlimit = {
-            ammoriflenormal    = 2
+
+        --------------------- ONLY 1 MUST BE TRUE or ALL 2 FALSE(no limits in bank)
+        useitemlimit = false, -- if TRUE limit only items above
+        usespecificitem = false, -- if TRUE deposit only items above
+        -----------------------------------------
+
+        itemlist = { 
+            ammorevolvernormal = 3, -- name = count
+            WEAPON_MELEE_KNIFE = 1
         },
 
     },
@@ -69,9 +82,15 @@ Config.banks = {
         upgrade = true,
         costslot = 10,
         maxslots = 100,
-        itemlimit = {
-            iron = 5,
-            coal = 10
+
+        --------------------- ONLY 1 MUST BE TRUE or ALL 2 FALSE(no limits in bank)
+        useitemlimit = false, -- if TRUE limit only items above
+        usespecificitem = false, -- if TRUE deposit only items above
+        -----------------------------------------
+
+        itemlist = { 
+            ammorevolvernormal = 3, -- name = count
+            WEAPON_MELEE_KNIFE = 1
         },
 
     },
@@ -93,10 +112,15 @@ Config.banks = {
         upgrade = false,
         costslot = 10,
         maxslots = 50,
-        itemlimit = {
-            ammorevolvernormal = 1,
-            WEAPON_MELEE_KNIFE = 1,
-            ammoriflenormal    = 2
+
+        --------------------- ONLY 1 MUST BE TRUE or ALL 2 FALSE(no limits in bank)
+        useitemlimit = false, -- if TRUE limit only items above
+        usespecificitem = false, -- if TRUE deposit only items above
+        -----------------------------------------
+
+        itemlist = { 
+            ammorevolvernormal = 3, -- name = count
+            WEAPON_MELEE_KNIFE = 1
         },
 
     },
