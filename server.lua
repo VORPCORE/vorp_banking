@@ -508,12 +508,12 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                     items.action = "setSecondInventoryItems"
                     if itemType == "item_standard" then
                       VorpInv.subItem(_source, item.name, itemCount)
-                      TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. itemCount .. Config.language.of .. item.name, 5000)
+                      TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. itemCount .. Config.language.of .. item.label, 5000)
                     end
                     if itemType == "item_weapon" then
                       local weapId = item.id
                       VorpInv.subWeapon(_source, weapId)
-                      TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. item.name, 5000)
+                      TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. item.label, 5000)
                     end
                     TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                     exports["ghmattimysql"]:execute("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name", { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = bankName })
@@ -589,12 +589,12 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                 items.action = "setSecondInventoryItems"
                 if itemType == "item_standard" then
                   VorpInv.subItem(_source, item.name, itemCount)
-                  TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. itemCount .. Config.language.of .. item.name, 5000)
+                  TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. itemCount .. Config.language.of .. item.label, 5000)
                 end
                 if itemType == "item_weapon" then
                   local weapId = item.id
                   VorpInv.subWeapon(_source, weapId)
-                  TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. item.name, 5000)
+                  TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. item.label, 5000)
                 end
                 TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                 exports["ghmattimysql"]:execute("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name"
