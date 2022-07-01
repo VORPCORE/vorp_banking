@@ -176,6 +176,7 @@ Citizen.CreateThread(function()
                                 inmenu = true
                                 bank = bankConfig.city
                                 TriggerServerEvent("vorp_bank:getinfo", bank)
+                                    Wait(100) -- needed
                                 while bankinfo == nil do
                                     Citizen.Wait(500)
                                 end
