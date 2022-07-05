@@ -226,6 +226,8 @@ Citizen.CreateThread(function()
 end)
 
 function Openbank(bankName)
+    local pedCoords = GetEntityCoords(PlayerPedId())
+    local town_hash = Citizen.InvokeNative(0x43AD8FC02B429D33, pedCoords, 1)
     MenuData.CloseAll()
     DisplayRadar(false)
     local elements = {
@@ -234,7 +236,7 @@ function Openbank(bankName)
         { label = Config.language.takecash, value = 'wcash', desc = Config.language.takecash2 }
     }
     for index, bankConfig in pairs(Config.banks) do
-        if bankConfig.name == bankName then
+        if bankConfig.name == bankName and town_hash == GetHashKey(index) then
             if bankConfig.items then
                 elements[#elements + 1] = { label = Config.language.depoitem, value = 'bitem',
                     desc = Config.language.depoitem2 .. bankinfo.invspace }
