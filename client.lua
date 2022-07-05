@@ -271,7 +271,7 @@ function Openbank(bankName)
                     attributes = {
                         inputHeader = "DEPOSIT CASH", -- header
                         type = "text", -- inputype text, number,date,textarea
-                        pattern = "[0-9]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
+                        pattern = "[0-9.]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = "numbers only", -- if input doesnt match show this message
                         style = "border-radius: 10px; background-color: ; border:none;" -- style
                     }
@@ -298,7 +298,7 @@ function Openbank(bankName)
                     attributes = {
                         inputHeader = "DEPOSIT GOLD", -- header
                         type = "text", -- inputype text, number,date,textarea
-                        pattern = "[0-9]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
+                        pattern = "[0-9.]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = "numbers only", -- if input doesnt match show this message
                         style = "border-radius: 10px; background-color: ; border:none;" -- style
                     }
@@ -325,7 +325,7 @@ function Openbank(bankName)
                     attributes = {
                         inputHeader = "WITHDRAW CASH", -- header
                         type = "text", -- inputype text, number,date,textarea
-                        pattern = "[0-9]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
+                        pattern = "[0-9.]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = "numbers only", -- if input doesnt match show this message
                         style = "border-radius: 10px; background-color: ; border:none;" -- style
                     }
@@ -352,7 +352,7 @@ function Openbank(bankName)
                     attributes = {
                         inputHeader = "WITHDRAW GOLD", -- header
                         type = "text", -- inputype text, number,date,textarea
-                        pattern = "[0-9]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
+                        pattern = "[0-9.]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = "numbers only", -- if input doesnt match show this message
                         style = "border-radius: 10px; background-color: ; border:none;" -- style
                     }
@@ -393,7 +393,7 @@ function Openbank(bankName)
                             attributes = {
                                 inputHeader = "UP SLOTS", -- header
                                 type = "text", -- inputype text, number,date,textarea
-                                pattern = "[0-9]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
+                                pattern = "[0-9.]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                                 title = "numbers only", -- if input doesnt match show this message
                                 style = "border-radius: 10px; background-color: ; border:none;" -- style
                             }
