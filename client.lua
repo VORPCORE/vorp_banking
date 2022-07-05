@@ -269,9 +269,9 @@ function Openbank(bankName)
                     placeholder = "insertamount", -- placeholder name
                     style = "block", -- don't touch
                     attributes = {
-                        inputHeader = "HEADER", -- header
+                        inputHeader = "DEPOSIT CASH", -- header
                         type = "text", -- inputype text, number,date,textarea
-                        pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
+                        pattern = "[0-9]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = "numbers only", -- if input doesnt match show this message
                         style = "border-radius: 10px; background-color: ; border:none;" -- style
                     }
@@ -296,9 +296,9 @@ function Openbank(bankName)
                     placeholder = "insertamount", -- placeholder name
                     style = "block", -- don't touch
                     attributes = {
-                        inputHeader = "HEADER", -- header
+                        inputHeader = "DEPOSIT GOLD", -- header
                         type = "text", -- inputype text, number,date,textarea
-                        pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
+                        pattern = "[0-9]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = "numbers only", -- if input doesnt match show this message
                         style = "border-radius: 10px; background-color: ; border:none;" -- style
                     }
@@ -323,9 +323,9 @@ function Openbank(bankName)
                     placeholder = "insertamount", -- placeholder name
                     style = "block", -- don't touch
                     attributes = {
-                        inputHeader = "HEADER", -- header
+                        inputHeader = "WITHDRAW CASH", -- header
                         type = "text", -- inputype text, number,date,textarea
-                        pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
+                        pattern = "[0-9]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = "numbers only", -- if input doesnt match show this message
                         style = "border-radius: 10px; background-color: ; border:none;" -- style
                     }
@@ -350,9 +350,9 @@ function Openbank(bankName)
                     placeholder = "insertamount", -- placeholder name
                     style = "block", -- don't touch
                     attributes = {
-                        inputHeader = "HEADER", -- header
+                        inputHeader = "WITHDRAW GOLD", -- header
                         type = "text", -- inputype text, number,date,textarea
-                        pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
+                        pattern = "[0-9]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = "numbers only", -- if input doesnt match show this message
                         style = "border-radius: 10px; background-color: ; border:none;" -- style
                     }
@@ -391,9 +391,9 @@ function Openbank(bankName)
                             placeholder = "insertamount", -- placeholder name
                             style = "block", -- don't touch
                             attributes = {
-                                inputHeader = "HEADER", -- header
+                                inputHeader = "UP SLOTS", -- header
                                 type = "text", -- inputype text, number,date,textarea
-                                pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
+                                pattern = "[0-9]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                                 title = "numbers only", -- if input doesnt match show this message
                                 style = "border-radius: 10px; background-color: ; border:none;" -- style
                             }
