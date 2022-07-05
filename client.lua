@@ -88,7 +88,7 @@ function PromptSetUp()
 end
 
 function PromptSetUp2()
-    local str = "Closed"
+    local str = "歇業"
     CloseBanks = PromptRegisterBegin()
     PromptSetControlAction(CloseBanks, Config.Key)
     str = CreateVarString(10, 'LITERAL_STRING', str)
@@ -145,7 +145,7 @@ Citizen.CreateThread(function()
                             sleep = false
 
                             local label2 = CreateVarString(10, 'LITERAL_STRING',
-                                "Opening Hours " .. bankConfig.StoreOpen .. "am - " .. bankConfig.StoreClose .. "pm")
+                                "營業時間：" .. bankConfig.StoreOpen .. ":00 - " .. bankConfig.StoreClose .. ":00")
                             PromptSetActiveGroupThisFrame(PromptGroup2, label2)
 
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, CloseBanks) then
@@ -176,7 +176,7 @@ Citizen.CreateThread(function()
                                 inmenu = true
                                 bank = bankConfig.city
                                 TriggerServerEvent("vorp_bank:getinfo", bank)
-                                Wait(100) -- needed
+                                    Wait(100) -- needed
                                 while bankinfo == nil do
                                     Citizen.Wait(500)
                                 end
@@ -262,112 +262,51 @@ function Openbank(bankName)
         },
         function(data, menu)
             if (data.current.value == 'dcash') then
-                local myInput = {
-                    type = "enableinput", -- don't touch
-                    inputType = "input", -- input type
-                    button = "Confirm", -- button name
-                    placeholder = "insertamount", -- placeholder name
-                    style = "block", -- don't touch
-                    attributes = {
-                        inputHeader = "HEADER", -- header
-                        type = "text", -- inputype text, number,date,textarea
-                        pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
-                        title = "numbers only", -- if input doesnt match show this message
-                        style = "border-radius: 10px; background-color: ; border:none;" -- style
-                    }
-                }
-
-                TriggerEvent("vorpinputs:advancedInput", json.encode(myInput), function(cb)
-                    local result = tonumber(cb)
-                    if result ~= "" and result then
-                        TriggerServerEvent("vorp_bank:depositcash", result, bank)
+                TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
+                    local amount = tonumber(cb)
+                    if tonumber(amount) and tonumber(amount) > 0 then
+                        TriggerServerEvent("vorp_bank:depositcash", amount, bank)
                     else
                         TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
                         inmenu = false
+
                     end
                 end)
             end
             if (data.current.value == 'dgold') then
-
-                local myInput = {
-                    type = "enableinput", -- don't touch
-                    inputType = "input", -- input type
-                    button = "Confirm", -- button name
-                    placeholder = "insertamount", -- placeholder name
-                    style = "block", -- don't touch
-                    attributes = {
-                        inputHeader = "HEADER", -- header
-                        type = "text", -- inputype text, number,date,textarea
-                        pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
-                        title = "numbers only", -- if input doesnt match show this message
-                        style = "border-radius: 10px; background-color: ; border:none;" -- style
-                    }
-                }
-
-                TriggerEvent("vorpinputs:advancedInput", json.encode(myInput), function(cb)
-                    local result = tonumber(cb)
-                    if result ~= "" and result then
-                        TriggerServerEvent("vorp_bank:depositgold", result, bank)
+                TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
+                    local amount = tonumber(cb)
+                    if tonumber(amount) and tonumber(amount) > 0 and tonumber(amount) % 1 == 0 then
+                        TriggerServerEvent("vorp_bank:depositgold", amount, bank)
                     else
                         TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
                         inmenu = false
+
                     end
                 end)
-
             end
             if (data.current.value == 'wcash') then
-                local myInput = {
-                    type = "enableinput", -- don't touch
-                    inputType = "input", -- input type
-                    button = "Confirm", -- button name
-                    placeholder = "insertamount", -- placeholder name
-                    style = "block", -- don't touch
-                    attributes = {
-                        inputHeader = "HEADER", -- header
-                        type = "text", -- inputype text, number,date,textarea
-                        pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
-                        title = "numbers only", -- if input doesnt match show this message
-                        style = "border-radius: 10px; background-color: ; border:none;" -- style
-                    }
-                }
-
-                TriggerEvent("vorpinputs:advancedInput", json.encode(myInput), function(cb)
-                    local result = tonumber(cb)
-                    if result ~= "" and result then
-                        TriggerServerEvent("vorp_bank:withcash", result, bank)
+                TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
+                    local amount = tonumber(cb)
+                    if tonumber(amount) and tonumber(amount) > 0 then
+                        TriggerServerEvent("vorp_bank:withcash", amount, bank)
                     else
                         TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
                         inmenu = false
+
                     end
                 end)
-
             end
             if (data.current.value == 'wgold') then
-                local myInput = {
-                    type = "enableinput", -- don't touch
-                    inputType = "input", -- input type
-                    button = "Confirm", -- button name
-                    placeholder = "insertamount", -- placeholder name
-                    style = "block", -- don't touch
-                    attributes = {
-                        inputHeader = "HEADER", -- header
-                        type = "text", -- inputype text, number,date,textarea
-                        pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
-                        title = "numbers only", -- if input doesnt match show this message
-                        style = "border-radius: 10px; background-color: ; border:none;" -- style
-                    }
-                }
-
-                TriggerEvent("vorpinputs:advancedInput", json.encode(myInput), function(cb)
-                    local result = tonumber(cb)
-                    if result ~= "" and result then
-                        TriggerServerEvent("vorp_bank:withgold", result, bank)
+                TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount, function(cb)
+                    local amount = tonumber(cb)
+                    if tonumber(amount) and tonumber(amount) > 0 and tonumber(amount) % 1 == 0 then
+                        TriggerServerEvent("vorp_bank:withgold", amount, bank)
                     else
                         TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
                         inmenu = false
                     end
                 end)
-
             end
             if (data.current.value == 'bitem') then
                 TriggerServerEvent("vorp_bank:ReloadBankInventory", bank)
@@ -384,30 +323,19 @@ function Openbank(bankName)
                         local invspace = bankinfo.invspace
                         local maxslots = bankConfig.maxslots
                         local costslot = bankConfig.costslot
-                        local myInput = {
-                            type = "enableinput", -- don't touch
-                            inputType = "input", -- input type
-                            button = "Confirm", -- button name
-                            placeholder = "insertamount", -- placeholder name
-                            style = "block", -- don't touch
-                            attributes = {
-                                inputHeader = "HEADER", -- header
-                                type = "text", -- inputype text, number,date,textarea
-                                pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
-                                title = "numbers only", -- if input doesnt match show this message
-                                style = "border-radius: 10px; background-color: ; border:none;" -- style
-                            }
-                        }
 
-                        TriggerEvent("vorpinputs:advancedInput", json.encode(myInput), function(cb)
-                            local result = tonumber(cb)
-                            if result ~= "" and result then
-                                TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, result, bank, invspace)
-                            else
-                                TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
-                                inmenu = false
-                            end
-                        end)
+                        TriggerEvent("vorpinputs:getInput", Config.language.confirm, Config.language.amount,
+                            function(cb)
+                                local amount = tonumber(cb)
+                                if tonumber(amount) and tonumber(amount) > 0 and tonumber(amount) % 1 == 0 then
+                                    TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, amount, bank,
+                                        invspace)
+                                else
+                                    TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
+                                    inmenu = false
+
+                                end
+                            end)
 
                     end
                 end
@@ -419,4 +347,4 @@ function Openbank(bankName)
             inmenu = false
             ClearPedTasks(PlayerPedId())
         end)
-end
+end 
