@@ -270,7 +270,7 @@ function Openbank(bankName)
                     style = "block", -- don't touch
                     attributes = {
                         inputHeader = "HEADER", -- header
-                        type = "number", -- inputype text, number,date,textarea
+                        type = "text", -- inputype text, number,date,textarea
                         pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = "numbers only", -- if input doesnt match show this message
                         style = "border-radius: 10px; background-color: ; border:none;" -- style
@@ -297,7 +297,7 @@ function Openbank(bankName)
                     style = "block", -- don't touch
                     attributes = {
                         inputHeader = "HEADER", -- header
-                        type = "number", -- inputype text, number,date,textarea
+                        type = "text", -- inputype text, number,date,textarea
                         pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = "numbers only", -- if input doesnt match show this message
                         style = "border-radius: 10px; background-color: ; border:none;" -- style
@@ -324,7 +324,7 @@ function Openbank(bankName)
                     style = "block", -- don't touch
                     attributes = {
                         inputHeader = "HEADER", -- header
-                        type = "number", -- inputype text, number,date,textarea
+                        type = "text", -- inputype text, number,date,textarea
                         pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = "numbers only", -- if input doesnt match show this message
                         style = "border-radius: 10px; background-color: ; border:none;" -- style
@@ -351,7 +351,7 @@ function Openbank(bankName)
                     style = "block", -- don't touch
                     attributes = {
                         inputHeader = "HEADER", -- header
-                        type = "number", -- inputype text, number,date,textarea
+                        type = "text", -- inputype text, number,date,textarea
                         pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = "numbers only", -- if input doesnt match show this message
                         style = "border-radius: 10px; background-color: ; border:none;" -- style
@@ -392,7 +392,7 @@ function Openbank(bankName)
                             style = "block", -- don't touch
                             attributes = {
                                 inputHeader = "HEADER", -- header
-                                type = "number", -- inputype text, number,date,textarea
+                                type = "text", -- inputype text, number,date,textarea
                                 pattern = "[0-9]", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                                 title = "numbers only", -- if input doesnt match show this message
                                 style = "border-radius: 10px; background-color: ; border:none;" -- style
