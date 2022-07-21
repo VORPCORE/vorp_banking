@@ -1,4 +1,4 @@
-Languages["en"] = {
+Languages["no"] = {
     openmenu = "Meny",
     bank = "Bank",
     welcome = "Velkommen til Banken",
