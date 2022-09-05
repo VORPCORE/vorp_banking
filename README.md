@@ -13,7 +13,7 @@
 - supports weapons 
 <img width="874" alt="image" src="https://user-images.githubusercontent.com/87246847/176014228-a0cc55e0-f514-4493-ad5c-2a0862d707ef.png">
 
-## Dependencies
+## :receipt: requirement
 
 * [menuapi](https://github.com/outsider31000/menuapi)
 
