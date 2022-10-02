@@ -86,7 +86,7 @@ AddEventHandler('vorp_bank:depositcash', function(amount, name, bankinfo)
     }
     TriggerClientEvent("vorp_bank:ReloadBankMenu", _source, bankinfo)
 
-    Discord(Config.language.depoc, GetPlayerName(_source), amount, name)
+    Discord(Config.language.depoc, GetPlayerName(_source), tostring(amount), name)
   else
     TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 10000)
   end
@@ -114,7 +114,7 @@ AddEventHandler('vorp_bank:depositgold', function(amount, name, bankinfo)
     }
     TriggerClientEvent("vorp_bank:ReloadBankMenu", _source, bankinfo)
 
-    Discord(Config.language.depog, GetPlayerName(_source), amount, name)
+    Discord(Config.language.depog, GetPlayerName(_source), tostring(amount), name)
   else
     TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 10000)
   end
@@ -144,7 +144,7 @@ AddEventHandler('vorp_bank:withcash', function(amount, name, bankinfo)
       }
       TriggerClientEvent("vorp_bank:ReloadBankMenu", _source, bankinfo)
 
-      Discord(Config.language.withc, GetPlayerName(_source), amount, name)
+      Discord(Config.language.withc, GetPlayerName(_source), tostring(amount), name)
     else
       TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 10000)
     end
@@ -175,7 +175,7 @@ AddEventHandler('vorp_bank:withgold', function(amount, name, bankinfo)
       }
       TriggerClientEvent("vorp_bank:ReloadBankMenu", _source, bankinfo)
 
-      Discord(Config.language.withg, GetPlayerName(_source), amount, name)
+      Discord(Config.language.withg, GetPlayerName(_source), tostring(amount), name)
     else
       TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 10000)
     end
