@@ -51,7 +51,7 @@ AddEventHandler('vorp_bank:UpgradeSafeBox', function(costlot, maxslots, amount, 
       exports["ghmattimysql"]:execute("SELECT invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
         , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
         local Parameters = { ['charidentifier'] = charidentifier, ['invspace'] = amount, ['name'] = name }
-        exports.ghmattimysql:execute("UPDATE bank_users Set invspace=invspace+@invspace WHERE charidentifier=@charidentifier AND name = @name"
+        exports.ghmattimysql:execute("UPDATE bank_users SET invspace=invspace+@invspace WHERE charidentifier=@charidentifier AND name = @name"
           , Parameters)
       end)
       TriggerClientEvent("vorp:TipRight", _source,
@@ -245,6 +245,20 @@ function ToInteger(number)
   end
 end
 
+function pairsByKeys (t, f) -- non toccare
+  local a = {}
+  for n in pairs(t) do table.insert(a, n) end
+  table.sort(a, f)
+  local i = 0      -- iterator variable
+  local iter = function ()   -- iterator function
+    i = i + 1
+    if a[i] == nil then return nil
+    else return a[i], t[a[i]]
+    end
+  end
+  return iter
+end
+
 RegisterNetEvent("vorp_bank:ReloadBankInventory") -- inventory system
 AddEventHandler("vorp_bank:ReloadBankInventory", function(bankid)
   local _source = source
@@ -284,6 +298,13 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
     local item = data.item
     local itemCount = ToInteger(data["number"])
     local itemType = data.type
+
+    local itemMeta = data.item.metadata
+    local dataMeta = true
+    if itemMeta == nil then
+      itemMeta = {}
+    end
+
     if itemCount and itemCount ~= 0 then
       if item.count < itemCount then
         TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
@@ -296,7 +317,7 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
     if itemType == "item_weapon" then
       TriggerEvent("vorpCore:canCarryWeapons", tonumber(_source), itemCount, function(canCarry)
         if canCarry then
-          exports["ghmattimysql"]:execute("SELECT items FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
+          exports["ghmattimysql"]:execute("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
             , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
             notpass = true
             if result[1] then
@@ -357,18 +378,36 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
       TriggerEvent("vorpCore:canCarryItems", tonumber(_source), itemCount, function(canCarry)
         TriggerEvent("vorpCore:canCarryItem", tonumber(_source), item.name, itemCount, function(canCarry2)
           if canCarry and canCarry2 then
-            exports["ghmattimysql"]:execute("SELECT items FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
+            exports["ghmattimysql"]:execute("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
               , { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
               notpass = true
               if result[1] then
                 local items = {}
                 local inv = json.decode(result[1].items)
                 local foundItem, foundIndex = nil, nil
-                for k, v in pairs(inv) do
-                  if v.name == item.name then
-                    foundItem = v
+
+                if next(itemMeta) ~= nil then
+                  for k,v in pairs(inv) do 
+                    if v.name == item.name then -- se hanno stesso nome
+                      for x,y in pairsByKeys(v.metadata) do
+                        for w,z in pairsByKeys(itemMeta) do
+                          if x == w and y == z then
+                            foundItem = v
+                          end
+                        end
+                      end
+                    end
+                  end
+                else
+                  for k,v in pairs(inv) do 
+                    if v.name == item.name then
+                      if v.metadata == nil or next(v.metadata) == nil then
+                        foundItem = v
+                      end
+                    end
                   end
                 end
+
                 if foundItem then
                   local foundIndex2 = AnIndexOf(inv, foundItem)
                   foundItem.count = foundItem.count - itemCount
@@ -379,7 +418,12 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                   items.itemList = inv
                   items.action = "setSecondInventoryItems"
 
-                  VorpInv.addItem(_source, item.name, itemCount)
+                  if dataMeta then
+                    VorpInv.addItem(_source, item.name, itemCount, itemMeta)
+                  else
+                    VorpInv.addItem(_source, item.name, itemCount)
+                  end
+
                   TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                   exports["ghmattimysql"]:execute("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name"
                     , { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = name })
@@ -460,11 +504,17 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
     local itemType = data["type"]
     local itemDBCount = 1
 
+    local itemMeta = data.item.metadata
+    local dataMeta = true
+    if itemMeta == nil then
+      itemMeta = {}
+    end
+
     for index, bankConfig in pairs(Config.banks) do
       if bankConfig.city == bankName then
         local existItem = checkLimit(bankConfig.itemlist, item.name)
         if (existItem and bankConfig.useitemlimit) or (existItem and bankConfig.usespecificitem) then                        
-          exports["ghmattimysql"]:execute("SELECT items FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
+          exports["ghmattimysql"]:execute("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
             if result[1].items ~= "[]" then
               local inv = json.decode(result[1].items) 
               for k, v in pairs(inv) do
@@ -505,21 +555,42 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                 TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
                 return trem(_source)
               end
-              exports["ghmattimysql"]:execute("SELECT items, invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
+              exports["ghmattimysql"]:execute("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
                 notpass = true
+
                 if result[1].items then
                   local space = result[1].invspace
                   local items = {}
                   local countDB = 0
                   local inv = json.decode(result[1].items)
                   local foundItem = nil
-                  for _, k in pairs(inv) do
-                    if k.name == item.name then
-                      if itemType == "item_standard" then
-                        foundItem = k
+
+                  if next(itemMeta) ~= nil then
+                    for k,v in pairs(inv) do 
+                      if v.name == item.name then
+                        for x,y in pairsByKeys(v.metadata) do
+                          for w,z in pairsByKeys(itemMeta) do 
+                            if x == w and y == z then
+                              if itemType == "item_standard" then
+                                foundItem = v
+                              end
+                            end
+                          end
+                        end
+                      end
+                    end
+                  else
+                    for k,v in pairs(inv) do
+                      if v.name == item.name then
+                        if v.metadata == nil or next(v.metadata) == nil then
+                          if itemType == "item_standard" then
+                            foundItem = v
+                          end
+                        end
                       end
                     end
                   end
+
                   for _, k in pairs(inv) do
                     countDB = countDB + k.count
                   end
@@ -531,20 +602,28 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                       foundItem.count = foundItem.count + itemCount
                     else
                       if itemType == "item_standard" then
-                        foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit }
-
-                        inv[#inv + 1] = foundItem
+                        if next(itemMeta) == nil then
+                          foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit, metadata = {}  }
+                          inv[#inv + 1] = foundItem
+                        else
+                          foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit, id = item.id, metadata = itemMeta }
+                          inv[#inv + 1] = foundItem
+                        end
                       else
-                        foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit, id = item.id }
-
-                        inv[#inv + 1] = foundItem
+                        foundItem = {name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit, id = item.id }
+                        table.insert(inv, foundItem)
                       end
                     end
                     items.itemList = inv
                     items.action = "setSecondInventoryItems"
                     if itemType == "item_standard" then
-                      VorpInv.subItem(_source, item.name, itemCount)
-                      TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. itemCount .. Config.language.of .. item.label, 5000)
+                      if dataMeta then
+                        VorpInv.subItem(_source, item.name, itemCount, itemMeta)
+                        TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. itemCount .. Config.language.of .. item.label, 5000)
+                      else
+                        VorpInv.subItem(_source, item.name, itemCount)
+                        TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. itemCount .. Config.language.of .. item.label, 5000)
+                      end
                     end
                     if itemType == "item_weapon" then
                       local weapId = item.id
@@ -584,7 +663,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
             TriggerClientEvent("vorp:TipRight", _source, Config.language.invalid, 5000)
             return trem(_source)
           end
-          exports["ghmattimysql"]:execute("SELECT items, invspace FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
+          exports["ghmattimysql"]:execute("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
             , { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
             notpass = true
             if result[1].items then
@@ -593,13 +672,33 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
               local countDB = 0
               local inv = json.decode(result[1].items)
               local foundItem = nil
-              for k, v in pairs(inv) do
-                if v.name == item.name then
-                  if itemType == "item_standard" then
-                    foundItem = v
+
+              if next(itemMeta) ~= nil then
+                for k,v in pairs(inv) do 
+                  if v.name == item.name then
+                    for x,y in pairsByKeys(v.metadata) do
+                      for w,z in pairsByKeys(itemMeta) do 
+                        if x == w and y == z then
+                          if itemType == "item_standard" then
+                            foundItem = v
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              else
+                for k,v in pairs(inv) do
+                  if v.name == item.name then
+                    if v.metadata == nil or next(v.metadata) == nil then
+                      if itemType == "item_standard" then
+                        foundItem = v
+                      end
+                    end
                   end
                 end
               end
+
               for k, v in pairs(inv) do
                 countDB = countDB + v.count
               end
@@ -611,20 +710,26 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                   foundItem.count = foundItem.count + itemCount
                 else
                   if itemType == "item_standard" then
-                    foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit }
-      
-                    inv[#inv + 1] = foundItem
+                    if next(itemMeta) == nil then
+                      foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit, metadata = {}  }
+                      inv[#inv + 1] = foundItem
+                    else
+                      foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit, id = item.id, metadata = itemMeta }
+                      inv[#inv + 1] = foundItem
+                    end
                   else
-                    foundItem = { name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit,
-                      id = item.id }
-      
-                    inv[#inv + 1] = foundItem
+                    foundItem = {name = item.name, count = itemCount, label = item.label, type = item.type, limit = item.limit, id = item.id }
+                    table.insert(inv, foundItem)
                   end
                 end
                 items.itemList = inv
                 items.action = "setSecondInventoryItems"
                 if itemType == "item_standard" then
-                  VorpInv.subItem(_source, item.name, itemCount)
+                  if dataMeta then
+                    VorpInv.subItem(_source, item.name, itemCount, itemMeta)
+                  else
+                    VorpInv.subItem(_source, item.name, itemCount)
+                  end
                   TriggerClientEvent("vorp:TipRight", _source, Config.language.depoitem3 .. itemCount .. Config.language.of .. item.label, 5000)
                 end
                 if itemType == "item_weapon" then
