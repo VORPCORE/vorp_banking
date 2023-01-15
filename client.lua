@@ -407,7 +407,7 @@ function Openbank(bankName)
                             attributes = {
                                 inputHeader = "UP SLOTS", -- header
                                 type = "text", -- inputype text, number,date,textarea
-                                pattern = "[0-9.]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
+                                pattern = "[0-9]{1,10}", --  only numbers "[0-9]" | for letters only "[A-Za-z]+"
                                 title = "numbers only", -- if input doesnt match show this message
                                 style = "border-radius: 10px; background-color: ; border:none;" -- style
                             }
@@ -416,7 +416,9 @@ function Openbank(bankName)
                         TriggerEvent("vorpinputs:advancedInput", json.encode(myInput), function(cb)
                             local result = tonumber(cb)
                             if result ~= "" and result then
-                                TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, result, bank, invspace)
+                                TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, math.floor(result), bank, invspace)
+                                menu.close()
+                                inmenu = false
                             else
                                 TriggerEvent("vorp:TipBottom", Config.language.invalid, 6000)
                                 inmenu = false
