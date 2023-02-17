@@ -1,12 +1,15 @@
 Config              = {}
 
-Config.languageCode = "en";
+Config.languageCode = "en"
 
-Config.banks        = {
+
+
+
+Config.banks       = {
     Valentine = { -- names must be the same in databse BANKS TABLE
+        city = "Valentine", -- names must be the same in databse BANKS TABLE
         name = "Valentine Bank",
         x = -308.50, y = 776.24, z = 118.75,
-        city = "Valentine", -- names must be the same in databse BANKS TABLE
         blipsprite = -2128054417,
         blipAllowed = true,
         NpcAllowed = true,
@@ -65,10 +68,10 @@ Config.banks        = {
         },
 
     },
-    STdenis = {
+    SaintDenis = {
+        city = "SaintDenis",
         name = "Saint Denis Bank",
         x = 2644.08, y = -1292.21, z = 52.29,
-        city = "SaintDenis",
         blipsprite = -2128054417,
         blipAllowed = true,
         NpcAllowed = true,
@@ -127,14 +130,14 @@ Config.banks        = {
     },
 }
 
-Config.Logwithdraw  = ""
-Config.LogDeposti   = ""
-Config.Key          = 0x760A9C6F --[G]
+Config.Logwithdraw = ""
+Config.LogDeposti  = ""
+Config.Key         = 0x760A9C6F --[G]
 
 -- Set correct language table
-Config.language     = Languages[Config.languageCode]
+Config.language    = Languages[Config.languageCode]
 
-Config.Doors        = {
+Config.Doors       = {
     [2642457609] = 0, -- Valentine bank, front entrance, left door
     [3886827663] = 0, -- Valentine bank, front entrance, right door
     [1340831050] = 0, -- Valentine bank, gate to tellers
