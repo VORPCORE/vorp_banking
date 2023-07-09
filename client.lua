@@ -127,9 +127,11 @@ Citizen.CreateThread(function()
             for index, bankConfig in pairs(Config.banks) do
                 if bankConfig.StoreHoursAllowed then
                     if hour >= bankConfig.StoreClose or hour < bankConfig.StoreOpen then
+                        if not Config.banks[index].BlipHandle and bankConfig.blipAllowed then
+                            AddBlip(index)
+                        end
                         if Config.banks[index].BlipHandle then
-                            RemoveBlip(Config.banks[index].BlipHandle)
-                            Config.banks[index].BlipHandle = nil
+                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.banks[index].BlipHandle, GetHashKey('BLIP_MODIFIER_MP_COLOR_10'))
                         end
                         if Config.banks[index].NPC then
                             DeleteEntity(Config.banks[index].NPC)
@@ -154,6 +156,9 @@ Citizen.CreateThread(function()
                     elseif hour >= bankConfig.StoreOpen then
                         if not Config.banks[index].BlipHandle and bankConfig.blipAllowed then
                             AddBlip(index)
+                        end
+                        if Config.banks[index].BlipHandle then
+                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.banks[index].BlipHandle, GetHashKey('BLIP_MODIFIER_MP_COLOR_32'))
                         end
                         if not Config.banks[index].NPC and bankConfig.NpcAllowed then
                             SpawnNPC(index)
