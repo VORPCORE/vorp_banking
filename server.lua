@@ -528,7 +528,10 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
         local itemCount = ToInteger(data["number"])
         local itemType = data["type"]
         local itemDBCount = 1
-
+        -- until its resolved
+        if itemType == "weapon" then
+          return   TriggerClientEvent("vorp:TipRight", _source, "cant store weapons", 5000)
+        end
         local itemMeta = data.item.metadata
         local dataMeta = true
         if itemMeta == nil then
