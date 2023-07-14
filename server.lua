@@ -33,18 +33,21 @@ AddEventHandler('vorp_bank:getinfo', function(name)
                     ['gold'] = 0,
                     ['invspace'] = 10
                 }
-                MySQL.insert( "INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)", Parameters)
+                MySQL.insert(
+                "INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)",
+                    Parameters)
                 Wait(200)
-                MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result1)
-                        if result1[1] then
-                            local money = 0
-                            local gold = 0
-                            local invspace1 = 10
-                            local bankinfo = { money = money, gold = gold, invspace = invspace1, name = name }
+                MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
+                    { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result1)
+                    if result1[1] then
+                        local money = 0
+                        local gold = 0
+                        local invspace1 = 10
+                        local bankinfo = { money = money, gold = gold, invspace = invspace1, name = name }
 
-                            TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo)
-                        end
-                    end)
+                        TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo)
+                    end
+                end)
             end
         end)
 end)
@@ -72,9 +75,11 @@ AddEventHandler('vorp_bank:UpgradeSafeBox', function(costlot, maxslots, slotsBou
 
     Character.removeCurrency(0, amountToPay)
     local Parameters = { ['charidentifier'] = charidentifier, ['invspace'] = FinalSlots, ['name'] = name }
-    MySQL.update("UPDATE bank_users SET invspace=@invspace WHERE charidentifier=@charidentifier AND name = @name", Parameters)
+    MySQL.update("UPDATE bank_users SET invspace=@invspace WHERE charidentifier=@charidentifier AND name = @name",
+        Parameters)
 
-    TriggerClientEvent("vorp:TipRight", _source, T.success .. (costlot * slotsBought) .. " | " .. FinalSlots .. " / " .. maxslots, 10000)
+    TriggerClientEvent("vorp:TipRight", _source,
+        T.success .. (costlot * slotsBought) .. " | " .. FinalSlots .. " / " .. maxslots, 10000)
 end)
 
 
@@ -119,7 +124,9 @@ AddEventHandler('vorp_bank:depositcash', function(amount, name, bankinfo)
                     local finalamount = inmoney + amount
                     Wait(100)
                     local Parameters = { ['charidentifier'] = charidentifier, ['money'] = finalamount, ['name'] = name }
-                    MySQL.update("UPDATE bank_users Set money=@money WHERE charidentifier=@charidentifier AND name = @name", Parameters)
+                    MySQL.update(
+                    "UPDATE bank_users Set money=@money WHERE charidentifier=@charidentifier AND name = @name",
+                        Parameters)
                     TriggerClientEvent("vorp:TipRight", _source, T.youdepo .. amount, 10000)
                 end
             end)
@@ -138,7 +145,8 @@ AddEventHandler('vorp_bank:depositgold', function(amount, name, bankinfo)
     if money >= amount then
         Character.removeCurrency(1, amount)
         local Parameters = { ['charidentifier'] = charidentifier, ['gold'] = amount, ['name'] = name }
-        MySQL.update("UPDATE bank_users Set gold=gold+@gold WHERE charidentifier=@charidentifier AND name = @name", Parameters)
+        MySQL.update("UPDATE bank_users Set gold=gold+@gold WHERE charidentifier=@charidentifier AND name = @name",
+            Parameters)
         TriggerClientEvent("vorp:TipRight", _source, T.youdepog .. amount, 10000)
     else
         TriggerClientEvent("vorp:TipRight", _source, T.invalid, 10000)
@@ -184,7 +192,8 @@ AddEventHandler('vorp_bank:withgold', function(amount, name, bankinfo)
             local gold = result[1].gold
             if gold >= amount then
                 local Parameters = { ['charidentifier'] = charidentifier, ['gold'] = amount, ['name'] = name }
-                MySQL.update("UPDATE bank_users Set gold=gold-@gold WHERE charidentifier=@charidentifier AND name = @name", Parameters)
+                MySQL.update(
+                "UPDATE bank_users Set gold=gold-@gold WHERE charidentifier=@charidentifier AND name = @name", Parameters)
                 Character.addCurrency(1, amount)
                 TriggerClientEvent("vorp:TipRight", _source, T.withdrewg .. amount, 10000)
             else
@@ -376,7 +385,7 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                 else
                     TriggerClientEvent("vorp:TipRight", _source, T.limit, 5000)
                 end
-            end)
+            end, item.name)
         else
             if itemCount and itemCount ~= 0 then
                 if item.count < itemCount then
@@ -530,7 +539,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
         local itemDBCount = 1
         -- until its resolved
         if itemType == "weapon" then
-          return   TriggerClientEvent("vorp:TipRight", _source, "cant store weapons", 5000)
+            return TriggerClientEvent("vorp:TipRight", _source, "cant store weapons", 5000)
         end
         local itemMeta = data.item.metadata
         local dataMeta = true
@@ -821,15 +830,17 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                         else
                                             VorpInv.subItem(_source, item.name, itemCount)
                                         end
-                                        TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. itemCount .. T.of .. item.label, 5000)
+                                        TriggerClientEvent("vorp:TipRight", _source,
+                                            T.depoitem3 .. itemCount .. T.of .. item.label, 5000)
                                     end
                                     if itemType == "item_weapon" then
                                         local weapId = item.id
                                         VorpInv.subWeapon(_source, weapId)
-                                        TriggerClientEvent("vorp:TipRight", _source,T.depoitem3 .. item.label, 5000)
+                                        TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. item.label, 5000)
                                     end
                                     TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
-                                    MySQL.update("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name",
+                                    MySQL.update(
+                                        "UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name",
                                         {
                                             ["@inv"] = json.encode(inv),
                                             ["@charidentifier"] = charidentifier,
