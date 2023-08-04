@@ -297,13 +297,16 @@ function Openbank(bankName, index)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:depositcash", result, Config.banks[index].city, bankinfo)
-                    else
-                        TriggerEvent("vorp:TipBottom", T.invalid, 6000)
-                        inmenu = false
-                    end
-                end)
+                                DisplayRadar(true)
+                inmenu = false
                 MenuData.CloseAll()
                 ClearPedTasks(PlayerPedId())
+                    else
+                        TriggerEvent("vorp:TipBottom", T.invalid, 6000)
+                      
+                    end
+                end)
+
             end
             if (data.current.value == 'dgold') then
                 local myInput = {
@@ -325,13 +328,16 @@ function Openbank(bankName, index)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:depositgold", result, Config.banks[index].city, bankinfo)
-                    else
-                        TriggerEvent("vorp:TipBottom", T.invalid, 6000)
-                        inmenu = false
-                    end
-                end)
+                                DisplayRadar(true)
+                inmenu = false
                 MenuData.CloseAll()
                 ClearPedTasks(PlayerPedId())
+                    else
+                        TriggerEvent("vorp:TipBottom", T.invalid, 6000)
+                    
+                    end
+                end)
+
             end
             if (data.current.value == 'wcash') then
                 local myInput = {
@@ -353,13 +359,16 @@ function Openbank(bankName, index)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:withcash", result, Config.banks[index].city, bankinfo)
-                    else
-                        TriggerEvent("vorp:TipBottom", T.invalid, 6000)
-                        inmenu = false
-                    end
-                end)
+                                DisplayRadar(true)
+                inmenu = false
                 MenuData.CloseAll()
                 ClearPedTasks(PlayerPedId())
+                    else
+                        TriggerEvent("vorp:TipBottom", T.invalid, 6000)
+                     
+                    end
+                end)
+
             end
             if (data.current.value == 'wgold') then
                 local myInput = {
@@ -381,13 +390,16 @@ function Openbank(bankName, index)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:withgold", result, Config.banks[index].city, bankinfo)
+                                DisplayRadar(true)
+                           inmenu = false
+                         MenuData.CloseAll()
+                         ClearPedTasks(PlayerPedId())
                     else
                         TriggerEvent("vorp:TipBottom", T.invalid, 6000)
-                        inmenu = false
+
                     end
                 end)
-                MenuData.CloseAll()
-                ClearPedTasks(PlayerPedId())
+              
             end
             if (data.current.value == 'bitem') then
                 TriggerServerEvent("vorp_bank:ReloadBankInventory", Config.banks[index].city)
@@ -421,11 +433,13 @@ function Openbank(bankName, index)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, math.floor(result), Config.banks[index].city, invspace)
-                        menu.close()
-                        inmenu = false
+                         DisplayRadar(true)
+                inmenu = false
+                MenuData.CloseAll()
+                ClearPedTasks(PlayerPedId())
                     else
                         TriggerEvent("vorp:TipBottom", T.invalid, 6000)
-                        inmenu = false
+ 
                     end
                 end)
             end
