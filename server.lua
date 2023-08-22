@@ -365,7 +365,7 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                                     items.itemList = inv
                                     items.action = "setSecondInventoryItems"
                                     local weapId = foundItem.id
-                                    VorpInv.giveWeapon(_source, weapId, _source)
+                                    VorpInv.giveWeapon(_source, weapId, 0) -- 0 or target , if source will get 2 times a notification , this function is to be used as a trade , not to be used like this
                                     Wait(200)
                                     TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                                     MySQL.update(
