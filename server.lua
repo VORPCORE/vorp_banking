@@ -365,7 +365,7 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                                     items.itemList = inv
                                     items.action = "setSecondInventoryItems"
                                     local weapId = foundItem.id
-                                    VorpInv.giveWeapon(_source, weapId, 0)
+                                    VorpInv.giveWeapon(_source, weapId, _source)
                                     Wait(200)
                                     TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                                     MySQL.update(
