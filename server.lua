@@ -34,20 +34,20 @@ AddEventHandler('vorp_bank:getinfo', function(name)
                     ['invspace'] = 10
                 }
                 MySQL.insert(
-                "INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)",
+                    "INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)",
                     Parameters)
                 Wait(200)
                 MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
                     { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result1)
-                    if result1[1] then
-                        local money = 0
-                        local gold = 0
-                        local invspace1 = 10
-                        local bankinfo = { money = money, gold = gold, invspace = invspace1, name = name }
+                        if result1[1] then
+                            local money = 0
+                            local gold = 0
+                            local invspace1 = 10
+                            local bankinfo = { money = money, gold = gold, invspace = invspace1, name = name }
 
-                        TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo)
-                    end
-                end)
+                            TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo)
+                        end
+                    end)
             end
         end)
 end)
@@ -125,7 +125,7 @@ AddEventHandler('vorp_bank:depositcash', function(amount, name, bankinfo)
                     Wait(100)
                     local Parameters = { ['charidentifier'] = charidentifier, ['money'] = finalamount, ['name'] = name }
                     MySQL.update(
-                    "UPDATE bank_users Set money=@money WHERE charidentifier=@charidentifier AND name = @name",
+                        "UPDATE bank_users Set money=@money WHERE charidentifier=@charidentifier AND name = @name",
                         Parameters)
                     TriggerClientEvent("vorp:TipRight", _source, T.youdepo .. amount, 10000)
                 end
@@ -154,25 +154,37 @@ AddEventHandler('vorp_bank:depositgold', function(amount, name, bankinfo)
     TriggerClientEvent("vorp_bank:ready", _source)
 end)
 
+local lastMoney = {}
+
 RegisterServerEvent('vorp_bank:withcash')
 AddEventHandler('vorp_bank:withcash', function(amount, name, bankinfo)
     local _source = source
     local Character = VorpCore.getUser(_source).getUsedCharacter
     local playername = Character.firstname .. ' ' .. Character.lastname
     local charidentifier = Character.charIdentifier
+
     MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
         { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
             if result[1] then
                 local money = result[1].money
                 if money >= amount then
-                    local finalamount = money - amount
-                    local Parameters = { ['charidentifier'] = charidentifier, ['money'] = finalamount, ['name'] = name }
-                    MySQL.update(
-                        "UPDATE bank_users Set money=@money WHERE charidentifier=@charidentifier AND name = @name",
-                        Parameters)
-                    Character.addCurrency(0, amount)
-                    DiscordLogs(amount, name, playername, "with")
-                    TriggerClientEvent("vorp:TipRight", _source, T.withdrew .. amount, 10000)
+                    if not lastMoney[_source] or lastMoney[_source] ~= money then
+                        local finalamount = money - amount
+                        local Parameters = {
+                            ['charidentifier'] = charidentifier,
+                            ['money'] = finalamount,
+                            ['name'] = name
+                        }
+                        MySQL.update(
+                            "UPDATE bank_users Set money=@money WHERE charidentifier=@charidentifier AND name = @name",
+                            Parameters)
+                        lastMoney[_source] = money
+                        Character.addCurrency(0, amount)
+                        DiscordLogs(amount, name, playername, "with")
+                        TriggerClientEvent("vorp:TipRight", _source, T.withdrew .. amount, 10000)
+                    else
+                        print("^1cheater found bann this player^7")
+                    end
                 else
                     TriggerClientEvent("vorp:TipRight", _source, T.invalid, 10000)
                 end
@@ -193,7 +205,8 @@ AddEventHandler('vorp_bank:withgold', function(amount, name, bankinfo)
             if gold >= amount then
                 local Parameters = { ['charidentifier'] = charidentifier, ['gold'] = amount, ['name'] = name }
                 MySQL.update(
-                "UPDATE bank_users Set gold=gold-@gold WHERE charidentifier=@charidentifier AND name = @name", Parameters)
+                    "UPDATE bank_users Set gold=gold-@gold WHERE charidentifier=@charidentifier AND name = @name",
+                    Parameters)
                 Character.addCurrency(1, amount)
                 TriggerClientEvent("vorp:TipRight", _source, T.withdrewg .. amount, 10000)
             else
@@ -859,6 +872,17 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                     trem(_source)
                 end
             end
+        end
+    end
+end)
+
+--playerdrop
+AddEventHandler("onPlayerDropped", function()
+    local _source = source
+    for key, value in pairs(lastMoney) do
+        if key == _source then
+            lastMoney[key] = nil
+            break
         end
     end
 end)
