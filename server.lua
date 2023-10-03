@@ -151,7 +151,6 @@ AddEventHandler('vorp_bank:depositgold', function(amount, name, bankinfo)
     else
         TriggerClientEvent("vorp:TipRight", _source, T.invalid, 10000)
     end
-    TriggerClientEvent("vorp_bank:ready", _source)
 end)
 
 local lastMoney = {}
@@ -183,13 +182,14 @@ AddEventHandler('vorp_bank:withcash', function(amount, name, bankinfo)
                         DiscordLogs(amount, name, playername, "with")
                         TriggerClientEvent("vorp:TipRight", _source, T.withdrew .. amount, 10000)
                     else
-                        print("^1cheater found bann this player^7")
+                        print("^1cheater found ban this player^7")
                     end
+                    TriggerClientEvent("vorp_bank:ready", _source)
                 else
+                    TriggerClientEvent("vorp_bank:ready", _source)
                     TriggerClientEvent("vorp:TipRight", _source, T.invalid, 10000)
                 end
             end
-            TriggerClientEvent("vorp_bank:ready", _source)
         end)
 end)
 

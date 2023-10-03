@@ -41,7 +41,8 @@ end)
 ---------------- BLIPS ---------------------
 function AddBlip(index)
     if Config.banks[index].blipAllowed then
-        Config.banks[index].BlipHandle = N_0x554d9d53f696d002(1664425300, Config.banks[index].x, Config.banks[index].y, Config.banks[index].z)
+        Config.banks[index].BlipHandle = N_0x554d9d53f696d002(1664425300, Config.banks[index].x, Config.banks[index].y,
+            Config.banks[index].z)
         SetBlipSprite(Config.banks[index].BlipHandle, Config.banks[index].blipsprite, 1)
         SetBlipScale(Config.banks[index].BlipHandle, 0.2)
         Citizen.InvokeNative(0x9CB1A1623062F402, Config.banks[index].BlipHandle, Config.banks[index].name)
@@ -107,8 +108,7 @@ AddEventHandler("vorp_bank:recinfo", function(data)
     bankinfo = data
 end)
 
-RegisterNetEvent("vorp_bank:ready")
-AddEventHandler("vorp_bank:ready", function()
+RegisterNetEvent("vorp_bank:ready", function()
     inmenu = false
 end)
 
@@ -131,7 +131,8 @@ Citizen.CreateThread(function()
                             AddBlip(index)
                         end
                         if Config.banks[index].BlipHandle then
-                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.banks[index].BlipHandle, GetHashKey('BLIP_MODIFIER_MP_COLOR_10'))
+                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.banks[index].BlipHandle,
+                                GetHashKey('BLIP_MODIFIER_MP_COLOR_10'))
                         end
                         if Config.banks[index].NPC then
                             DeleteEntity(Config.banks[index].NPC)
@@ -145,7 +146,10 @@ Citizen.CreateThread(function()
                         if distance <= bankConfig.distOpen then
                             sleep = false
 
-                            local label2 = CreateVarString(10, 'LITERAL_STRING', T.openHours .. " " .. bankConfig.StoreOpen .. T.amTimeZone .. " - " .. bankConfig.StoreClose .. T.pmTimeZone)
+                            local label2 = CreateVarString(10, 'LITERAL_STRING',
+                                T.openHours ..
+                                " " ..
+                                bankConfig.StoreOpen .. T.amTimeZone .. " - " .. bankConfig.StoreClose .. T.pmTimeZone)
                             PromptSetActiveGroupThisFrame(PromptGroup2, label2)
 
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, CloseBanks) then
@@ -158,7 +162,8 @@ Citizen.CreateThread(function()
                             AddBlip(index)
                         end
                         if Config.banks[index].BlipHandle then
-                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.banks[index].BlipHandle, GetHashKey('BLIP_MODIFIER_MP_COLOR_32'))
+                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.banks[index].BlipHandle,
+                                GetHashKey('BLIP_MODIFIER_MP_COLOR_32'))
                         end
                         if not Config.banks[index].NPC and bankConfig.NpcAllowed then
                             SpawnNPC(index)
@@ -297,16 +302,14 @@ function Openbank(bankName, index)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:depositcash", result, Config.banks[index].city, bankinfo)
-                                DisplayRadar(true)
-                inmenu = false
-                MenuData.CloseAll()
-                ClearPedTasks(PlayerPedId())
+                        DisplayRadar(true)
+                        inmenu = false
+                        MenuData.CloseAll()
+                        ClearPedTasks(PlayerPedId())
                     else
                         TriggerEvent("vorp:TipBottom", T.invalid, 6000)
-                      
                     end
                 end)
-
             end
             if (data.current.value == 'dgold') then
                 local myInput = {
@@ -328,16 +331,14 @@ function Openbank(bankName, index)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:depositgold", result, Config.banks[index].city, bankinfo)
-                                DisplayRadar(true)
-                inmenu = false
-                MenuData.CloseAll()
-                ClearPedTasks(PlayerPedId())
+                        DisplayRadar(true)
+                        inmenu = false
+                        MenuData.CloseAll()
+                        ClearPedTasks(PlayerPedId())
                     else
                         TriggerEvent("vorp:TipBottom", T.invalid, 6000)
-                    
                     end
                 end)
-
             end
             if (data.current.value == 'wcash') then
                 local myInput = {
@@ -359,16 +360,14 @@ function Openbank(bankName, index)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:withcash", result, Config.banks[index].city, bankinfo)
-                                DisplayRadar(true)
-                inmenu = false
-                MenuData.CloseAll()
-                ClearPedTasks(PlayerPedId())
+                        DisplayRadar(true)
+                        inmenu = false
+                        MenuData.CloseAll()
+                        ClearPedTasks(PlayerPedId())
                     else
                         TriggerEvent("vorp:TipBottom", T.invalid, 6000)
-                     
                     end
                 end)
-
             end
             if (data.current.value == 'wgold') then
                 local myInput = {
@@ -390,16 +389,14 @@ function Openbank(bankName, index)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:withgold", result, Config.banks[index].city, bankinfo)
-                                DisplayRadar(true)
-                           inmenu = false
-                         MenuData.CloseAll()
-                         ClearPedTasks(PlayerPedId())
+                        DisplayRadar(true)
+                        inmenu = false
+                        MenuData.CloseAll()
+                        ClearPedTasks(PlayerPedId())
                     else
                         TriggerEvent("vorp:TipBottom", T.invalid, 6000)
-
                     end
                 end)
-              
             end
             if (data.current.value == 'bitem') then
                 TriggerServerEvent("vorp_bank:ReloadBankInventory", Config.banks[index].city)
@@ -432,14 +429,14 @@ function Openbank(bankName, index)
                 TriggerEvent("vorpinputs:advancedInput", json.encode(myInput), function(cb)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
-                        TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, math.floor(result), Config.banks[index].city, invspace)
-                         DisplayRadar(true)
-                inmenu = false
-                MenuData.CloseAll()
-                ClearPedTasks(PlayerPedId())
+                        TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, math.floor(result),
+                            Config.banks[index].city, invspace)
+                        DisplayRadar(true)
+                        inmenu = false
+                        MenuData.CloseAll()
+                        ClearPedTasks(PlayerPedId())
                     else
                         TriggerEvent("vorp:TipBottom", T.invalid, 6000)
- 
                     end
                 end)
             end
