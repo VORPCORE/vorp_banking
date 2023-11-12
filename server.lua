@@ -351,14 +351,13 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
         if itemType == "item_weapon" then
             TriggerEvent("vorpCore:canCarryWeapons", tonumber(_source), itemCount, function(canCarry)
                 if canCarry then
-                    MySQL.query(
-                        "SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
+                    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
                         { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
                             notpass = true
                             if result[1].items then
                                 local items = {}
                                 local inv = json.decode(result[1].items)
-                                local foundItem, foundIndex = nil, nil
+                                local foundItem = nil
                                 for k, v in pairs(inv) do
                                     if v.name == item.name then
                                         foundItem = v
@@ -550,10 +549,6 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
         local itemCount = ToInteger(data["number"])
         local itemType = data["type"]
         local itemDBCount = 1
-        -- until its resolved
-        if itemType == "weapon" then
-            return TriggerClientEvent("vorp:TipRight", _source, "cant store weapons", 5000)
-        end
         local itemMeta = data.item.metadata
         local dataMeta = true
         if itemMeta == nil then
@@ -685,7 +680,10 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                                             label = item.label,
                                                             type = item.type,
                                                             limit = item.limit,
-                                                            id = item.id
+                                                            id = item.id,
+                                                            serial = item.serial_number,
+                                                            desc = item.custom_desc,
+                                                            custom_label = item.custom_label
                                                         }
                                                         table.insert(inv, foundItem)
                                                     end
@@ -696,8 +694,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                                     if dataMeta then
                                                         VorpInv.subItem(_source, item.name, itemCount, itemMeta)
                                                         TriggerClientEvent("vorp:TipRight", _source,
-                                                            T.depoitem3 ..
-                                                            itemCount .. T.of .. item.label, 5000)
+                                                            T.depoitem3 .. itemCount .. T.of .. item.label, 5000)
                                                     else
                                                         VorpInv.subItem(_source, item.name, itemCount)
                                                         TriggerClientEvent("vorp:TipRight", _source,
@@ -714,8 +711,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                                 TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source,
                                                     json.encode(items))
                                                 MySQL.update(
-                                                    "UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name"
-                                                    ,
+                                                    "UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name",
                                                     {
                                                         ["@inv"] = json.encode(inv),
                                                         ["@charidentifier"] = charidentifier,
@@ -731,8 +727,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                 trem(_source)
                             end
                         end)
-                elseif (bankConfig.useitemlimit and not bankConfig.usespecificitem) or
-                    (not bankConfig.useitemlimit and not bankConfig.usespecificitem) then
+                elseif (bankConfig.useitemlimit and not bankConfig.usespecificitem) or (not bankConfig.useitemlimit and not bankConfig.usespecificitem) then
                     if itemType ~= "item_weapon" then
                         local countin = VorpInv.getItemCount(_source, item.name)
                         if itemCount > countin then
@@ -740,10 +735,12 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                             return trem(_source)
                         end
                     end
+
                     if itemType == "item_weapon" then
                         itemCount = 1
                         item.count = 1
                     end
+
                     if itemCount and itemCount ~= 0 then
                         if item.count < itemCount then
                             TriggerClientEvent("vorp:TipRight", _source, T.invalid, 5000)
@@ -753,76 +750,66 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                         TriggerClientEvent("vorp:TipRight", _source, T.invalid, 5000)
                         return trem(_source)
                     end
-                    MySQL.query(
-                        "SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
-                        , { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
-                            notpass = true
-                            if result[1].items then
-                                local space = result[1].invspace
-                                local items = {}
-                                local countDB = 0
-                                local inv = json.decode(result[1].items)
-                                local foundItem = nil
 
-                                if next(itemMeta) ~= nil then
-                                    for k, v in pairs(inv) do
-                                        if v.name == item.name then
-                                            for x, y in pairsByKeys(v.metadata) do
-                                                for w, z in pairsByKeys(itemMeta) do
-                                                    if x == w and y == z then
-                                                        if itemType == "item_standard" then
-                                                            foundItem = v
-                                                        end
+                    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
+                    , { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
+                        notpass = true
+                        if result[1].items then
+                            local space = result[1].invspace
+                            local items = {}
+                            local countDB = 0
+                            local inv = json.decode(result[1].items)
+                            local foundItem = nil
+
+                            if next(itemMeta) ~= nil then
+                                for k, v in pairs(inv) do
+                                    if v.name == item.name then
+                                        for x, y in pairsByKeys(v.metadata) do
+                                            for w, z in pairsByKeys(itemMeta) do
+                                                if x == w and y == z then
+                                                    if itemType == "item_standard" then
+                                                        foundItem = v
                                                     end
                                                 end
                                             end
                                         end
                                     end
-                                else
-                                    for k, v in pairs(inv) do
-                                        if v.name == item.name then
-                                            if v.metadata == nil or next(v.metadata) == nil then
-                                                if itemType == "item_standard" then
-                                                    foundItem = v
-                                                end
+                                end
+                            else
+                                for k, v in pairs(inv) do
+                                    if v.name == item.name then
+                                        if v.metadata == nil or next(v.metadata) == nil then
+                                            if itemType == "item_standard" then
+                                                foundItem = v
                                             end
                                         end
                                     end
                                 end
+                            end
 
-                                for k, v in pairs(inv) do
-                                    countDB = countDB + v.count
-                                end
-                                countDB = countDB + itemCount
-                                if countDB > space then
-                                    TriggerClientEvent("vorp:TipRight", _source, T.limit, 5000)
+                            for k, v in pairs(inv) do
+                                countDB = countDB + v.count
+                            end
+
+                            countDB = countDB + itemCount
+                            if countDB > space then
+                                TriggerClientEvent("vorp:TipRight", _source, T.limit, 5000)
+                            else
+                                if foundItem then
+                                    foundItem.count = foundItem.count + itemCount
                                 else
-                                    if foundItem then
-                                        foundItem.count = foundItem.count + itemCount
-                                    else
-                                        if itemType == "item_standard" then
-                                            if next(itemMeta) == nil then
-                                                foundItem = {
-                                                    name = item.name,
-                                                    count = itemCount,
-                                                    label = item.label,
-                                                    type = item.type,
-                                                    limit = item.limit,
-                                                    metadata = {}
-                                                }
-                                                inv[#inv + 1] = foundItem
-                                            else
-                                                foundItem = {
-                                                    name = item.name,
-                                                    count = itemCount,
-                                                    label = item.label,
-                                                    type = item.type,
-                                                    limit = item.limit,
-                                                    id = item.id,
-                                                    metadata = itemMeta
-                                                }
-                                                inv[#inv + 1] = foundItem
-                                            end
+                                    if itemType == "item_standard" then
+                                        if next(itemMeta) == nil then
+                                            foundItem = {
+                                                name = item.name,
+                                                count = itemCount,
+                                                label = item.label,
+                                                type = item.type,
+                                                limit = item.limit,
+                                                id = item.id,
+                                                metadata = {}
+                                            }
+                                            inv[#inv + 1] = foundItem
                                         else
                                             foundItem = {
                                                 name = item.name,
@@ -830,39 +817,54 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                                 label = item.label,
                                                 type = item.type,
                                                 limit = item.limit,
-                                                id = item.id
+                                                id = item.id,
+                                                metadata = itemMeta
                                             }
-                                            table.insert(inv, foundItem)
+                                            inv[#inv + 1] = foundItem
                                         end
+                                    else
+                                        foundItem = {
+                                            name = item.name,
+                                            count = itemCount,
+                                            label = item.label,
+                                            type = item.type,
+                                            limit = item.limit,
+                                            id = item.id,
+                                            serial = item.serial_number,
+                                            desc = item.custom_desc,
+                                            custom_label = item.custom_label
+                                        }
+                                        table.insert(inv, foundItem)
                                     end
-                                    items.itemList = inv
-                                    items.action = "setSecondInventoryItems"
-                                    if itemType == "item_standard" then
-                                        if dataMeta then
-                                            VorpInv.subItem(_source, item.name, itemCount, itemMeta)
-                                        else
-                                            VorpInv.subItem(_source, item.name, itemCount)
-                                        end
-                                        TriggerClientEvent("vorp:TipRight", _source,
-                                            T.depoitem3 .. itemCount .. T.of .. item.label, 5000)
-                                    end
-                                    if itemType == "item_weapon" then
-                                        local weapId = item.id
-                                        VorpInv.subWeapon(_source, weapId)
-                                        TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. item.label, 5000)
-                                    end
-                                    TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
-                                    MySQL.update(
-                                        "UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name",
-                                        {
-                                            ["@inv"] = json.encode(inv),
-                                            ["@charidentifier"] = charidentifier,
-                                            ["@name"] = bankName
-                                        })
                                 end
+                                items.itemList = inv
+                                items.action = "setSecondInventoryItems"
+                                if itemType == "item_standard" then
+                                    if dataMeta then
+                                        VorpInv.subItem(_source, item.name, itemCount, itemMeta)
+                                    else
+                                        VorpInv.subItem(_source, item.name, itemCount)
+                                    end
+                                    TriggerClientEvent("vorp:TipRight", _source,
+                                        T.depoitem3 .. itemCount .. T.of .. item.label, 5000)
+                                end
+                                if itemType == "item_weapon" then
+                                    local weapId = item.id
+                                    VorpInv.subWeapon(_source, weapId)
+                                    TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. item.label, 5000)
+                                end
+                                TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
+                                MySQL.update(
+                                    "UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name",
+                                    {
+                                        ["@inv"] = json.encode(inv),
+                                        ["@charidentifier"] = charidentifier,
+                                        ["@name"] = bankName
+                                    })
                             end
-                            notpass = false
-                        end)
+                        end
+                        notpass = false
+                    end)
                     while notpass do
                         Wait(500)
                     end
