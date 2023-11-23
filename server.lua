@@ -377,7 +377,7 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                                     items.itemList = inv
                                     items.action = "setSecondInventoryItems"
                                     local weapId = foundItem.id
-                                    VorpInv.giveWeapon(_source, weapId, 0) -- 0 or target , if source will get 2 times a notification , this function is to be used as a trade , not to be used like this
+                                    VorpInv.giveWeapon(_source, weapId)
                                     Wait(200)
                                     TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                                     MySQL.update(
@@ -681,8 +681,8 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                                             type = item.type,
                                                             limit = item.limit,
                                                             id = item.id,
-                                                            serial = item.serial_number,
-                                                            desc = item.custom_desc,
+                                                            serial_number = item.serial_number,
+                                                            custom_desc = item.custom_desc,
                                                             custom_label = item.custom_label
                                                         }
                                                         table.insert(inv, foundItem)
@@ -830,8 +830,8 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                             type = item.type,
                                             limit = item.limit,
                                             id = item.id,
-                                            serial = item.serial_number,
-                                            desc = item.custom_desc,
+                                            serial_number = item.serial_number,
+                                            custom_desc = item.custom_desc,
                                             custom_label = item.custom_label
                                         }
                                         table.insert(inv, foundItem)
