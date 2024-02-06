@@ -474,7 +474,7 @@ function Openallbanks(bankName, allbanks)
         {
             title    = bankName,
             subtext  = T.welcome,
-            align    = 'top-right',
+            align    = 'top-left',
             elements = elements,
         },
         function(data, menu)

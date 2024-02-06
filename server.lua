@@ -203,7 +203,7 @@ AddEventHandler('vorp_bank:transfer', function(amount, from, to)
                     banks[from].money = string.format("%.2f", newmoneyfrom)
                     DiscordLogs(transferedmoney, from, playername, "transfer", to)
                     local msg = string.format(T.transfer .. "%s $" .. T.to .. "%s" .. T.transferred, transferedmoney, to)
-                    TriggerClientEvent("vorp:Tip", _source, msg, 5000)
+                    TriggerClientEvent("vorp:TipRight", _source, msg, 5000)
                     TriggerClientEvent("vorp_bank:recinfo", _source, banks[to], to, _allbanks)
                 else
                     print("Second update failed.")
