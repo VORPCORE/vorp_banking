@@ -69,6 +69,10 @@ TranslationBanking.Langs = {
             withdrawGold = "WITHDRAW GOLD",
             numOnlyGoldW = "numbers only",
             ------------------------------------
+            -- [ MONEY TRANSFER ]
+            Transfer = "Transfer",
+            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
+            ------------------------------------
             -- [ UPGRADE SLOTS INV ]
             confirmUp = "Confirm",
             insertAmountUp = "insert amount",
@@ -143,6 +147,10 @@ TranslationBanking.Langs = {
             insertAmountGoldW = "inserir quantia",
             withdrawGold = "LEVANTAR OURO",
             numOnlyGoldW = "apenas números",
+            ------------------------------------
+            -- [ MONEY TRANSFER ]
+            Transfer = "Transfer",
+            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
             ------------------------------------
             -- [ MELHORAR ESPAÇOS DO INVENTÁRIO ]
             confirmUp = "Confirmar",
@@ -219,6 +227,10 @@ TranslationBanking.Langs = {
             withdrawGold = "SACAR OURO",
             numOnlyGoldW = "apenas números",
             ------------------------------------
+            -- [ MONEY TRANSFER ]
+            Transfer = "Transfer",
+            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
+            ------------------------------------
             -- [ UPGRADE SLOTS INV ]
             confirmUp = "Confirmar",
             insertAmountUp = "inserir quantidade",
@@ -294,6 +306,10 @@ TranslationBanking.Langs = {
             withdrawGold = "RETIRER DE L'OR",
             numOnlyGoldW = "nombres uniquement",
             ------------------------------------
+            -- [ MONEY TRANSFER ]
+            Transfer = "Transfer",
+            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
+            ------------------------------------
             -- [ AMÉLIORER LES EMPLACEMENTS DE L'INV ]
             confirmUp = "Confirmer",
             insertAmountUp = "insérer le montant",
@@ -346,6 +362,13 @@ TranslationBanking.Langs = {
         openHours    = "Öffnungszeiten",
         amTimeZone   = "vorm.",
         pmTimeZone   = "nachm.",
+        noaccmoney   = "Soviel Geld kannst du nicht überweisen!",
+        transfer     = "Du hast ",
+        to           = " nach",
+        transferred  = " überwiesen.",
+        bankacc      = "Weitere Bankkonten",
+        bankaccinfo  = "Hier hast du eine Übersicht, über deine Bankkonten in andern Städten, du kannst Überweisungen auf dein Konto HIER vornehmen.",
+        transferinfo = "Du kannst dir Geld hierher überweisen lassen, es fallen 10% Gebühren auf jede Überweisung an! Die Gebühren werden dem zu überweisenden Betrag abgezogen.",
         inputsLang   = {
             -- [ GELD EINZAHLEN ]
             confirmCash = "Bestätigen",          -- Button Name
@@ -368,6 +391,10 @@ TranslationBanking.Langs = {
             insertAmountGoldW = "Betrag eingeben",
             withdrawGold = "GOLD ABHEBEN",
             numOnlyGoldW = "nur Zahlen",
+            ------------------------------------
+            -- [ GELD ÜBERWEISUNG ]
+            Transfer = "Überweisung",
+            depositTransfer = "Welchen Betrag, darf ich auf ihr Bankkonto HIER überweisen?", -- Überschrift des Buttons
             ------------------------------------
             -- [ SLOTS ERWEITERN ]
             confirmUp = "Bestätigen",
@@ -443,6 +470,10 @@ TranslationBanking.Langs = {
             insertAmountGoldW = "insertar cantidad",
             withdrawGold = "RETIRAR ORO",
             numOnlyGoldW = "solo números",
+            ------------------------------------
+            -- [ MONEY TRANSFER ]
+            Transfer = "Transfer",
+            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
             ------------------------------------
             -- [ MEJORAR ESPACIOS INV ]
             confirmUp = "Confirmar",

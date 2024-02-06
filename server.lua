@@ -14,6 +14,7 @@ AddEventHandler('vorp_bank:getinfo', function(name)
     local Character = VorpCore.getUser(_source).getUsedCharacter
     local charidentifier = Character.charIdentifier
     local identifier = Character.identifier
+local _allBanks =  {}
 
     MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
         { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
@@ -23,7 +24,14 @@ AddEventHandler('vorp_bank:getinfo', function(name)
                 local invspace1 = result[1].invspace
                 local bankinfo = { money = money, gold = gold, invspace = invspace1, name = name }
 
-                TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo)
+                MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier",
+                    { ["@charidentifier"] = charidentifier }, function(result2)
+                        if result2[1] then
+                            _allBanks = result2
+                        end
+                    end)
+                Wait(500)
+                TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo, name, _allBanks)
             else -- if account dont exist create new one
                 local Parameters = {
                     ['name'] = name,
@@ -44,8 +52,14 @@ AddEventHandler('vorp_bank:getinfo', function(name)
                             local gold = 0
                             local invspace1 = 10
                             local bankinfo = { money = money, gold = gold, invspace = invspace1, name = name }
-
-                            TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo)
+                            MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier",
+                                { ["@charidentifier"] = charidentifier }, function(result3)
+                                    if result3[1] then
+                                        _allBanks = result3
+                                    end
+                                end)
+                            Wait(500)
+                            TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo, name, _allBanks)
                         end
                     end)
             end
@@ -83,7 +97,7 @@ AddEventHandler('vorp_bank:UpgradeSafeBox', function(costlot, maxslots, slotsBou
 end)
 
 
-DiscordLogs = function(amount, bankname, playername, type)
+DiscordLogs = function(amount, bankname, playername, type, tobankname)
     local title = "Bank Logs"
     local color = nil
     local logo = nil
@@ -94,17 +108,114 @@ DiscordLogs = function(amount, bankname, playername, type)
     if type == "with" then
         local webhook = Config.Logwithdraw
         local description = "**Player:**`" ..
-            playername .. "`\n **withdrew:** `" .. amount .. "` \n**Bank** `" .. bankname .. "`"
+            playername .. "`\n **withdrew:** `" .. amount .. "$` \n**Bank** `" .. bankname .. "`"
         VorpCore.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
     end
 
     if type == "depo" then
         local webhook = Config.LogDeposti
         local description = "**Player:**`" ..
-            playername .. "`\n **Deposited: ** `" .. amount .. "`\n **Bank** `" .. bankname .. "`"
+            playername .. "`\n **Deposited: ** `" .. amount .. "$`\n **Bank** `" .. bankname .. "`"
+            VorpCore.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
+    end
+
+    if type == "transfer" then
+        local webhook = Config.LogDeposti
+        local description = "**Player:**`" ..
+            playername .. "`\n **Transfered: ** `" .. amount .. "$`\n **from Bank** `" .. bankname .. "`" .. "\n **to Bank** `" .. tobankname .. "`"
         VorpCore.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
     end
 end
+
+RegisterServerEvent('vorp_bank:transfer')
+AddEventHandler('vorp_bank:transfer', function(amount, from, to)
+    local _source = source
+    local Character = VorpCore.getUser(_source).getUsedCharacter
+    local playername = Character.firstname .. ' ' .. Character.lastname
+    local charidentifier = Character.charIdentifier
+    local money = Character.money
+
+    local p = promise.new()
+    local query = "SELECT * FROM bank_users WHERE charidentifier = ?;"
+    local params = {charidentifier}
+    local on_load_cb = function(rows)
+        if rows and #rows > 0 then
+            p:resolve(rows)
+        else
+            p:resolve(nil)
+        end
+    end
+    exports.ghmattimysql:execute(query, params, on_load_cb)
+    local result = Citizen.Await(p)
+    local banks = {}
+    local _allbanks = {}
+    if result then
+        _allbanks = result
+        for _, bank in pairs(result) do
+            banks[bank.name] = bank
+        end
+
+        if banks[from].money > amount then
+            local newmoneyfrom = banks[from].money - amount
+            local newmoneyto = banks[to].money + (amount * 0.9)
+
+            local p1 = promise.new()
+
+            local query1 = "UPDATE bank_users SET money = @newmoney WHERE charidentifier = @charidentifier AND name = @from;"
+            local params1 = {
+                ['@newmoney'] = newmoneyfrom,
+                ['@charidentifier'] = charidentifier, 
+                ['@from'] = from
+            }
+
+            exports.ghmattimysql:execute(query1, params1, function(affectedRows)
+                if affectedRows then
+                    p1:resolve(true)
+                else
+                    p1:resolve(false)
+                end
+            end)
+
+            local result1 = Citizen.Await(p1)
+            if result1 then
+                local p2 = promise.new()
+
+                local query2 = "UPDATE bank_users SET money = @newmoney WHERE charidentifier = @charidentifier AND name = @to;"
+                local params2 = {
+                    ['@newmoney'] = newmoneyto, 
+                    ['@charidentifier'] = charidentifier, 
+                    ['@to'] = to 
+                }
+
+                exports.ghmattimysql:execute(query2, params2, function(affectedRows)
+                    if affectedRows then
+                        p2:resolve(true)
+                    else
+                        p2:resolve(false)
+                    end
+                end)
+
+                local result2 = Citizen.Await(p2)
+                if result2 then
+                    local transferedmoney = amount * 0.9
+                    transferedmoney = string.format("%.2f", transferedmoney)
+                    banks[to].money = string.format("%.2f", newmoneyto)
+                    banks[from].money = string.format("%.2f", newmoneyfrom)
+                    DiscordLogs(transferedmoney, from, playername, "transfer", to)
+                    local msg = string.format(T.transfer .. "%s $" .. T.to .. "%s" .. T.transferred, transferedmoney, to)
+                    TriggerClientEvent("vorp:Tip", _source, msg, 5000)
+                    TriggerClientEvent("vorp_bank:recinfo", _source, banks[to], to, _allbanks)
+                else
+                    print("Second update failed.")
+                end
+            else
+                print("First update failed.")
+            end
+        else
+            TriggerClientEvent("vorp:TipRight", _source, T.noaccmoney, 5000)
+        end
+    end
+end)
 
 RegisterServerEvent('vorp_bank:depositcash')
 AddEventHandler('vorp_bank:depositcash', function(amount, name, bankinfo)
