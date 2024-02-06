@@ -4,6 +4,7 @@ Lang               = "English"
 
 Config.Logwithdraw = ""
 Config.LogDeposti  = ""
+Config.Logtransfer = ""
 Config.Key         = 0x760A9C6F --[G]
 
 Config.banks       = {

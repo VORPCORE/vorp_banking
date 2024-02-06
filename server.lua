@@ -120,7 +120,7 @@ DiscordLogs = function(amount, bankname, playername, type, tobankname)
     end
 
     if type == "transfer" then
-        local webhook = Config.LogDeposti
+        local webhook = Config.Logtransfer
         local description = "**Player:**`" ..
             playername .. "`\n **Transfered: ** `" .. amount .. "$`\n **from Bank** `" .. bankname .. "`" .. "\n **to Bank** `" .. tobankname .. "`"
         VorpCore.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
