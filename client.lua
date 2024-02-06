@@ -17,6 +17,7 @@ AddEventHandler('menuapi:closemenu', function()
         inmenu = false
         bankinfo = nil
         ClearPedTasks(PlayerPedId())
+        DisplayRadar(true)
     end
 end)
 
@@ -32,6 +33,7 @@ AddEventHandler("onResourceStop", function(resourceName)
                 SetEntityAsNoLongerNeeded(v.NPC)
             end
         end
+        DisplayRadar(true)
         MenuData.CloseAll()
         inmenu = false
         ClearPedTasks(PlayerPedId())
