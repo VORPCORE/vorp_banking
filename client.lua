@@ -214,6 +214,7 @@ Citizen.CreateThread(function()
                             TriggerServerEvent("vorp_bank:getinfo", bankConfig.city)
                             Wait(200)
                             TaskStandStill(PlayerPedId(), -1)
+                            DisplayRadar(false)
                             Openbank(bankConfig.name, index)
                         end
                     end
