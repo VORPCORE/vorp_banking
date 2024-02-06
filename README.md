@@ -17,6 +17,7 @@
 
 * [menuapi](https://github.com/outsider31000/menuapi)
 * [oxmysql](https://github.com/overextended/oxmysql)
+* [vorp_inventory](https://github.com/VORPCORE/vorp_inventory-lua)
 
 # license
 
