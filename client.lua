@@ -111,6 +111,7 @@ AddEventHandler("vorp_bank:recinfo", function(data)
 end)
 
 RegisterNetEvent("vorp_bank:ready", function()
+    DisplayRadar(true)
     inmenu = false
 end)
 
