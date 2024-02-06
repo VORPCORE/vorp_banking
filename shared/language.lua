@@ -3,6 +3,7 @@ TranslationBanking = {}
 TranslationBanking.Langs = {
     English = {
         openmenu     = "Speak to the attendant",
+        closemenu    = "The bank is currently closed",
         bank         = "Welcome to",
         welcome      = "Welcome To The Bank",
         cashbalance  = "Money: $",
@@ -89,6 +90,7 @@ TranslationBanking.Langs = {
     },
     Portugues_PT = {
         openmenu     = "Falar com o atendente",
+        closemenu    = "The bank is currently closed",
         bank         = "Seja bem-vindo(a) ao",
         welcome      = "Bem-vindo ao Banco",
         cashbalance  = "Dinheiro: $",
@@ -175,6 +177,7 @@ TranslationBanking.Langs = {
     },
     Portugues_BR = {
         openmenu     = "Falar com o atendente",
+        closemenu    = "The bank is currently closed",
         bank         = "Seja bem vindo(a) ao",
         welcome      = "Bem-vindo ao Banco",
         cashbalance  = "Dinheiro: $",
@@ -261,6 +264,7 @@ TranslationBanking.Langs = {
     },
     Francais = {
         openmenu     = "Parler à l'agent",
+        closemenu    = "The bank is currently closed",
         bank         = "Bienvenue à",
         welcome      = "Bienvenue à la Banque",
         cashbalance  = "Argent : $",
@@ -347,6 +351,7 @@ TranslationBanking.Langs = {
     },
     German = {
         openmenu     = "Mit dem Mitarbeiter sprechen",
+        closemenu    = "Die Bank hat aktuell geschlossen",
         bank         = "Willkommen bei",
         welcome      = "Willkommen in der Bank",
         cashbalance  = "Geld: $",
@@ -433,6 +438,7 @@ TranslationBanking.Langs = {
     },
     Spanish = {
         openmenu     = "Hablar con el empleado",
+        closemenu    = "El banco está actualmente cerrado",
         bank         = "Bienvenido a",
         welcome      = "Bienvenido Al Banco",
         cashbalance  = "Dinero: $",

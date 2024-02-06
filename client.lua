@@ -92,7 +92,7 @@ function PromptSetUp()
 end
 
 function PromptSetUp2()
-    local str = "Closed"
+    local str = T.closemenu
     CloseBanks = PromptRegisterBegin()
     PromptSetControlAction(CloseBanks, Config.Key)
     str = CreateVarString(10, 'LITERAL_STRING', str)
@@ -244,7 +244,7 @@ function Openbank(bankName, allbanks)
         { label = T.depocash,                      value = 'dcash',   desc = T.depocash2 },
         { label = T.takecash,                      value = 'wcash',   desc = T.takecash2 }
     }
-if #allbanks > 1 then
+if #allbanks > 1 and Config.banktransfer then
         table.insert(elements, { label = T.bankacc, value = 'others', desc = T.bankaccinfo })
     end
 

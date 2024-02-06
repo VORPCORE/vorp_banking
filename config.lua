@@ -7,6 +7,8 @@ Config.LogDeposti  = ""
 Config.Logtransfer = ""
 Config.Key         = 0x760A9C6F --[G]
 
+Config.banktransfer = true -- if you want to use bank transfer
+
 Config.banks       = {
 
     Valentine = {           -- names must be the same in databse BANKS TABLE
