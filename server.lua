@@ -160,7 +160,7 @@ AddEventHandler('vorp_bank:transfer', function(amount, from, to)
                     { ["@newmoney"] = newmoneyto, ["@charidentifier"] = charidentifier, ["@to"] = to })
 
                 if result2 then
-                    local transferedmoney = amount * 0.9
+                    local transferedmoney = amount * Config.feeamount
                     transferedmoney = string.format("%.2f", transferedmoney)
                     banks[to].money = string.format("%.2f", newmoneyto)
                     banks[from].money = string.format("%.2f", newmoneyfrom)
