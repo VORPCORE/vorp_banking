@@ -3,6 +3,7 @@ TranslationBanking = {}
 TranslationBanking.Langs = {
     English = {
         openmenu     = "Speak to the attendant",
+        closemenu    = "The bank is currently closed",
         bank         = "Welcome to",
         welcome      = "Welcome To The Bank",
         cashbalance  = "Money: $",
@@ -46,6 +47,13 @@ TranslationBanking.Langs = {
         openHours    = "Opening Hours",
         amTimeZone   = "am",
         pmTimeZone   = "pm",
+        noaccmoney   = "You can't transfer that much money!",
+        transfer     = "You have transferred ",
+        to           = " to ",
+        transferred  = " successfully.",
+        bankacc      = "Additional Bank Accounts",
+        bankaccinfo  = "Here you have an overview of your bank accounts in other cities. You can make transfers to your account HERE.",
+        transferinfo = "You can have money transferred here. There is a 10% fee applied to each transfer!",
         inputsLang   = {
             -- [ DEPOSIT CASH ]
             confirmCash = "Confirm",            -- Button Name
@@ -69,6 +77,10 @@ TranslationBanking.Langs = {
             withdrawGold = "WITHDRAW GOLD",
             numOnlyGoldW = "numbers only",
             ------------------------------------
+            -- [ MONEY TRANSFER ]
+            Transfer = "Transfer",
+            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
+            ------------------------------------
             -- [ UPGRADE SLOTS INV ]
             confirmUp = "Confirm",
             insertAmountUp = "insert amount",
@@ -78,6 +90,7 @@ TranslationBanking.Langs = {
     },
     Portugues_PT = {
         openmenu     = "Falar com o atendente",
+        closemenu    = "The bank is currently closed",
         bank         = "Seja bem-vindo(a) ao",
         welcome      = "Bem-vindo ao Banco",
         cashbalance  = "Dinheiro: $",
@@ -121,6 +134,13 @@ TranslationBanking.Langs = {
         openHours    = "Horário de Funcionamento",
         amTimeZone   = "am",
         pmTimeZone   = "pm",
+        noaccmoney   = "You can't transfer that much money!",
+        transfer     = "You have transferred ",
+        to           = " to ",
+        transferred  = " successfully.",
+        bankacc      = "Additional Bank Accounts",
+        bankaccinfo  = "Here you have an overview of your bank accounts in other cities. You can make transfers to your account HERE.",
+        transferinfo = "You can have money transferred here. There is a 10% fee applied to each transfer!",
         inputsLang   = {
             -- [ DEPOSITAR DINHEIRO ]
             confirmCash = "Confirmar",            -- Nome do botão
@@ -144,6 +164,10 @@ TranslationBanking.Langs = {
             withdrawGold = "LEVANTAR OURO",
             numOnlyGoldW = "apenas números",
             ------------------------------------
+            -- [ MONEY TRANSFER ]
+            Transfer = "Transfer",
+            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
+            ------------------------------------
             -- [ MELHORAR ESPAÇOS DO INVENTÁRIO ]
             confirmUp = "Confirmar",
             insertAmountUp = "inserir quantia",
@@ -153,6 +177,7 @@ TranslationBanking.Langs = {
     },
     Portugues_BR = {
         openmenu     = "Falar com o atendente",
+        closemenu    = "The bank is currently closed",
         bank         = "Seja bem vindo(a) ao",
         welcome      = "Bem-vindo ao Banco",
         cashbalance  = "Dinheiro: $",
@@ -196,6 +221,13 @@ TranslationBanking.Langs = {
         openHours    = "Horário de Funcionamento",
         amTimeZone   = "am",
         pmTimeZone   = "pm",
+        noaccmoney   = "You can't transfer that much money!",
+        transfer     = "You have transferred ",
+        to           = " to ",
+        transferred  = " successfully.",
+        bankacc      = "Additional Bank Accounts",
+        bankaccinfo  = "Here you have an overview of your bank accounts in other cities. You can make transfers to your account HERE.",
+        transferinfo = "You can have money transferred here. There is a 10% fee applied to each transfer!",
         inputsLang   = {
             -- [ DEPOSIT CASH ]
             confirmCash = "Confirmar",               -- Nome do Botão
@@ -219,6 +251,10 @@ TranslationBanking.Langs = {
             withdrawGold = "SACAR OURO",
             numOnlyGoldW = "apenas números",
             ------------------------------------
+            -- [ MONEY TRANSFER ]
+            Transfer = "Transfer",
+            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
+            ------------------------------------
             -- [ UPGRADE SLOTS INV ]
             confirmUp = "Confirmar",
             insertAmountUp = "inserir quantidade",
@@ -228,6 +264,7 @@ TranslationBanking.Langs = {
     },
     Francais = {
         openmenu     = "Parler à l'agent",
+        closemenu    = "The bank is currently closed",
         bank         = "Bienvenue à",
         welcome      = "Bienvenue à la Banque",
         cashbalance  = "Argent : $",
@@ -271,6 +308,13 @@ TranslationBanking.Langs = {
         openHours    = "Heures d'ouverture",
         amTimeZone   = "matin",
         pmTimeZone   = "après-midi",
+        noaccmoney   = "You can't transfer that much money!",
+        transfer     = "You have transferred ",
+        to           = " to ",
+        transferred  = " successfully.",
+        bankacc      = "Additional Bank Accounts",
+        bankaccinfo  = "Here you have an overview of your bank accounts in other cities. You can make transfers to your account HERE.",
+        transferinfo = "You can have money transferred here. There is a 10% fee applied to each transfer!",
         inputsLang   = {
             -- [ DÉPOSER DE L'ARGENT ]
             confirmCash = "Confirmer",               -- Nom du bouton
@@ -294,6 +338,10 @@ TranslationBanking.Langs = {
             withdrawGold = "RETIRER DE L'OR",
             numOnlyGoldW = "nombres uniquement",
             ------------------------------------
+            -- [ MONEY TRANSFER ]
+            Transfer = "Transfer",
+            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
+            ------------------------------------
             -- [ AMÉLIORER LES EMPLACEMENTS DE L'INV ]
             confirmUp = "Confirmer",
             insertAmountUp = "insérer le montant",
@@ -303,6 +351,7 @@ TranslationBanking.Langs = {
     },
     German = {
         openmenu     = "Mit dem Mitarbeiter sprechen",
+        closemenu    = "Die Bank hat aktuell geschlossen",
         bank         = "Willkommen bei",
         welcome      = "Willkommen in der Bank",
         cashbalance  = "Geld: $",
@@ -346,6 +395,13 @@ TranslationBanking.Langs = {
         openHours    = "Öffnungszeiten",
         amTimeZone   = "vorm.",
         pmTimeZone   = "nachm.",
+        noaccmoney   = "Soviel Geld kannst du nicht überweisen!",
+        transfer     = "Du hast ",
+        to           = " nach ",
+        transferred  = " überwiesen.",
+        bankacc      = "Weitere Bankkonten",
+        bankaccinfo  = "Hier hast du eine Übersicht, über deine Bankkonten in andern Städten, du kannst Überweisungen auf dein Konto HIER vornehmen.",
+        transferinfo = "Du kannst dir Geld hierher überweisen lassen, es fallen 10% Gebühren auf jede Überweisung an! Die Gebühren werden dem zu überweisenden Betrag abgezogen.",
         inputsLang   = {
             -- [ GELD EINZAHLEN ]
             confirmCash = "Bestätigen",          -- Button Name
@@ -369,6 +425,10 @@ TranslationBanking.Langs = {
             withdrawGold = "GOLD ABHEBEN",
             numOnlyGoldW = "nur Zahlen",
             ------------------------------------
+            -- [ GELD ÜBERWEISUNG ]
+            Transfer = "Überweisung",
+            depositTransfer = "Welchen Betrag, darf ich auf ihr Bankkonto HIER überweisen?", -- Überschrift des Buttons
+            ------------------------------------
             -- [ SLOTS ERWEITERN ]
             confirmUp = "Bestätigen",
             insertAmountUp = "Betrag eingeben",
@@ -378,6 +438,7 @@ TranslationBanking.Langs = {
     },
     Spanish = {
         openmenu     = "Hablar con el empleado",
+        closemenu    = "El banco está actualmente cerrado",
         bank         = "Bienvenido a",
         welcome      = "Bienvenido Al Banco",
         cashbalance  = "Dinero: $",
@@ -421,6 +482,13 @@ TranslationBanking.Langs = {
         openHours    = "Horario de Apertura",
         amTimeZone   = "am",
         pmTimeZone   = "pm",
+        noaccmoney   = "You can't transfer that much money!",
+        transfer     = "You have transferred ",
+        to           = " to ",
+        transferred  = " successfully.",
+        bankacc      = "Additional Bank Accounts",
+        bankaccinfo  = "Here you have an overview of your bank accounts in other cities. You can make transfers to your account HERE.",
+        transferinfo = "You can have money transferred here. There is a 10% fee applied to each transfer!",
         inputsLang   = {
             -- [ DEPOSITAR DINERO ]
             confirmCash = "Confirmar",             -- Nombre del Botón
@@ -443,6 +511,10 @@ TranslationBanking.Langs = {
             insertAmountGoldW = "insertar cantidad",
             withdrawGold = "RETIRAR ORO",
             numOnlyGoldW = "solo números",
+            ------------------------------------
+            -- [ MONEY TRANSFER ]
+            Transfer = "Transfer",
+            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
             ------------------------------------
             -- [ MEJORAR ESPACIOS INV ]
             confirmUp = "Confirmar",

@@ -1,3 +1,10 @@
+<1.6>
+- Everything made into the translation.
+- Bank transfer from bank to bank added.
+- Webhook for bank transfers added.
+- Readme adjusted.
+- Other small adjustments.
+
 <1.5>
 - Improving translation.
 - changed exports.oxmysql:execute to MySQL.

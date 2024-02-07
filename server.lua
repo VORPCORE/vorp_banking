@@ -11,45 +11,62 @@ local T = TranslationBanking.Langs[Lang]
 RegisterServerEvent('vorp_bank:getinfo')
 AddEventHandler('vorp_bank:getinfo', function(name)
     local _source = source
-    local Character = VorpCore.getUser(_source).getUsedCharacter
-    local charidentifier = Character.charIdentifier
-    local identifier = Character.identifier
+    local user = VorpCore.getUser(_source)
+    local character = user.getUsedCharacter
+    local charidentifier = character.charIdentifier
+    local identifier = character.identifier
+    local allBanks = {}
 
     MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
-        { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
-            if result[1] then
-                local money = result[1].money
-                local gold = result[1].gold
-                local invspace1 = result[1].invspace
-                local bankinfo = { money = money, gold = gold, invspace = invspace1, name = name }
+        {["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
+        if result[1] then
 
-                TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo)
-            else -- if account dont exist create new one
-                local Parameters = {
-                    ['name'] = name,
-                    ['identifier'] = identifier,
-                    ['charidentifier'] = charidentifier,
-                    ['money'] = 0,
-                    ['gold'] = 0,
-                    ['invspace'] = 10
-                }
-                MySQL.insert(
-                    "INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)",
-                    Parameters)
-                Wait(200)
-                MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
-                    { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result1)
-                        if result1[1] then
-                            local money = 0
-                            local gold = 0
-                            local invspace1 = 10
-                            local bankinfo = { money = money, gold = gold, invspace = invspace1, name = name }
+            local money = result[1].money
+            local gold = result[1].gold
+            local invspace = result[1].invspace
+            local bankinfo = { money = money, gold = gold, invspace = invspace, name = name }
 
-                            TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo)
-                        end
-                    end)
+            local allBanksResult = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @charidentifier", { ["@charidentifier"] = charidentifier })
+            if allBanksResult[1] then
+                allBanks = allBanksResult
             end
-        end)
+
+            TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo, name, allBanks)
+        else
+
+            local defaultMoney = 0
+            local defaultGold = 0
+            local defaultInvspace = 10
+            local parameters = {
+                ['name'] = name,
+                ['identifier'] = identifier,
+                ['charidentifier'] = charidentifier,
+                ['money'] = defaultMoney,
+                ['gold'] = defaultGold,
+                ['invspace'] = defaultInvspace
+            }
+
+            MySQL.insert("INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)", parameters)
+            Wait(200)
+
+            MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
+                { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result1)
+                    if result1[1] then
+                        local money = defaultMoney
+                        local gold = defaultGold
+                        local invspace = defaultInvspace
+                        local bankinfo = { money = money, gold = gold, invspace = invspace, name = name }
+
+                        local allBanksResult = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @charidentifier", { ["@charidentifier"] = charidentifier })
+                        if allBanksResult[1] then
+                            allBanks = allBanksResult
+                        end
+
+                        TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo, name, allBanks)
+                    end
+                end)
+        end
+    end)
 end)
 
 RegisterServerEvent('vorp_bank:UpgradeSafeBox')
@@ -83,7 +100,7 @@ AddEventHandler('vorp_bank:UpgradeSafeBox', function(costlot, maxslots, slotsBou
 end)
 
 
-DiscordLogs = function(amount, bankname, playername, type)
+DiscordLogs = function(amount, bankname, playername, type, tobankname)
     local title = "Bank Logs"
     local color = nil
     local logo = nil
@@ -94,17 +111,74 @@ DiscordLogs = function(amount, bankname, playername, type)
     if type == "with" then
         local webhook = Config.Logwithdraw
         local description = "**Player:**`" ..
-            playername .. "`\n **withdrew:** `" .. amount .. "` \n**Bank** `" .. bankname .. "`"
+            playername .. "`\n **withdrew:** `" .. amount .. "$` \n**Bank** `" .. bankname .. "`"
         VorpCore.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
     end
 
     if type == "depo" then
         local webhook = Config.LogDeposti
         local description = "**Player:**`" ..
-            playername .. "`\n **Deposited: ** `" .. amount .. "`\n **Bank** `" .. bankname .. "`"
+            playername .. "`\n **Deposited: ** `" .. amount .. "$`\n **Bank** `" .. bankname .. "`"
+            VorpCore.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
+    end
+
+    if type == "transfer" then
+        local webhook = Config.Logtransfer
+        local description = "**Player:**`" ..
+            playername .. "`\n **Transfered: ** `" .. amount .. "$`\n **from Bank** `" .. bankname .. "`" .. "\n **to Bank** `" .. tobankname .. "`"
         VorpCore.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
     end
 end
+
+RegisterServerEvent('vorp_bank:transfer')
+AddEventHandler('vorp_bank:transfer', function(amount, from, to)
+    local _source = source
+    local Character = VorpCore.getUser(_source).getUsedCharacter
+    local playername = Character.firstname .. ' ' .. Character.lastname
+    local charidentifier = Character.charIdentifier
+    local money = Character.money
+
+    local result = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @charidentifier;", { ["@charidentifier"] = charidentifier })
+    
+    local banks = {}
+    local _allbanks = {}
+    if result then
+        _allbanks = result
+        for _, bank in pairs(result) do
+            banks[bank.name] = bank
+        end
+
+        if banks[from].money > amount then
+            local newmoneyfrom = banks[from].money - amount
+            local newmoneyto = banks[to].money + (amount * 0.9)
+
+            local result1 = MySQL.query.await("UPDATE bank_users SET money = @newmoney WHERE charidentifier = @charidentifier AND name = @from;",
+                { ["@newmoney"] = newmoneyfrom, ["@charidentifier"] = charidentifier, ["@from"] = from })
+
+            if result1 then
+                local result2 = MySQL.query.await("UPDATE bank_users SET money = @newmoney WHERE charidentifier = @charidentifier AND name = @to;",
+                    { ["@newmoney"] = newmoneyto, ["@charidentifier"] = charidentifier, ["@to"] = to })
+
+                if result2 then
+                    local transferedmoney = amount * Config.feeamount
+                    transferedmoney = string.format("%.2f", transferedmoney)
+                    banks[to].money = string.format("%.2f", newmoneyto)
+                    banks[from].money = string.format("%.2f", newmoneyfrom)
+                    DiscordLogs(transferedmoney, from, playername, "transfer", to)
+                    local msg = string.format(T.transfer .. "%s $" .. T.to .. "%s" .. T.transferred, transferedmoney, to)
+                    TriggerClientEvent("vorp:TipRight", _source, msg, 5000)
+                    TriggerClientEvent("vorp_bank:recinfo", _source, banks[to], to, _allbanks)
+                else
+                    print("Second update failed.")
+                end
+            else
+                print("First update failed.")
+            end
+        else
+            TriggerClientEvent("vorp:TipRight", _source, T.noaccmoney, 5000)
+        end
+    end
+end)
 
 RegisterServerEvent('vorp_bank:depositcash')
 AddEventHandler('vorp_bank:depositcash', function(amount, name, bankinfo)
