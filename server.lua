@@ -11,59 +11,62 @@ local T = TranslationBanking.Langs[Lang]
 RegisterServerEvent('vorp_bank:getinfo')
 AddEventHandler('vorp_bank:getinfo', function(name)
     local _source = source
-    local Character = VorpCore.getUser(_source).getUsedCharacter
-    local charidentifier = Character.charIdentifier
-    local identifier = Character.identifier
-local _allBanks =  {}
+    local user = VorpCore.getUser(_source)
+    local character = user.getUsedCharacter
+    local charidentifier = character.charIdentifier
+    local identifier = character.identifier
+    local allBanks = {}
 
     MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
-        { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
-            if result[1] then
-                local money = result[1].money
-                local gold = result[1].gold
-                local invspace1 = result[1].invspace
-                local bankinfo = { money = money, gold = gold, invspace = invspace1, name = name }
+        {["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
+        if result[1] then
 
-                MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier",
-                    { ["@charidentifier"] = charidentifier }, function(result2)
-                        if result2[1] then
-                            _allBanks = result2
-                        end
-                    end)
-                Wait(500)
-                TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo, name, _allBanks)
-            else -- if account dont exist create new one
-                local Parameters = {
-                    ['name'] = name,
-                    ['identifier'] = identifier,
-                    ['charidentifier'] = charidentifier,
-                    ['money'] = 0,
-                    ['gold'] = 0,
-                    ['invspace'] = 10
-                }
-                MySQL.insert(
-                    "INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)",
-                    Parameters)
-                Wait(200)
-                MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
-                    { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result1)
-                        if result1[1] then
-                            local money = 0
-                            local gold = 0
-                            local invspace1 = 10
-                            local bankinfo = { money = money, gold = gold, invspace = invspace1, name = name }
-                            MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier",
-                                { ["@charidentifier"] = charidentifier }, function(result3)
-                                    if result3[1] then
-                                        _allBanks = result3
-                                    end
-                                end)
-                            Wait(500)
-                            TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo, name, _allBanks)
-                        end
-                    end)
+            local money = result[1].money
+            local gold = result[1].gold
+            local invspace = result[1].invspace
+            local bankinfo = { money = money, gold = gold, invspace = invspace, name = name }
+
+            local allBanksResult = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @charidentifier", { ["@charidentifier"] = charidentifier })
+            if allBanksResult[1] then
+                allBanks = allBanksResult
             end
-        end)
+
+            TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo, name, allBanks)
+        else
+
+            local defaultMoney = 0
+            local defaultGold = 0
+            local defaultInvspace = 10
+            local parameters = {
+                ['name'] = name,
+                ['identifier'] = identifier,
+                ['charidentifier'] = charidentifier,
+                ['money'] = defaultMoney,
+                ['gold'] = defaultGold,
+                ['invspace'] = defaultInvspace
+            }
+
+            MySQL.insert("INSERT INTO bank_users ( `name`,`identifier`,`charidentifier`,`money`,`gold`,`invspace`) VALUES ( @name, @identifier, @charidentifier, @money, @gold, @invspace)", parameters)
+            Wait(200)
+
+            MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
+                { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result1)
+                    if result1[1] then
+                        local money = defaultMoney
+                        local gold = defaultGold
+                        local invspace = defaultInvspace
+                        local bankinfo = { money = money, gold = gold, invspace = invspace, name = name }
+
+                        local allBanksResult = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @charidentifier", { ["@charidentifier"] = charidentifier })
+                        if allBanksResult[1] then
+                            allBanks = allBanksResult
+                        end
+
+                        TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo, name, allBanks)
+                    end
+                end)
+        end
+    end)
 end)
 
 RegisterServerEvent('vorp_bank:UpgradeSafeBox')
@@ -135,18 +138,8 @@ AddEventHandler('vorp_bank:transfer', function(amount, from, to)
     local charidentifier = Character.charIdentifier
     local money = Character.money
 
-    local p = promise.new()
-    local query = "SELECT * FROM bank_users WHERE charidentifier = ?;"
-    local params = {charidentifier}
-    local on_load_cb = function(rows)
-        if rows and #rows > 0 then
-            p:resolve(rows)
-        else
-            p:resolve(nil)
-        end
-    end
-    exports.ghmattimysql:execute(query, params, on_load_cb)
-    local result = Citizen.Await(p)
+    local result = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @charidentifier;", { ["@charidentifier"] = charidentifier })
+    
     local banks = {}
     local _allbanks = {}
     if result then
@@ -159,43 +152,13 @@ AddEventHandler('vorp_bank:transfer', function(amount, from, to)
             local newmoneyfrom = banks[from].money - amount
             local newmoneyto = banks[to].money + (amount * 0.9)
 
-            local p1 = promise.new()
+            local result1 = MySQL.query.await("UPDATE bank_users SET money = @newmoney WHERE charidentifier = @charidentifier AND name = @from;",
+                { ["@newmoney"] = newmoneyfrom, ["@charidentifier"] = charidentifier, ["@from"] = from })
 
-            local query1 = "UPDATE bank_users SET money = @newmoney WHERE charidentifier = @charidentifier AND name = @from;"
-            local params1 = {
-                ['@newmoney'] = newmoneyfrom,
-                ['@charidentifier'] = charidentifier, 
-                ['@from'] = from
-            }
-
-            exports.ghmattimysql:execute(query1, params1, function(affectedRows)
-                if affectedRows then
-                    p1:resolve(true)
-                else
-                    p1:resolve(false)
-                end
-            end)
-
-            local result1 = Citizen.Await(p1)
             if result1 then
-                local p2 = promise.new()
+                local result2 = MySQL.query.await("UPDATE bank_users SET money = @newmoney WHERE charidentifier = @charidentifier AND name = @to;",
+                    { ["@newmoney"] = newmoneyto, ["@charidentifier"] = charidentifier, ["@to"] = to })
 
-                local query2 = "UPDATE bank_users SET money = @newmoney WHERE charidentifier = @charidentifier AND name = @to;"
-                local params2 = {
-                    ['@newmoney'] = newmoneyto, 
-                    ['@charidentifier'] = charidentifier, 
-                    ['@to'] = to 
-                }
-
-                exports.ghmattimysql:execute(query2, params2, function(affectedRows)
-                    if affectedRows then
-                        p2:resolve(true)
-                    else
-                        p2:resolve(false)
-                    end
-                end)
-
-                local result2 = Citizen.Await(p2)
                 if result2 then
                     local transferedmoney = amount * 0.9
                     transferedmoney = string.format("%.2f", transferedmoney)
