@@ -5,27 +5,22 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 author 'VORP edit by RobiZona#0001'
 description 'Bank system VORP'
 
-client_scripts {
-    'client.lua'
-}
 shared_scripts {
     'shared/language.lua',
     'config.lua'
 }
 
-server_scripts {
-    'server.lua',
-    '@oxmysql/lib/MySQL.lua'
+client_scripts {
+    'client.lua'
 }
 
-
-
-dependencies {
-    'oxmysql'
+server_scripts {
+    '@oxmysql/lib/MySQL.lua'
+    'server.lua',
 }
 
 --dont touch
-version '1.5'
+version '1.6'
 vorp_checker 'yes'
 vorp_name '^4Resource version Check^3'
 vorp_github 'https://github.com/VORPCORE/vorp_banking'
