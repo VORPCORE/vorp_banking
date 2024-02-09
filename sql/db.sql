@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS `bank_users` (
   `items` longtext DEFAULT '[]',
   `invspace` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `name` (`name`),
+  KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
