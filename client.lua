@@ -244,8 +244,6 @@ function Openbank(bankName, allbanks)
         { label = T.depocash,                      value = 'dcash',   desc = T.depocash2 },
         { label = T.takecash,                      value = 'wcash',   desc = T.takecash2 }
     }
-    
-    table.insert(elements, { label = T.bankacc, value = 'others', desc = T.bankaccinfo })
 
     if Config.banktransfer and #allbanks > 1 then
         elements[#elements + 1] = {
