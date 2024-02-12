@@ -523,4 +523,92 @@ TranslationBanking.Langs = {
             numOnlyUp = "solo números",
         }
     },
+	Romanian = {
+		openmenu     = "Vorbiti cu angajatul",
+		closemenu    = "Banca este închisă momentan",
+		bank         = "Bine ati venit la",
+		welcome      = "Bine ati venit la Banca",
+		cashbalance  = "Bani: $",
+		goldbalance  = "Aur: ",
+		cashbalance2 = "Conturile tale.",
+		takecash     = "Retrage bani",
+		depocash     = "Depune bani",
+		takegold     = "Retrage aur",
+		depogold     = "Depune aur",
+		takecash2    = "Retrage-ti banii",
+		depocash2    = "Depune-ti banii",
+		takegold2    = "Retrage-ti aurul",
+		depogold2    = "Depune-ti aurul",
+		depoitem     = "Folosește cutia ta de valori",
+		depoitem2    = "Spatiu disponibil: ",
+		confirm      = "Confirmă",
+		amount       = "Numărul de sloturi",
+		youdepo      = "Ai depus $",
+		youdepog     = "Ai depus G",
+		invalid      = "Sumă invalidă",
+		withdrew     = "Ai retras $",
+		withdrewg    = "Ai retras G",
+		withc        = "Retrage bani",
+		withg        = "Retrage aur",
+		depoc        = "Depune bani",
+		depog        = "Depune aur",
+		namebank     = "Inventarul băncii",
+		limit        = "Nu poti purta alte obiecte",
+		maxlimit     = "Ai atins limita maximă a obiectului",
+		upgradeitem  = "Upgrade Slot Cutie de Valori",
+		upgradeitem2 = "Cost pentru fiecare slot: $ ",
+		nomoney      = "Nu ai bani",
+		success      = "Ai upgrade-at cutia de valori, plătind $ ",
+		maxslots     = "Ai atins numărul maxim de sloturi: ",
+		maxitems     = "Limita pentru acest obiect este: ",
+		depoitem3    = "Ai depozitat ",
+		of           = " din ",
+		withitem     = "Ai retras ",
+		cant         = "Nu poti depune acest obiect",
+		closed       = "Banca este închisă momentan",
+		openHours    = "Orele de deschidere",
+		amTimeZone   = "am",
+		pmTimeZone   = "pm",
+		noaccmoney   = "Nu poti transfera atât de multi bani!",
+		transfer     = "Ai transferat ",
+		to           = " către ",
+		transferred  = " cu succes.",
+		bankacc      = "Conturi bancare suplimentare",
+		bankaccinfo  = "Aici ai o vedere de ansamblu a conturilor tale bancare în alte orașe. Puteti face transferuri către contul TĂU aici.",
+		transferinfo = "Puteti transfera bani aici. Se aplică o taxă de 10% la fiecare transfer!",
+        inputsLang   = {
+			 -- [ DEPOZITARE BANI ]
+			confirmCash = "Confirmă",             -- Numele Butonului
+			insertAmountCash = "introdu suma",     -- Numele de Afișare
+			depositCash = "DEPOZITEAZĂ BANI",      -- Antetul Butonului
+			numOnlyCash = "doar numere",           -- Mesaj afișat dacă input-ul nu este valid
+			-- [ DEPOZITARE AUR ]
+			confirmGold = "Confirmă",
+			insertAmountGold = "introdu suma",
+			depositGold = "DEPOZITEAZĂ AUR",
+			numOnlyGold = "doar numere",
+			------------------------------------
+			-- [ RETRAGERE BANI ]
+			confirmCashW = "Confirmă",
+			insertAmountCashW = "introdu suma",
+			withdrawCash = "RETRAGE BANI",
+			numOnlyCashW = "doar numere",
+			-- [ RETRAGERE AUR ]
+			confirmGoldW = "Confirmă",
+			insertAmountGoldW = "introdu suma",
+			withdrawGold = "RETRAGE AUR",
+			numOnlyGoldW = "doar numere",
+			------------------------------------
+			-- [ TRANSFER DE BANI ]
+			Transfer = "Transfer",
+			depositTransfer = "Cât dorești să transferi în contul tău bancar AICI?", -- Antetul Butonului
+			------------------------------------
+			-- [ UPGRADE SLOTURI INVENTAR ]
+			confirmUp = "Confirmă",
+			insertAmountUp = "introdu suma",
+			upgradeSlots = "UPGRADE SLOTURI",
+			numOnlyUp = "doar numere",
+
+        }
+    },
 }
