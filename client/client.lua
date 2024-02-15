@@ -1,3 +1,5 @@
+local VORPcore = exports.vorp_core:GetCore()
+
 local prompts = GetRandomIntInRange(0, 0xffffff)
 local PromptGroup2 = GetRandomIntInRange(0, 0xffffff)
 local openmenu
@@ -6,7 +8,7 @@ local inmenu = false
 local bankinfo = {}
 local blips = {}
 
-local T = TranslationBanking.Langs[Lang]
+local T = Translation.Langs[Config.Lang]
 
 TriggerEvent("menuapi:getData", function(call)
     MenuData = call
@@ -160,7 +162,7 @@ Citizen.CreateThread(function()
 
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, CloseBanks) then
                                 Wait(100)
-                                TriggerEvent("vorp:TipRight", T.closed, 6000)
+                                VORPcore.NotifyRightTip(T.closed, 4000)
                             end
                         end
                     elseif hour >= bankConfig.StoreOpen then
@@ -322,7 +324,7 @@ function Openbank(bankName, allbanks)
                         MenuData.CloseAll()
                         ClearPedTasks(PlayerPedId())
                     else
-                        TriggerEvent("vorp:TipBottom", T.invalid, 6000)
+                        VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
             end
@@ -351,7 +353,7 @@ function Openbank(bankName, allbanks)
                         MenuData.CloseAll()
                         ClearPedTasks(PlayerPedId())
                     else
-                        TriggerEvent("vorp:TipBottom", T.invalid, 6000)
+                        VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
             end
@@ -380,7 +382,7 @@ function Openbank(bankName, allbanks)
                         MenuData.CloseAll()
                         ClearPedTasks(PlayerPedId())
                     else
-                        TriggerEvent("vorp:TipBottom", T.invalid, 6000)
+                        VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
             end
@@ -409,7 +411,7 @@ function Openbank(bankName, allbanks)
                         MenuData.CloseAll()
                         ClearPedTasks(PlayerPedId())
                     else
-                        TriggerEvent("vorp:TipBottom", T.invalid, 6000)
+                        VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
             end
@@ -452,7 +454,7 @@ function Openbank(bankName, allbanks)
                         MenuData.CloseAll()
                         ClearPedTasks(PlayerPedId())
                     else
-                        TriggerEvent("vorp:TipBottom", T.invalid, 6000)
+                        VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
             end
@@ -508,7 +510,7 @@ function Openallbanks(bankName, allbanks)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:transfer", result, data.current.info, bankName)
                     else
-                        TriggerEvent("vorp:TipBottom", T.invalid, 6000)
+                        VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
             end
