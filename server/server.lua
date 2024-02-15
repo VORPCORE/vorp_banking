@@ -1,5 +1,5 @@
 local VORPcore = exports.vorp_core:GetCore()
-
+local lastMoney = {}
 local T = Translation.Langs[Config.Lang]
 
 RegisterServerEvent('vorp_bank:getinfo')
@@ -103,42 +103,41 @@ DiscordLogs = function(transactionAmount, bankName, playerName, transactionType,
 end
 
 RegisterServerEvent('vorp_bank:transfer')
-AddEventHandler('vorp_bank:transfer', function(amount, from, to)
+AddEventHandler('vorp_bank:transfer', function(amount, fromBank, toBank)
     local _source = source
     local Character = VORPcore.getUser(_source).getUsedCharacter
-    local playername = Character.firstname .. ' ' .. Character.lastname
-    local charidentifier = Character.charIdentifier
-    local money = Character.money
+    local playerFullName = Character.firstname .. ' ' .. Character.lastname
+    local characterId = Character.charIdentifier
 
-    local result = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @charidentifier;", { ["@charidentifier"] = charidentifier })
+    local queryResult = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @charidentifier;", { ["@charidentifier"] = characterId })
 
-    local banks = {}
-    local _allbanks = {}
+    local bankAccounts = {}
+    local allBankAccounts = {}
 
-    if result then
-        _allbanks = result
-        for _, bank in pairs(result) do
-            banks[bank.name] = bank
+    if queryResult then
+        allBankAccounts = queryResult
+        for _, bank in pairs(queryResult) do
+            bankAccounts[bank.name] = bank
         end
 
-        if banks[from].money > amount then
-            local newmoneyfrom = banks[from].money - amount
-            local newmoneyto = banks[to].money + (amount * 0.9)
+        if bankAccounts[fromBank].money > amount then
+            local newBalanceFrom = bankAccounts[fromBank].money - amount
+            local newBalanceTo = bankAccounts[toBank].money + (amount * 0.9)
 
-            local result1 = MySQL.query.await("UPDATE bank_users SET money = @newmoney WHERE charidentifier = @charidentifier AND name = @from;", { ["@newmoney"] = newmoneyfrom, ["@charidentifier"] = charidentifier, ["@from"] = from })
+            local updateFromResult = MySQL.query.await("UPDATE bank_users SET money = @newBalance WHERE charidentifier = @charidentifier AND name = @fromBank;", { ["@newBalance"] = newBalanceFrom, ["@charidentifier"] = characterId, ["@fromBank"] = fromBank })
 
-            if result1 then
-                local result2 = MySQL.query.await("UPDATE bank_users SET money = @newmoney WHERE charidentifier = @charidentifier AND name = @to;", { ["@newmoney"] = newmoneyto, ["@charidentifier"] = charidentifier, ["@to"] = to })
+            if updateFromResult then
+                local updateToResult = MySQL.query.await("UPDATE bank_users SET money = @newBalance WHERE charidentifier = @charidentifier AND name = @toBank;", { ["@newBalance"] = newBalanceTo, ["@charidentifier"] = characterId, ["@toBank"] = toBank })
 
-                if result2 then
-                    local transferedmoney = amount * Config.feeamount
-                    transferedmoney = string.format("%.2f", transferedmoney)
-                    banks[to].money = string.format("%.2f", newmoneyto)
-                    banks[from].money = string.format("%.2f", newmoneyfrom)
-                    DiscordLogs(transferedmoney, from, playername, "transfer", to)
-                    local msg = string.format(T.transfer .. "%s $" .. T.to .. "%s" .. T.transferred, transferedmoney, to)
-                    TriggerClientEvent("vorp:TipRight", _source, msg, 5000)
-                    TriggerClientEvent("vorp_bank:recinfo", _source, banks[to], to, _allbanks)
+                if updateToResult then
+                    local transferredAmount = amount * Config.feeamount
+                    transferredAmount = string.format("%.2f", transferredAmount)
+                    bankAccounts[toBank].money = string.format("%.2f", newBalanceTo)
+                    bankAccounts[fromBank].money = string.format("%.2f", newBalanceFrom)
+                    DiscordLogs(transferredAmount, fromBank, playerFullName, "transfer", toBank)
+                    local msg = string.format(T.transfer .. "%s $" .. T.to .. "%s" .. T.transferred, transferredAmount, toBank)
+                    VORPcore.NotifyRightTip(_source, msg, 4000)
+                    TriggerClientEvent("vorp_bank:recinfo", _source, bankAccounts[toBank], toBank, allBankAccounts)
                 else
                     print("Second update failed.")
                 end
@@ -146,110 +145,105 @@ AddEventHandler('vorp_bank:transfer', function(amount, from, to)
                 print("First update failed.")
             end
         else
-            TriggerClientEvent("vorp:TipRight", _source, T.noaccmoney, 5000)
+            VORPcore.NotifyRightTip(_source, T.noaccmoney, 4000)
         end
     end
+    TriggerClientEvent("vorp_bank:ready", _source)
 end)
 
 RegisterServerEvent('vorp_bank:depositcash')
-AddEventHandler('vorp_bank:depositcash', function(amount, name, bankinfo)
+AddEventHandler('vorp_bank:depositcash', function(amount, bankName, bankInfo)
     local _source = source
     local Character = VORPcore.getUser(_source).getUsedCharacter
-    local playername = Character.firstname .. ' ' .. Character.lastname
-    local charidentifier = Character.charIdentifier
-    local money = Character.money
+    local playerFullName = Character.firstname .. ' ' .. Character.lastname
+    local characterId = Character.charIdentifier
+    local playerCash = Character.money
 
-    if money >= amount then
-        MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
-                if result[1] then
-                    Character.removeCurrency(0, amount)
-                    DiscordLogs(amount, name, playername, "deposit")
-                    local inmoney = result[1].money
-                    local finalamount = inmoney + amount
-                    Wait(100)
-                    local Parameters = { ['charidentifier'] = charidentifier, ['money'] = finalamount, ['name'] = name }
-                    MySQL.update("UPDATE bank_users Set money=@money WHERE charidentifier=@charidentifier AND name = @name", Parameters)
-                    TriggerClientEvent("vorp:TipRight", _source, T.youdepo .. amount, 10000)
-                end
-            end)
+    if playerCash >= amount then
+        MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { ["@characterId"] = characterId, ["@bankName"] = bankName }, function(result)
+            if result[1] then
+                Character.removeCurrency(0, amount)
+                DiscordLogs(amount, bankName, playerFullName, "deposit")
+                local currentBalance = result[1].money
+                local newBalance = currentBalance + amount
+                Wait(100)
+                local updateParams = { ['charidentifier'] = characterId, ['money'] = newBalance, ['name'] = bankName }
+                MySQL.update("UPDATE bank_users SET money=@money WHERE charidentifier=@characterId AND name = @name", updateParams)
+                VORPcore.NotifyRightTip(_source, T.youdepo .. amount, 4000)
+            end
+        end)
     else
-        TriggerClientEvent("vorp:TipRight", _source, T.invalid, 10000)
+        VORPcore.NotifyRightTip(_source, T.invalid, 4000)
     end
     TriggerClientEvent("vorp_bank:ready", _source)
 end)
 
 RegisterServerEvent('vorp_bank:depositgold')
-AddEventHandler('vorp_bank:depositgold', function(amount, name, bankinfo)
+AddEventHandler('vorp_bank:depositgold', function(amount, bankName, bankinfo)
     local _source = source
     local Character = VORPcore.getUser(_source).getUsedCharacter
-    local charidentifier = Character.charIdentifier
-    local money = Character.gold
-    if money >= amount then
+    local characterId = Character.charIdentifier
+    local playerGold = Character.gold
+
+    if playerGold >= amount then
         Character.removeCurrency(1, amount)
-        local Parameters = { ['charidentifier'] = charidentifier, ['gold'] = amount, ['name'] = name }
-        MySQL.update("UPDATE bank_users Set gold=gold+@gold WHERE charidentifier=@charidentifier AND name = @name", Parameters)
-        TriggerClientEvent("vorp:TipRight", _source, T.youdepog .. amount, 10000)
+        local updateParams = { ['charidentifier'] = characterId, ['gold'] = amount, ['name'] = bankName }
+        MySQL.update("UPDATE bank_users SET gold = gold + @gold WHERE charidentifier = @charidentifier AND name = @name", updateParams)
+        VORPcore.NotifyRightTip(_source, T.youdepog .. amount, 4000)
     else
-        TriggerClientEvent("vorp:TipRight", _source, T.invalid, 10000)
+        VORPcore.NotifyRightTip(_source, T.invalid, 4000)
     end
+    TriggerClientEvent("vorp_bank:ready", _source)
 end)
 
-local lastMoney = {}
-
 RegisterServerEvent('vorp_bank:withcash')
-AddEventHandler('vorp_bank:withcash', function(amount, name, bankinfo)
+AddEventHandler('vorp_bank:withcash', function(amount, bankName, bankinfo)
     local _source = source
     local Character = VORPcore.getUser(_source).getUsedCharacter
-    local playername = Character.firstname .. ' ' .. Character.lastname
-    local charidentifier = Character.charIdentifier
+    local playerFullName = Character.firstname .. ' ' .. Character.lastname
+    local characterId = Character.charIdentifier
 
-    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
-            if result[1] then
-                local money = result[1].money
-                if money >= amount then
-                    if not lastMoney[_source] or lastMoney[_source] ~= money then
-                        local finalamount = money - amount
-                        local Parameters = {
-                            ['charidentifier'] = charidentifier,
-                            ['money'] = finalamount,
-                            ['name'] = name
-                        }
-                        MySQL.update("UPDATE bank_users Set money=@money WHERE charidentifier=@charidentifier AND name = @name", Parameters)
-                        lastMoney[_source] = money
-                        Character.addCurrency(0, amount)
-                        DiscordLogs(amount, name, playername, "with")
-                        TriggerClientEvent("vorp:TipRight", _source, T.withdrew .. amount, 10000)
-                    else
-                        print("^1cheater found ban this player^7")
-                    end
-                    TriggerClientEvent("vorp_bank:ready", _source)
+    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { ["@characterId"] = characterId, ["@bankName"] = bankName }, function(result)
+        if result[1] then
+            local bankBalance = result[1].money
+            if bankBalance >= amount then
+                if not lastMoney[_source] or lastMoney[_source] ~= bankBalance then
+                    local newBalance = bankBalance - amount
+                    MySQL.update("UPDATE bank_users SET money=@newBalance WHERE charidentifier=@characterId AND name = @bankName", { ['charidentifier'] = characterId, ['money'] = newBalance, ['name'] = bankName })
+                    lastMoney[_source] = bankBalance
+                    Character.addCurrency(0, amount)
+                    DiscordLogs(amount, bankName, playerFullName, "withdraw")
+                    VORPcore.NotifyRightTip(_source, T.withdrew .. amount, 4000)
                 else
-                    TriggerClientEvent("vorp_bank:ready", _source)
-                    TriggerClientEvent("vorp:TipRight", _source, T.invalid, 10000)
+                    print("^1Potential cheating detected: player " .. playerFullName .. " attempted repeated transactions with unchanged balance.^7")
                 end
+            else
+                VORPcore.NotifyRightTip(_source, T.invalid .. amount, 4000)
             end
-        end)
+        end
+    end)
+    TriggerClientEvent("vorp_bank:ready", _source)
 end)
 
 RegisterServerEvent('vorp_bank:withgold')
-AddEventHandler('vorp_bank:withgold', function(amount, name, bankinfo)
+AddEventHandler('vorp_bank:withgold', function(amount, bankName, bankinfo)
     local _source = source
     local Character = VORPcore.getUser(_source).getUsedCharacter
-    local charidentifier = Character.charIdentifier
-    MySQL.query("SELECT gold FROM bank_users WHERE charidentifier = @charidentifier AND name = @name"
-        ,
-        { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
-            local gold = result[1].gold
-            if gold >= amount then
-                local Parameters = { ['charidentifier'] = charidentifier, ['gold'] = amount, ['name'] = name }
-                MySQL.update("UPDATE bank_users Set gold=gold-@gold WHERE charidentifier=@charidentifier AND name = @name", Parameters)
+    local characterId = Character.charIdentifier
+
+    MySQL.query("SELECT gold FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { ["@characterId"] = characterId, ["@bankName"] = bankName }, function(result)
+        if result[1] then
+            local bankGold = result[1].gold
+            if bankGold >= amount then
+                MySQL.update("UPDATE bank_users SET gold = gold - @amount WHERE charidentifier = @characterId AND name = @bankName", { ['charidentifier'] = characterId, ['gold'] = amount, ['name'] = bankName })
                 Character.addCurrency(1, amount)
-                TriggerClientEvent("vorp:TipRight", _source, T.withdrewg .. amount, 10000)
+                VORPcore.NotifyRightTip(_source, T.withdrewg .. amount, 4000)
             else
-                TriggerClientEvent("vorp:TipRight", _source, T.invalid, 10000)
+                VORPcore.NotifyRightTip(_source, T.invalid .. amount, 4000)
             end
-            TriggerClientEvent("vorp_bank:ready", _source)
-        end)
+        end
+    end)
+    TriggerClientEvent("vorp_bank:ready", _source)
 end)
 
 RegisterServerEvent("vorp_bank:find")

@@ -114,6 +114,8 @@ end)
 RegisterNetEvent("vorp_bank:ready", function()
     DisplayRadar(true)
     inmenu = false
+    MenuData.CloseAll()
+    ClearPedTasks(PlayerPedId())
 end)
 
 Citizen.CreateThread(function()
@@ -230,7 +232,6 @@ Citizen.CreateThread(function()
 end)
 
 function Openbank(bankName, allbanks)
-    
     MenuData.CloseAll()
     if not bankinfo.money then
         DisplayRadar(true)
@@ -247,9 +248,9 @@ function Openbank(bankName, allbanks)
 
     if Config.banktransfer and #allbanks > 1 then
         elements[#elements + 1] = {
-        label = T.bankacc,
-        value = 'others', 
-        desc = T.bankaccinfo
+            label = T.bankacc,
+            value = 'others',
+            desc = T.bankaccinfo
         }
     end
 
@@ -415,7 +416,8 @@ function Openbank(bankName, allbanks)
             if (data.current.value == 'bitem') then
                 TriggerServerEvent("vorp_bank:ReloadBankInventory", Config.banks[bankName].city)
                 Wait(300)
-                TriggerEvent("vorp_inventory:OpenBankInventory", T.namebank, Config.banks[bankName].city, bankinfo.invspace)
+                TriggerEvent("vorp_inventory:OpenBankInventory", T.namebank, Config.banks[bankName].city,
+                    bankinfo.invspace)
                 menu.close()
                 DisplayRadar(true)
                 inmenu = false
@@ -443,7 +445,8 @@ function Openbank(bankName, allbanks)
                 TriggerEvent("vorpinputs:advancedInput", json.encode(myInput), function(cb)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
-                        TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, math.floor(result), Config.banks[bankName].city, invspace)
+                        TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, math.floor(result),
+                            Config.banks[bankName].city, invspace)
                         DisplayRadar(true)
                         inmenu = false
                         MenuData.CloseAll()
@@ -454,8 +457,8 @@ function Openbank(bankName, allbanks)
                 end)
             end
             if (data.current.value == 'others') then
-            Openallbanks(bankName, allbanks)
-        end
+                Openallbanks(bankName, allbanks)
+            end
         end,
         function(data, menu)
             menu.close()
@@ -471,11 +474,13 @@ function Openallbanks(bankName, allbanks)
 
     for _, bank in pairs(allbanks) do
         if bankName ~= bank.name then
-            table.insert(elements, { label = bank.name .. " : " .. bank.money .. "$", value = 'transfer', desc = T.transferinfo, info = bank.name })
+            table.insert(elements,
+                { label = bank.name .. " : " .. bank.money .. "$", value = 'transfer', desc = T.transferinfo, info = bank
+                .name })
         end
     end
 
-        MenuData.Open('default', GetCurrentResourceName(), 'menuapi',
+    MenuData.Open('default', GetCurrentResourceName(), 'menuapi',
         {
             title    = bankName,
             subtext  = T.welcome,
@@ -487,11 +492,11 @@ function Openallbanks(bankName, allbanks)
                 local myInput = {
                     type = "enableinput",                                               -- don't touch
                     inputType = "input",                                                -- input type
-                    button = T.inputsLang.Transfer,                                  -- button name
+                    button = T.inputsLang.Transfer,                                     -- button name
                     placeholder = T.inputsLang.insertAmountCash,                        -- placeholder name
                     style = "block",                                                    -- don't touch
                     attributes = {
-                        inputHeader = T.inputsLang.depositTransfer,                         -- header
+                        inputHeader = T.inputsLang.depositTransfer,                     -- header
                         type = "text",                                                  -- inputype text, number,date,textarea
                         pattern = "[0-9.]{1,10}",                                       -- only numbers "[0-9]" | for letters only "[A-Za-z]+"
                         title = T.inputsLang.numOnlyCash,                               -- if input doesnt match show this message
