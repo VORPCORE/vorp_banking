@@ -83,19 +83,26 @@ AddEventHandler('vorp_bank:UpgradeSafeBox', function(costlot, maxslots, slotsBou
     VORPcore.NotifyRightTip(_source, T.success .. (costlot * slotsBought) .. " | " .. FinalSlots .. " / " .. maxslots, 4000)
 end)
 
-DiscordLogs = function(transactionAmount, bankName, playerName, transactionType, targetBankName)
+DiscordLogs = function(transactionAmount, bankName, playerName, transactionType, targetBankName, currencyType, itemName)
     local logTitle = T.Webhooks.LogTitle
     local webhookURL, logMessage = "", ""
+    local currencySymbol = currencyType == "gold" and "G" or "$"
 
     if transactionType == "withdraw" then
         webhookURL = Config.WithdrawLogWebhook
-        logMessage = string.format(T.Webhooks.WithdrawLogDescription, playerName, transactionAmount, bankName)
+        logMessage = string.format(T.Webhooks.WithdrawLogDescription, playerName, transactionAmount .. currencySymbol, bankName)
     elseif transactionType == "deposit" then
         webhookURL = Config.DepositLogWebhook
-        logMessage = string.format(T.Webhooks.DepositLogDescription, playerName, transactionAmount, bankName)
+        logMessage = string.format(T.Webhooks.DepositLogDescription, playerName, transactionAmount .. currencySymbol, bankName)
     elseif transactionType == "transfer" then
         webhookURL = Config.TransferLogWebhook
-        logMessage = string.format(T.Webhooks.TransferLogDescription, playerName, transactionAmount, bankName, targetBankName)
+        logMessage = string.format(T.Webhooks.TransferLogDescription, playerName, transactionAmount .. currencySymbol, bankName, targetBankName)
+    elseif transactionType == "take" then
+        webhookURL = Config.TakeLogWebhook
+        logMessage = string.format(T.Webhooks.TakeLogDescription, playerName, transactionAmount, itemName, bankName)
+    elseif transactionType == "move" then
+        webhookURL = Config.MoveLogWebhook
+        logMessage = string.format(T.Webhooks.MoveLogDescription, playerName, transactionAmount, itemName, bankName)
     end
 
     VORPcore.AddWebhook(logTitle, webhookURL, logMessage)
@@ -133,7 +140,7 @@ AddEventHandler('vorp_bank:transfer', function(amount, fromBank, toBank)
                     transferredAmount = string.format("%.2f", transferredAmount)
                     bankAccounts[toBank].money = string.format("%.2f", newBalanceTo)
                     bankAccounts[fromBank].money = string.format("%.2f", newBalanceFrom)
-                    DiscordLogs(transferredAmount, fromBank, playerFullName, "transfer", toBank)
+                    DiscordLogs(transferredAmount, fromBank, playerFullName, "transfer", toBank, "cash")
                     local msg = string.format(T.transfer .. "%s $" .. T.to .. "%s" .. T.transferred, transferredAmount, toBank)
                     VORPcore.NotifyRightTip(_source, msg, 4000)
                     TriggerClientEvent("vorp_bank:recinfo", _source, bankAccounts[toBank], toBank, allBankAccounts)
@@ -161,7 +168,7 @@ AddEventHandler('vorp_bank:depositcash', function(amount, bankName)
         MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { ["@characterId"] = characterId, ["@bankName"] = bankName }, function(result)
             if result[1] then
                 playerCharacter.removeCurrency(0, amount)
-                DiscordLogs(amount, bankName, playerCharacter.firstname .. ' ' .. playerCharacter.lastname, "deposit")
+                DiscordLogs(amount, bankName, playerCharacter.firstname .. ' ' .. playerCharacter.lastname, "deposit", "cash")
                 local newBalance = result[1].money + amount
                 MySQL.update("UPDATE bank_users SET money=@newBalance WHERE charidentifier=@characterId AND name = @bankName", { ['@characterId'] = characterId, ['@newBalance'] = newBalance, ['@bankName'] = bankName })
                 VORPcore.NotifyRightTip(_source, T.youdepo .. amount, 4000)
@@ -209,7 +216,7 @@ AddEventHandler('vorp_bank:withcash', function(amount, bankName, bankinfo)
                     MySQL.update("UPDATE bank_users SET money=@newBalance WHERE charidentifier=@characterId AND name = @bankName", { ['@characterId'] = characterId, ['@newBalance'] = newBalance, ['@bankName'] = bankName })
                     lastMoney[_source] = bankBalance
                     Character.addCurrency(0, amount)
-                    DiscordLogs(amount, bankName, playerFullName, "withdraw")
+                    DiscordLogs(amount, bankName, playerFullName, "withdraw", "cash")
                     VORPcore.NotifyRightTip(_source, T.withdrew .. amount, 4000)
                 else
                     print("^1Potential cheating detected: player " .. playerFullName .. " attempted repeated transactions with unchanged balance.^7")
@@ -226,6 +233,7 @@ RegisterServerEvent('vorp_bank:withgold')
 AddEventHandler('vorp_bank:withgold', function(amount, bankName)
     local _source = source
     local playerCharacter = VORPcore.getUser(_source).getUsedCharacter
+    local playerFullName = Character.firstname .. ' ' .. Character.lastname
     local characterId = playerCharacter.charIdentifier
 
     MySQL.query("SELECT gold FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { ["@characterId"] = characterId, ["@bankName"] = bankName }, function(result)
@@ -235,6 +243,7 @@ AddEventHandler('vorp_bank:withgold', function(amount, bankName)
                 local newGoldBalance = bankGold - amount
                 MySQL.update("UPDATE bank_users SET gold = @newGoldBalance WHERE charidentifier = @characterId AND name = @bankName", { ['@characterId'] = characterId, ['@newGoldBalance'] = newGoldBalance, ['@bankName'] = bankName })
                 playerCharacter.addCurrency(1, amount)
+                DiscordLogs(amount, bankName, playerFullName, "withdraw", "gold")
                 VORPcore.NotifyRightTip(_source, T.withdrewg .. amount, 4000)
             else
                 VORPcore.NotifyRightTip(_source, T.invalid, 4000)
@@ -353,6 +362,7 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                                     items.action = "setSecondInventoryItems"
                                     local weapId = foundItem.id
                                     exports.vorp_inventory:giveWeapon(_source, weapId, _source, nil)
+                                    DiscordLogs(itemCount, name, Character.firstname .. ' ' .. Character.lastname, "take", nil, nil, item.label)
                                     Wait(200)
                                     TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                                     MySQL.update("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name", { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = name })
@@ -432,7 +442,7 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                                         else
                                             exports.vorp_inventory:addItem(_source, item.name, itemCount)
                                         end
-
+                                        DiscordLogs(itemCount, name, Character.firstname .. ' ' .. Character.lastname, "take", nil, nil, item.label)
                                         TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                                         MySQL.update("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name", { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = name })
                                     end
@@ -618,6 +628,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                                     exports.vorp_inventory:subWeapon(_source, weapId)
                                                     VORPcore.NotifyRightTip(_source, T.depoitem3 .. item.label, 4000)
                                                 end
+                                                DiscordLogs(itemCount, bankName, Character.firstname .. ' ' .. Character.lastname, "move", nil, nil, item.label)
                                                 TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                                                 MySQL.update("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name", { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = bankName })
                                             end
@@ -754,6 +765,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                     exports.vorp_inventory:subWeapon(_source, weapId)
                                     VORPcore.NotifyRightTip(_source, T.depoitem3 .. item.label, 4000)
                                 end
+                                DiscordLogs(itemCount, bankName, Character.firstname .. ' ' .. Character.lastname, "move", nil, nil, item.label)
                                 TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                                 MySQL.update("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name", { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = bankName })
                             end

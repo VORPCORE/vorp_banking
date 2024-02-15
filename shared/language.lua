@@ -89,9 +89,11 @@ Translation.Langs = {
         },
         Webhooks = {
             LogTitle = "🏦 Bank Activity Log",
-            WithdrawLogDescription = "💸 **Player:** `%s`\n**Withdrew:** `%s$`\n**From Bank:** `%s`",
-            DepositLogDescription = "💰 **Player:** `%s`\n**Deposited:** `%s$`\n**To Bank:** `%s`",
-            TransferLogDescription = "🔄 **Player:** `%s`\n**Transferred:** `%s$`\n**From Bank:** `%s`\n**To Bank:** `%s`"
+            WithdrawLogDescription = "💸 **Player:** `%s`\n**Withdrew:** `%s`\n**From Bank:** `%s`",
+            DepositLogDescription = "💰 **Player:** `%s`\n**Deposited:** `%s`\n**To Bank:** `%s`",
+            TransferLogDescription = "🔄 **Player:** `%s`\n**Transferred:** `%s`\n**From Bank:** `%s`\n**To Bank:** `%s`",
+            TakeLogDescription = "📤 **Player:** `%s`\n**Take:** `%s %s`\n**From Bank:** `%s`",
+            MoveLogDescription = "📥 **Player:** `%s`\n**Moved:** `%s %s`\n**To Bank:** `%s`"
         }
     },
     Portuguese_PT = {
