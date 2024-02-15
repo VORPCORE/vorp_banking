@@ -406,7 +406,7 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                                     items.itemList = inv
                                     items.action = "setSecondInventoryItems"
                                     local weapId = foundItem.id
-                                    VorpInv.giveWeapon(_source, weapId)
+                                    exports.vorp_inventory:giveWeapon(_source, weapId)
                                     Wait(200)
                                     TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                                     MySQL.update("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name", { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = name })
@@ -431,7 +431,7 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                 TriggerClientEvent("vorp:TipRight", _source, T.invalid, 5000)
                 return trem(_source)
             end
-            local count = VorpInv.getItemCount(_source, item.name)
+            local count = exports.vorp_inventory:getItemCount(_source, item.name)
 
             if (count + itemCount) > item.limit then
                 TriggerClientEvent("vorp:TipRight", _source, T.maxlimit, 5000)
@@ -482,9 +482,9 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                                         items.action = "setSecondInventoryItems"
 
                                         if dataMeta then
-                                            VorpInv.addItem(_source, item.name, itemCount, itemMeta)
+                                            exports.vorp_inventory:addItem(_source, item.name, itemCount, itemMeta)
                                         else
-                                            VorpInv.addItem(_source, item.name, itemCount)
+                                            exports.vorp_inventory:addItem(_source, item.name, itemCount)
                                         end
 
                                         TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
@@ -596,7 +596,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                 return trem(_source)
                             else
                                 if itemType ~= "item_weapon" then
-                                    local countin = VorpInv.getItemCount(_source, item.name)
+                                    local countin = exports.vorp_inventory:getItemCount(_source, item.name)
                                     if itemCount > countin then
                                         TriggerClientEvent("vorp:TipRight", _source, T.limit, 5000)
                                         return trem(_source)
@@ -703,18 +703,17 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                                 items.action = "setSecondInventoryItems"
                                                 if itemType == "item_standard" then
                                                     if dataMeta then
-                                                        VorpInv.subItem(_source, item.name, itemCount, itemMeta)
+                                                        exports.vorp_inventory:subItem(_source, item.name, itemCount, itemMeta)
                                                         TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. itemCount .. T.of .. item.label, 5000)
                                                     else
-                                                        VorpInv.subItem(_source, item.name, itemCount)
+                                                        exports.vorp_inventory:subItem(_source, item.name, itemCount)
                                                         TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. itemCount .. T.of .. item.label, 5000)
                                                     end
                                                 end
                                                 if itemType == "item_weapon" then
                                                     local weapId = item.id
-                                                    VorpInv.subWeapon(_source, weapId)
-                                                    TriggerClientEvent("vorp:TipRight", _source,
-                                                        T.depoitem3 .. item.label, 5000)
+                                                    exports.vorp_inventory:subWeapon(_source, weapId)
+                                                    TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. item.label, 5000)
                                                 end
                                                 TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                                                 MySQL.update("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name", { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = bankName })
@@ -730,7 +729,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                         end)
                 elseif (bankConfig.useitemlimit and not bankConfig.usespecificitem) or (not bankConfig.useitemlimit and not bankConfig.usespecificitem) then
                     if itemType ~= "item_weapon" then
-                        local countin = VorpInv.getItemCount(_source, item.name)
+                        local countin = exports.vorp_inventory:getItemCount(_source, item.name)
                         if itemCount > countin then
                             TriggerClientEvent("vorp:TipRight", _source, T.limit, 5000)
                             return trem(_source)
@@ -841,15 +840,15 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                 items.action = "setSecondInventoryItems"
                                 if itemType == "item_standard" then
                                     if dataMeta then
-                                        VorpInv.subItem(_source, item.name, itemCount, itemMeta)
+                                        exports.vorp_inventory:subItem(_source, item.name, itemCount, itemMeta)
                                     else
-                                        VorpInv.subItem(_source, item.name, itemCount)
+                                        exports.vorp_inventory:subItem(_source, item.name, itemCount)
                                     end
                                     TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. itemCount .. T.of .. item.label, 5000)
                                 end
                                 if itemType == "item_weapon" then
                                     local weapId = item.id
-                                    VorpInv.subWeapon(_source, weapId)
+                                    exports.vorp_inventory:subWeapon(_source, weapId)
                                     TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. item.label, 5000)
                                 end
                                 TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
