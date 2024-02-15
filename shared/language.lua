@@ -1,6 +1,6 @@
-TranslationBanking = {}
+Translation = {}
 
-TranslationBanking.Langs = {
+Translation.Langs = {
     English = {
         openmenu     = "Speak to the attendant",
         closemenu    = "The bank is currently closed",
@@ -86,9 +86,15 @@ TranslationBanking.Langs = {
             insertAmountUp = "insert amount",
             upgradeSlots = "UP SLOTS",
             numOnlyUp = "numbers only",
+        },
+        Webhooks = {
+            LogTitle = "🏦 Bank Activity Log",
+            WithdrawLogDescription = "💸 **Player:** `%s`\n**Withdrew:** `%s$`\n**From Bank:** `%s`",
+            DepositLogDescription = "💰 **Player:** `%s`\n**Deposited:** `%s$`\n**To Bank:** `%s`",
+            TransferLogDescription = "🔄 **Player:** `%s`\n**Transferred:** `%s$`\n**From Bank:** `%s`\n**To Bank:** `%s`"
         }
     },
-    Portugues_PT = {
+    Portuguese_PT = {
         openmenu     = "Falar com o atendente",
         closemenu    = "The bank is currently closed",
         bank         = "Seja bem-vindo(a) ao",
@@ -175,7 +181,7 @@ TranslationBanking.Langs = {
             numOnlyUp = "apenas números",
         }
     },
-    Portugues_BR = {
+    Portuguese_BR = {
         openmenu     = "Falar com o atendente",
         closemenu    = "The bank is currently closed",
         bank         = "Seja bem vindo(a) ao",
