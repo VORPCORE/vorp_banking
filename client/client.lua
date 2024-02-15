@@ -327,6 +327,7 @@ function Openbank(bankName, allbanks)
                         VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
+                TriggerEvent("vorp_bank:ready")
             end
             if (data.current.value == 'dgold') then
                 local myInput = {
@@ -356,6 +357,7 @@ function Openbank(bankName, allbanks)
                         VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
+                TriggerEvent("vorp_bank:ready")
             end
             if (data.current.value == 'wcash') then
                 local myInput = {
@@ -385,6 +387,7 @@ function Openbank(bankName, allbanks)
                         VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
+                TriggerEvent("vorp_bank:ready")
             end
             if (data.current.value == 'wgold') then
                 local myInput = {
@@ -414,6 +417,7 @@ function Openbank(bankName, allbanks)
                         VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
+                TriggerEvent("vorp_bank:ready")
             end
             if (data.current.value == 'bitem') then
                 TriggerServerEvent("vorp_bank:ReloadBankInventory", Config.banks[bankName].city)
@@ -456,6 +460,7 @@ function Openbank(bankName, allbanks)
                         VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
+                TriggerEvent("vorp_bank:ready")
             end
             if (data.current.value == 'others') then
                 Openallbanks(bankName, allbanks)
@@ -512,6 +517,7 @@ function Openallbanks(bankName, allbanks)
                         VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
+                TriggerEvent("vorp_bank:ready")
             end
         end,
         function(data, menu)
