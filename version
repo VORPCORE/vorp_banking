@@ -1,10 +1,19 @@
+<1.7>
+- Added client and server files inside folders
+- server and client use new exports events
+- Added webhook to take or move items using safebox
+- Added readyevent in all finally ServerEvents
+- Added readyevent in client.lua in inputs to prevend dump disconnect
+- All languages are translated
+- Added webhooks languages
+- Added services.lua to functions
+
 <1.6>
 - Everything made into the translation.
 - Bank transfer from bank to bank added.
 - Webhook for bank transfers added.
 - Readme adjusted.
 - Other small adjustments.
-
 <1.5>
 - Improving translation.
 - changed exports.oxmysql:execute to MySQL.
