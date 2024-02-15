@@ -1,34 +1,33 @@
 local VORPcore = exports.vorp_core:GetCore()
-local lastMoney = {}
 local T = Translation.Langs[Config.Lang]
 
 RegisterServerEvent('vorp_bank:getinfo')
-AddEventHandler('vorp_bank:getinfo', function(name)
+AddEventHandler('vorp_bank:getinfo', function(bankName)
     local _source = source
     local Character = VORPcore.getUser(_source).getUsedCharacter
     local charidentifier = Character.charIdentifier
     local identifier = Character.identifier
     local allBanks = {}
 
-    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
+    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @bankName", { ["@charidentifier"] = charidentifier, ["@bankName"] = bankName }, function(result)
             if result[1] then
                 local money = result[1].money
                 local gold = result[1].gold
                 local invspace = result[1].invspace
-                local bankinfo = { money = money, gold = gold, invspace = invspace, name = name }
+                local bankinfo = { money = money, gold = gold, invspace = invspace, name = bankName }
 
                 local allBanksResult = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @charidentifier", { ["@charidentifier"] = charidentifier })
                 if allBanksResult[1] then
                     allBanks = allBanksResult
                 end
 
-                TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo, name, allBanks)
+                TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo, bankName, allBanks)
             else
                 local defaultMoney = 0
                 local defaultGold = 0
                 local defaultInvspace = 10
                 local parameters = {
-                    ['name'] = name,
+                    ['name'] = bankName,
                     ['identifier'] = identifier,
                     ['charidentifier'] = charidentifier,
                     ['money'] = defaultMoney,
@@ -40,19 +39,19 @@ AddEventHandler('vorp_bank:getinfo', function(name)
 
                 Wait(200)
 
-                MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result1)
+                MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @bankName", { ["@charidentifier"] = charidentifier, ["@bankName"] = bankName }, function(result1)
                     if result1[1] then
                         local money = defaultMoney
                         local gold = defaultGold
                         local invspace = defaultInvspace
-                        local bankinfo = { money = money, gold = gold, invspace = invspace, name = name }
+                        local bankinfo = { money = money, gold = gold, invspace = invspace, name = bankName }
 
                         local allBanksResult = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @charidentifier", { ["@charidentifier"] = charidentifier })
                         if allBanksResult[1] then
                             allBanks = allBanksResult
                         end
 
-                        TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo, name, allBanks)
+                        TriggerClientEvent("vorp_bank:recinfo", _source, bankinfo, bankName, allBanks)
                     end
                 end)
             end
@@ -109,7 +108,7 @@ AddEventHandler('vorp_bank:transfer', function(amount, fromBank, toBank)
     local playerFullName = Character.firstname .. ' ' .. Character.lastname
     local characterId = Character.charIdentifier
 
-    local queryResult = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @charidentifier;", { ["@charidentifier"] = characterId })
+    local queryResult = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @characterId;", { ["@characterId"] = characterId })
 
     local bankAccounts = {}
     local allBankAccounts = {}
@@ -124,10 +123,10 @@ AddEventHandler('vorp_bank:transfer', function(amount, fromBank, toBank)
             local newBalanceFrom = bankAccounts[fromBank].money - amount
             local newBalanceTo = bankAccounts[toBank].money + (amount * 0.9)
 
-            local updateFromResult = MySQL.query.await("UPDATE bank_users SET money = @newBalance WHERE charidentifier = @charidentifier AND name = @fromBank;", { ["@newBalance"] = newBalanceFrom, ["@charidentifier"] = characterId, ["@fromBank"] = fromBank })
+            local updateFromResult = MySQL.query.await("UPDATE bank_users SET money = @newBalance WHERE charidentifier = @characterId AND name = @fromBank;", { ["@newBalance"] = newBalanceFrom, ["@characterId"] = characterId, ["@fromBank"] = fromBank })
 
             if updateFromResult then
-                local updateToResult = MySQL.query.await("UPDATE bank_users SET money = @newBalance WHERE charidentifier = @charidentifier AND name = @toBank;", { ["@newBalance"] = newBalanceTo, ["@charidentifier"] = characterId, ["@toBank"] = toBank })
+                local updateToResult = MySQL.query.await("UPDATE bank_users SET money = @newBalance WHERE charidentifier = @characterId AND name = @toBank;", { ["@newBalance"] = newBalanceTo, ["@characterId"] = characterId, ["@toBank"] = toBank })
 
                 if updateToResult then
                     local transferredAmount = amount * Config.feeamount
@@ -152,23 +151,19 @@ AddEventHandler('vorp_bank:transfer', function(amount, fromBank, toBank)
 end)
 
 RegisterServerEvent('vorp_bank:depositcash')
-AddEventHandler('vorp_bank:depositcash', function(amount, bankName, bankInfo)
+AddEventHandler('vorp_bank:depositcash', function(amount, bankName)
     local _source = source
-    local Character = VORPcore.getUser(_source).getUsedCharacter
-    local playerFullName = Character.firstname .. ' ' .. Character.lastname
-    local characterId = Character.charIdentifier
-    local playerCash = Character.money
+    local playerCharacter = VORPcore.getUser(_source).getUsedCharacter
+    local characterId = playerCharacter.charIdentifier
+    local playerCash = playerCharacter.money
 
     if playerCash >= amount then
         MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { ["@characterId"] = characterId, ["@bankName"] = bankName }, function(result)
             if result[1] then
-                Character.removeCurrency(0, amount)
-                DiscordLogs(amount, bankName, playerFullName, "deposit")
-                local currentBalance = result[1].money
-                local newBalance = currentBalance + amount
-                Wait(100)
-                local updateParams = { ['charidentifier'] = characterId, ['money'] = newBalance, ['name'] = bankName }
-                MySQL.update("UPDATE bank_users SET money=@money WHERE charidentifier=@characterId AND name = @name", updateParams)
+                playerCharacter.removeCurrency(0, amount)
+                DiscordLogs(amount, bankName, playerCharacter.firstname .. ' ' .. playerCharacter.lastname, "deposit")
+                local newBalance = result[1].money + amount
+                MySQL.update("UPDATE bank_users SET money=@newBalance WHERE charidentifier=@characterId AND name = @bankName", { ['@characterId'] = characterId, ['@newBalance'] = newBalance, ['@bankName'] = bankName })
                 VORPcore.NotifyRightTip(_source, T.youdepo .. amount, 4000)
             end
         end)
@@ -179,22 +174,24 @@ AddEventHandler('vorp_bank:depositcash', function(amount, bankName, bankInfo)
 end)
 
 RegisterServerEvent('vorp_bank:depositgold')
-AddEventHandler('vorp_bank:depositgold', function(amount, bankName, bankinfo)
+AddEventHandler('vorp_bank:depositgold', function(amount, bankName)
     local _source = source
-    local Character = VORPcore.getUser(_source).getUsedCharacter
-    local characterId = Character.charIdentifier
-    local playerGold = Character.gold
+    local playerCharacter = VORPcore.getUser(_source).getUsedCharacter
+    local characterId = playerCharacter.charIdentifier
+    local playerGold = playerCharacter.gold
 
     if playerGold >= amount then
-        Character.removeCurrency(1, amount)
-        local updateParams = { ['charidentifier'] = characterId, ['gold'] = amount, ['name'] = bankName }
-        MySQL.update("UPDATE bank_users SET gold = gold + @gold WHERE charidentifier = @charidentifier AND name = @name", updateParams)
+        playerCharacter.removeCurrency(1, amount)
+        MySQL.update("UPDATE bank_users SET gold = gold + @amount WHERE charidentifier = @characterId AND name = @bankName", { ['@characterId'] = characterId, ['@amount'] = amount, ['@bankName'] = bankName })
         VORPcore.NotifyRightTip(_source, T.youdepog .. amount, 4000)
     else
         VORPcore.NotifyRightTip(_source, T.invalid, 4000)
     end
     TriggerClientEvent("vorp_bank:ready", _source)
 end)
+
+
+local lastMoney = {}
 
 RegisterServerEvent('vorp_bank:withcash')
 AddEventHandler('vorp_bank:withcash', function(amount, bankName, bankinfo)
@@ -209,7 +206,7 @@ AddEventHandler('vorp_bank:withcash', function(amount, bankName, bankinfo)
             if bankBalance >= amount then
                 if not lastMoney[_source] or lastMoney[_source] ~= bankBalance then
                     local newBalance = bankBalance - amount
-                    MySQL.update("UPDATE bank_users SET money=@newBalance WHERE charidentifier=@characterId AND name = @bankName", { ['charidentifier'] = characterId, ['money'] = newBalance, ['name'] = bankName })
+                    MySQL.update("UPDATE bank_users SET money=@newBalance WHERE charidentifier=@characterId AND name = @bankName", { ['@characterId'] = characterId, ['@newBalance'] = newBalance, ['@bankName'] = bankName })
                     lastMoney[_source] = bankBalance
                     Character.addCurrency(0, amount)
                     DiscordLogs(amount, bankName, playerFullName, "withdraw")
@@ -226,20 +223,21 @@ AddEventHandler('vorp_bank:withcash', function(amount, bankName, bankinfo)
 end)
 
 RegisterServerEvent('vorp_bank:withgold')
-AddEventHandler('vorp_bank:withgold', function(amount, bankName, bankinfo)
+AddEventHandler('vorp_bank:withgold', function(amount, bankName)
     local _source = source
-    local Character = VORPcore.getUser(_source).getUsedCharacter
-    local characterId = Character.charIdentifier
+    local playerCharacter = VORPcore.getUser(_source).getUsedCharacter
+    local characterId = playerCharacter.charIdentifier
 
     MySQL.query("SELECT gold FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { ["@characterId"] = characterId, ["@bankName"] = bankName }, function(result)
         if result[1] then
             local bankGold = result[1].gold
             if bankGold >= amount then
-                MySQL.update("UPDATE bank_users SET gold = gold - @amount WHERE charidentifier = @characterId AND name = @bankName", { ['charidentifier'] = characterId, ['gold'] = amount, ['name'] = bankName })
-                Character.addCurrency(1, amount)
+                local newGoldBalance = bankGold - amount
+                MySQL.update("UPDATE bank_users SET gold = @newGoldBalance WHERE charidentifier = @characterId AND name = @bankName", { ['@characterId'] = characterId, ['@newGoldBalance'] = newGoldBalance, ['@bankName'] = bankName })
+                playerCharacter.addCurrency(1, amount)
                 VORPcore.NotifyRightTip(_source, T.withdrewg .. amount, 4000)
             else
-                VORPcore.NotifyRightTip(_source, T.invalid .. amount, 4000)
+                VORPcore.NotifyRightTip(_source, T.invalid, 4000)
             end
         end
     end)
@@ -268,70 +266,17 @@ AddEventHandler("vorp_bank:find", function(name)
     end)
 end)
 
-local processinguser = {}
+    --=============================================
+    --             IVENTORY SYSTEM               --
+    --=============================================
 
-function inprocessing(id)
-    for k, v in pairs(processinguser) do
-        if v == id then
-            return true
-        end
-    end
-    return false
-end
-
-function trem(id)
-    for k, v in pairs(processinguser) do
-        if v == id then
-            table.remove(processinguser, k)
-        end
-    end
-end
-
-function AnIndexOf(t, val)
-    for k, v in ipairs(t) do
-        if v == val then return k end
-    end
-end
-
-function ToInteger(number)
-    _source = source
-    number = tonumber(number)
-    if number then
-        if 0 > number then
-            number = number * -1
-        elseif number == 0 then
-            return nil
-        end
-        return math.floor(number or error("Could not cast '" .. tostring(number) .. "' to number.'"))
-    else
-        return nil
-    end
-end
-
-function pairsByKeys(t, f) -- non toccare
-    local a = {}
-    for n in pairs(t) do table.insert(a, n) end
-    table.sort(a, f)
-    local i = 0             -- iterator variable
-    local iter = function() -- iterator function
-        i = i + 1
-        if a[i] == nil then
-            return nil
-        else
-            return a[i], t[a[i]]
-        end
-    end
-    return iter
-end
-
-RegisterNetEvent("vorp_bank:ReloadBankInventory") -- inventory system
-AddEventHandler("vorp_bank:ReloadBankInventory", function(bankid)
+RegisterNetEvent("vorp_bank:ReloadBankInventory")
+AddEventHandler("vorp_bank:ReloadBankInventory", function(bankName)
     local _source = source
-    local name = bankid
     local Character = VORPcore.getUser(_source).getUsedCharacter
-    local charidentifier = Character.charIdentifier
+    local characterId = Character.charIdentifier
 
-    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name ", { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
+    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @characterId AND name = @bankName ", { ["@characterId"] = characterId, ["@bankName"] = bankName }, function(result)
             if result[1].items then
                 local items = {}
                 local inv = json.decode(result[1].items)
@@ -348,7 +293,7 @@ AddEventHandler("vorp_bank:ReloadBankInventory", function(bankid)
         end)
 end)
 
-RegisterServerEvent("vorp_bank:TakeFromBank") -- inventory system
+RegisterServerEvent("vorp_bank:TakeFromBank")
 AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
     local _source = source
     if not inprocessing(_source) then
@@ -371,15 +316,16 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
 
         if itemCount and itemCount ~= 0 then
             if item.count < itemCount then
-                TriggerClientEvent("vorp:TipRight", _source, T.invalid, 5000)
+                VORPcore.NotifyRightTip(_source, T.invalid, 4000)
                 return trem(_source)
             end
         else
-            TriggerClientEvent("vorp:TipRight", _source, T.invalid, 5000)
+            VORPcore.NotifyRightTip(_source, T.invalid, 4000)
             return trem(_source)
         end
+
         if itemType == "item_weapon" then
-            TriggerEvent("vorpCore:canCarryWeapons", tonumber(_source), itemCount, function(canCarry)
+            exports.vorp_inventory:canCarryWeapons(_source, itemCount, function(canCarry)
                 if canCarry then
                     MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
                             notpass = true
@@ -406,7 +352,7 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                                     items.itemList = inv
                                     items.action = "setSecondInventoryItems"
                                     local weapId = foundItem.id
-                                    exports.vorp_inventory:giveWeapon(_source, weapId)
+                                    exports.vorp_inventory:giveWeapon(_source, weapId, _source, nil)
                                     Wait(200)
                                     TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                                     MySQL.update("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name", { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = name })
@@ -418,28 +364,28 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                         Wait(500)
                     end
                 else
-                    TriggerClientEvent("vorp:TipRight", _source, T.limit, 5000)
+                    VORPcore.NotifyRightTip(_source, T.limit, 4000)
                 end
             end, item.name)
         else
             if itemCount and itemCount ~= 0 then
                 if item.count < itemCount then
-                    TriggerClientEvent("vorp:TipRight", _source, T.invalid, 5000)
+                    VORPcore.NotifyRightTip(_source, T.invalid, 4000)
                     return trem(_source)
                 end
             else
-                TriggerClientEvent("vorp:TipRight", _source, T.invalid, 5000)
+                VORPcore.NotifyRightTip(_source, T.invalid, 4000)
                 return trem(_source)
             end
-            local count = exports.vorp_inventory:getItemCount(_source, item.name)
+            local count = exports.vorp_inventory:getItemCount(_source, nil, item.name, nil)
 
             if (count + itemCount) > item.limit then
-                TriggerClientEvent("vorp:TipRight", _source, T.maxlimit, 5000)
+                VORPcore.NotifyRightTip(_source, T.maxlimit, 4000)
                 return trem(_source)
             end
-            TriggerEvent("vorpCore:canCarryItems", tonumber(_source), itemCount, function(canCarry)
-                TriggerEvent("vorpCore:canCarryItem", tonumber(_source), item.name, itemCount, function(canCarry2)
-                    if canCarry and canCarry2 then
+            exports.vorp_inventory:canCarryItems(_source, itemCount, function(canCarryItems)
+                exports.vorp_inventory:canCarryItem(_source, item.name, itemCount, function(canCarryItem)
+                    if canCarryItems and canCarryItem then
                         MySQL.query(
                             "SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
                             { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
@@ -497,7 +443,7 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
                             Wait(500)
                         end
                     else
-                        TriggerClientEvent("vorp:TipRight", _source, T.limit, 5000)
+                        VORPcore.NotifyRightTip(_source, T.limit, 4000)
                     end
                 end)
             end)
@@ -506,50 +452,7 @@ AddEventHandler("vorp_bank:TakeFromBank", function(jsonData)
     end
 end)
 
-function checkLimit(limit, name)
-    for k, v in pairs(limit) do
-        if k == name then
-            return true
-        end
-    end
-end
-
-function checkCount(countinv, countdb, limit, nameitem)
-    for k, v in pairs(limit) do
-        if k == nameitem then
-            if countinv > v or countdb > v then
-                return true
-            end
-        end
-    end
-end
-
-function checkLimite(limit, nameitem)
-    for index, countConfig in pairs(limit) do
-        if index == nameitem then
-            return countConfig
-        end
-    end
-end
-
-function checkDB(inv, itemName, itemType)
-    for k, v in pairs(inv) do
-        if v.name == itemName then
-            if itemType == "item_standard" then
-                return v.count -- da quanti item c erano prima del deposito
-            else
-                for index, data in pairs(inv) do
-                    if v.name == itemName and itemType == "item_weapon" then
-                        count = count + 1
-                        return count
-                    end
-                end
-            end
-        end
-    end
-end
-
-RegisterServerEvent("vorp_bank:MoveToBank") -- inventory system
+RegisterServerEvent("vorp_bank:MoveToBank")
 AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
     local _source = source
     if not inprocessing(_source) then
@@ -592,13 +495,13 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                             local checkCount = checkCount(itemCount, itemDBCount, bankConfig.itemlist, item.name)
                             if checkCount then
                                 local limite = checkLimite(bankConfig.itemlist, item.name)
-                                TriggerClientEvent("vorp:TipRight", _source, T.maxitems .. limite, 5000)
+                                VORPcore.NotifyRightTip(_source, T.maxitems .. limite, 4000)
                                 return trem(_source)
                             else
                                 if itemType ~= "item_weapon" then
-                                    local countin = exports.vorp_inventory:getItemCount(_source, item.name)
+                                    local countin = exports.vorp_inventory:getItemCount(_source, nil, item.name, nil)
                                     if itemCount > countin then
-                                        TriggerClientEvent("vorp:TipRight", _source, T.limit, 5000)
+                                        VORPcore.NotifyRightTip(_source, T.limit, 4000)
                                         return trem(_source)
                                     end
                                 end
@@ -608,11 +511,11 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                 end
                                 if itemCount and itemCount ~= 0 then
                                     if item.count < itemCount then
-                                        TriggerClientEvent("vorp:TipRight", _source, T.invalid, 5000)
+                                        VORPcore.NotifyRightTip(_source, T.invalid, 4000)
                                         return trem(_source)
                                     end
                                 else
-                                    TriggerClientEvent("vorp:TipRight", _source, T.invalid, 5000)
+                                    VORPcore.NotifyRightTip(_source, T.invalid, 4000)
                                     return trem(_source)
                                 end
                                 MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name", { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
@@ -656,7 +559,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                             end
                                             countDB = countDB + itemCount
                                             if countDB > space then
-                                                TriggerClientEvent("vorp:TipRight", _source, T.limit, 5000)
+                                                VORPcore.NotifyRightTip(_source, T.maxslots, 4000)
                                             else
                                                 if foundItem then
                                                     foundItem.count = foundItem.count + itemCount
@@ -704,16 +607,16 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                                 if itemType == "item_standard" then
                                                     if dataMeta then
                                                         exports.vorp_inventory:subItem(_source, item.name, itemCount, itemMeta)
-                                                        TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. itemCount .. T.of .. item.label, 5000)
+                                                        VORPcore.NotifyRightTip(_source, T.depoitem3 .. itemCount .. T.of .. item.label, 4000)
                                                     else
                                                         exports.vorp_inventory:subItem(_source, item.name, itemCount)
-                                                        TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. itemCount .. T.of .. item.label, 5000)
+                                                        VORPcore.NotifyRightTip(_source, T.depoitem3 .. itemCount .. T.of .. item.label, 4000)
                                                     end
                                                 end
                                                 if itemType == "item_weapon" then
                                                     local weapId = item.id
                                                     exports.vorp_inventory:subWeapon(_source, weapId)
-                                                    TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. item.label, 5000)
+                                                    VORPcore.NotifyRightTip(_source, T.depoitem3 .. item.label, 4000)
                                                 end
                                                 TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                                                 MySQL.update("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name", { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = bankName })
@@ -729,9 +632,9 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                         end)
                 elseif (bankConfig.useitemlimit and not bankConfig.usespecificitem) or (not bankConfig.useitemlimit and not bankConfig.usespecificitem) then
                     if itemType ~= "item_weapon" then
-                        local countin = exports.vorp_inventory:getItemCount(_source, item.name)
+                        local countin = exports.vorp_inventory:getItemCount(_source, nil, item.name, nil)
                         if itemCount > countin then
-                            TriggerClientEvent("vorp:TipRight", _source, T.limit, 5000)
+                            VORPcore.NotifyRightTip(_source, T.limit, 4000)
                             return trem(_source)
                         end
                     end
@@ -743,11 +646,11 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
 
                     if itemCount and itemCount ~= 0 then
                         if item.count < itemCount then
-                            TriggerClientEvent("vorp:TipRight", _source, T.invalid, 5000)
+                            VORPcore.NotifyRightTip(_source, T.invalid, 4000)
                             return trem(_source)
                         end
                     else
-                        TriggerClientEvent("vorp:TipRight", _source, T.invalid, 5000)
+                        VORPcore.NotifyRightTip(_source, T.invalid, 4000)
                         return trem(_source)
                     end
 
@@ -792,7 +695,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
 
                             countDB = countDB + itemCount
                             if countDB > space then
-                                TriggerClientEvent("vorp:TipRight", _source, T.limit, 5000)
+                                VORPcore.NotifyRightTip(_source, T.maxslots, 4000)
                             else
                                 if foundItem then
                                     foundItem.count = foundItem.count + itemCount
@@ -844,12 +747,12 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                                     else
                                         exports.vorp_inventory:subItem(_source, item.name, itemCount)
                                     end
-                                    TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. itemCount .. T.of .. item.label, 5000)
+                                    VORPcore.NotifyRightTip(_source, T.depoitem3 .. itemCount .. T.of .. item.label, 4000)
                                 end
                                 if itemType == "item_weapon" then
                                     local weapId = item.id
                                     exports.vorp_inventory:subWeapon(_source, weapId)
-                                    TriggerClientEvent("vorp:TipRight", _source, T.depoitem3 .. item.label, 5000)
+                                    VORPcore.NotifyRightTip(_source, T.depoitem3 .. item.label, 4000)
                                 end
                                 TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
                                 MySQL.update("UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name", { ["@inv"] = json.encode(inv), ["@charidentifier"] = charidentifier, ["@name"] = bankName })
@@ -862,7 +765,7 @@ AddEventHandler("vorp_bank:MoveToBank", function(jsonData)
                     end
                     trem(_source)
                 else
-                    TriggerClientEvent("vorp:TipRight", _source, T.cant, 5000)
+                    VORPcore.NotifyRightTip(_source, T.cant, 4000)
                     trem(_source)
                 end
             end

@@ -418,8 +418,7 @@ function Openbank(bankName, allbanks)
             if (data.current.value == 'bitem') then
                 TriggerServerEvent("vorp_bank:ReloadBankInventory", Config.banks[bankName].city)
                 Wait(300)
-                TriggerEvent("vorp_inventory:OpenBankInventory", T.namebank, Config.banks[bankName].city,
-                    bankinfo.invspace)
+                TriggerEvent("vorp_inventory:OpenBankInventory", T.namebank, Config.banks[bankName].city, bankinfo.invspace)
                 menu.close()
                 DisplayRadar(true)
                 inmenu = false
