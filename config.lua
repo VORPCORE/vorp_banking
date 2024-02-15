@@ -1,16 +1,18 @@
-Config             = {}
+Config                    = {}
 
-Lang               = "English"
+Config.Lang               = "English"
 
-Config.Logwithdraw = ""
-Config.LogDeposti  = ""
-Config.Logtransfer = ""
-Config.Key         = 0x760A9C6F --[G]
+Config.WithdrawLogWebhook = ""
+Config.DepositLogWebhook  = ""
+Config.TransferLogWebhook = ""
+Config.TakeLogWebhook     = ""
+Config.MoveLogWebhook     = ""
+Config.Key                = 0x760A9C6F --[G]
 
-Config.banktransfer = true -- if you want to use bank transfer
-Config.feeamount    = 0.9 -- 0.9 is 10% of the transferred amount, 0.5 is 50% of the transferred amount, 0.7 is 30% of the transferred amount
+Config.banktransfer       = true       -- if you want to use bank transfer
+Config.feeamount          = 0.9        -- 0.9 is 10% of the transferred amount, 0.5 is 50% of the transferred amount, 0.7 is 30% of the transferred amount
 
-Config.banks       = {
+Config.banks              = {
 
     Valentine = {           -- names must be the same in databse BANKS TABLE
         city = "Valentine", -- names must be the same in databse BANKS TABLE
@@ -158,7 +160,7 @@ Config.banks       = {
     },
 }
 
-Config.Doors       = {
+Config.Doors              = {
     [2642457609] = 0, -- Valentine bank, front entrance, left door
     [3886827663] = 0, -- Valentine bank, front entrance, right door
     [1340831050] = 0, -- Valentine bank, gate to tellers

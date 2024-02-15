@@ -1,6 +1,6 @@
-TranslationBanking = {}
+Translation = {}
 
-TranslationBanking.Langs = {
+Translation.Langs = {
     English = {
         openmenu     = "Speak to the attendant",
         closemenu    = "The bank is currently closed",
@@ -37,7 +37,7 @@ TranslationBanking.Langs = {
         upgradeitem2 = "Cost for each slot: $ ",
         nomoney      = "You dont have money",
         success      = "You upgraded Safe Box by paying $ ",
-        maxslots     = "You have reached the maximum slots: ",
+        maxslots     = "You have reached the maximum slots ",
         maxitems     = "The limit for this item is: ",
         depoitem3    = "You have deposited ",
         of           = " of ",
@@ -86,25 +86,33 @@ TranslationBanking.Langs = {
             insertAmountUp = "insert amount",
             upgradeSlots = "UP SLOTS",
             numOnlyUp = "numbers only",
+        },
+        Webhooks     = {
+            LogTitle = "🏦 Bank Activity Log",
+            WithdrawLogDescription = "💸 **Player:** `%s`\n**Withdrew:** `%s`\n**From Bank:** `%s`",
+            DepositLogDescription = "💰 **Player:** `%s`\n**Deposited:** `%s`\n**To Bank:** `%s`",
+            TransferLogDescription = "🔄 **Player:** `%s`\n**Transferred:** `%s`\n**From Bank:** `%s`\n**To Bank:** `%s`",
+            TakeLogDescription = "📤 **Player:** `%s`\n**Take:** `%s %s`\n**From Bank:** `%s`",
+            MoveLogDescription = "📥 **Player:** `%s`\n**Moved:** `%s %s`\n**To Bank:** `%s`"
         }
     },
-    Portugues_PT = {
-        openmenu     = "Falar com o atendente",
-        closemenu    = "The bank is currently closed",
-        bank         = "Seja bem-vindo(a) ao",
+    Portuguese_PT = {
+        openmenu     = "Fale com o atendente",
+        closemenu    = "O banco está atualmente fechado",
+        bank         = "Bem-vindo ao",
         welcome      = "Bem-vindo ao Banco",
         cashbalance  = "Dinheiro: $",
         goldbalance  = "Ouro: ",
-        cashbalance2 = "As suas Economias.",
+        cashbalance2 = "As suas Poupanças.",
         takecash     = "Levantar Dinheiro",
         depocash     = "Depositar Dinheiro",
         takegold     = "Levantar Ouro",
         depogold     = "Depositar Ouro",
-        takecash2    = "Levantar o Seu Dinheiro",
-        depocash2    = "Depositar o Seu Dinheiro",
-        takegold2    = "Levantar o Seu Ouro",
-        depogold2    = "Depositar o Seu Ouro",
-        depoitem     = "Usar o seu Cofre",
+        takecash2    = "Levantar o seu Dinheiro",
+        depocash2    = "Depositar o seu Dinheiro",
+        takegold2    = "Levantar o seu Ouro",
+        depogold2    = "Depositar o seu Ouro",
+        depoitem     = "Use o seu Cofre",
         depoitem2    = "Espaço Disponível: ",
         confirm      = "Confirmar",
         amount       = "Quantidade de espaços",
@@ -118,86 +126,95 @@ TranslationBanking.Langs = {
         depoc        = "Depositar Dinheiro",
         depog        = "Depositar Ouro",
         namebank     = "Inventário do Banco",
-        limit        = "Não pode transportar outros itens",
+        limit        = "Não pode transportar mais itens",
         maxlimit     = "Atingiu o máximo do item",
-        upgradeitem  = "Melhorar Espaço no Cofre",
-        upgradeitem2 = "Custo por cada espaço: $ ",
+        upgradeitem  = "Melhorar Slot do Cofre",
+        upgradeitem2 = "Custo por cada slot: $ ",
         nomoney      = "Não tem dinheiro",
         success      = "Melhorou o Cofre pagando $ ",
-        maxslots     = "Atingiu o número máximo de espaços: ",
+        maxslots     = "Atingiu o número máximo de slots ",
         maxitems     = "O limite para este item é: ",
         depoitem3    = "Depositou ",
         of           = " de ",
         withitem     = "Levantou ",
         cant         = "Não pode depositar este item",
-        closed       = "O banco encontra-se fechado",
+        closed       = "O banco está atualmente fechado",
         openHours    = "Horário de Funcionamento",
-        amTimeZone   = "am",
-        pmTimeZone   = "pm",
-        noaccmoney   = "You can't transfer that much money!",
-        transfer     = "You have transferred ",
-        to           = " to ",
-        transferred  = " successfully.",
-        bankacc      = "Additional Bank Accounts",
-        bankaccinfo  = "Here you have an overview of your bank accounts in other cities. You can make transfers to your account HERE.",
-        transferinfo = "You can have money transferred here. There is a 10% fee applied to each transfer!",
+        amTimeZone   = "da manhã",
+        pmTimeZone   = "da tarde",
+        noaccmoney   = "Não pode transferir tanto dinheiro!",
+        transfer     = "Transferiu ",
+        to           = " para ",
+        transferred  = " com sucesso.",
+        bankacc      = "Contas Bancárias Adicionais",
+        bankaccinfo  = "Aqui tem uma visão geral das suas contas bancárias noutras cidades. Pode fazer transferências para a sua conta AQUI.",
+        transferinfo = "Pode receber transferências aqui. Aplica-se uma taxa de 10% a cada transferência!",
         inputsLang   = {
             -- [ DEPOSITAR DINHEIRO ]
-            confirmCash = "Confirmar",            -- Nome do botão
-            insertAmountCash = "inserir quantia", -- Nome do espaço reservado (placeholder)
-            depositCash = "DEPOSITAR DINHEIRO",   -- Cabeçalho do botão
-            numOnlyCash = "apenas números",      -- Mensagem se o input não for válido
+            confirmCash = "Confirmar",             -- Nome do Botão
+            insertAmountCash = "inserir montante", -- Nome do Espaço
+            depositCash = "DEPOSITAR DINHEIRO",    -- Cabeçalho do Botão
+            numOnlyCash = "apenas números",        -- se a entrada não corresponder, mostrar esta mensagem
             -- [ DEPOSITAR OURO ]
             confirmGold = "Confirmar",
-            insertAmountGold = "inserir quantia",
+            insertAmountGold = "inserir montante",
             depositGold = "DEPOSITAR OURO",
             numOnlyGold = "apenas números",
             ------------------------------------
             -- [ LEVANTAR DINHEIRO ]
             confirmCashW = "Confirmar",
-            insertAmountCashW = "inserir quantia",
+            insertAmountCashW = "inserir montante",
             withdrawCash = "LEVANTAR DINHEIRO",
             numOnlyCashW = "apenas números",
             -- [ LEVANTAR OURO ]
             confirmGoldW = "Confirmar",
-            insertAmountGoldW = "inserir quantia",
+            insertAmountGoldW = "inserir montante",
             withdrawGold = "LEVANTAR OURO",
             numOnlyGoldW = "apenas números",
             ------------------------------------
-            -- [ MONEY TRANSFER ]
-            Transfer = "Transfer",
-            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
+            -- [ TRANSFERÊNCIA DE DINHEIRO ]
+            Transfer = "Transferir",
+            depositTransfer = "Quanto gostaria de transferir para a sua conta bancária AQUI?", -- Cabeçalho do Botão
             ------------------------------------
-            -- [ MELHORAR ESPAÇOS DO INVENTÁRIO ]
+            -- [ MELHORAR SLOTS DE INV ]
             confirmUp = "Confirmar",
-            insertAmountUp = "inserir quantia",
-            upgradeSlots = "MELHORAR ESPAÇOS",
+            insertAmountUp = "inserir montante",
+            upgradeSlots = "MELHORAR SLOTS",
             numOnlyUp = "apenas números",
+        },
+        Webhooks     = {
+            LogTitle = "🏦 Registo de Atividades do Banco",
+            WithdrawLogDescription = "💸 **Jogador:** `%s`\n**Levantou:** `%s`\n**Do Banco:** `%s`",
+            DepositLogDescription = "💰 **Jogador:** `%s`\n**Depositou:** `%s`\n**No Banco:** `%s`",
+            TransferLogDescription =
+            "🔄 **Jogador:** `%s`\n**Transferiu:** `%s`\n**Do Banco:** `%s`\n**Para o Banco:** `%s`",
+            TakeLogDescription = "📤 **Jogador:** `%s`\n**Retirou:** `%s %s`\n**Do Banco:** `%s`",
+            MoveLogDescription = "📥 **Jogador:** `%s`\n**Moveu:** `%s %s`\n**Para o Banco:** `%s`"
         }
     },
-    Portugues_BR = {
-        openmenu     = "Falar com o atendente",
-        closemenu    = "The bank is currently closed",
-        bank         = "Seja bem vindo(a) ao",
+    Portuguese_BR = {
+        openmenu     = "Fale com o atendente",
+        closemenu    = "O banco está fechado no momento",
+        bank         = "Bem-vindo ao",
         welcome      = "Bem-vindo ao Banco",
         cashbalance  = "Dinheiro: $",
         goldbalance  = "Ouro: ",
-        cashbalance2 = "Suas Economias.",
+        cashbalance2 = "Suas economias.",
         takecash     = "Sacar Dinheiro",
         depocash     = "Depositar Dinheiro",
         takegold     = "Sacar Ouro",
         depogold     = "Depositar Ouro",
-        takecash2    = "Sacar Seu Dinheiro",
-        depocash2    = "Depositar Seu Dinheiro",
-        takegold2    = "Sacar Seu Ouro",
-        depogold2    = "Depositar Seu Ouro",
+        takecash2    = "Sacar seu Dinheiro",
+        depocash2    = "Depositar seu Dinheiro",
+        takegold2    = "Sacar seu Ouro",
+        depogold2    = "Depositar seu Ouro",
         depoitem     = "Usar seu Cofre",
         depoitem2    = "Espaço Disponível: ",
         confirm      = "Confirmar",
         amount       = "Quantidade de espaços",
         youdepo      = "Você depositou $",
         youdepog     = "Você depositou G",
-        invalid      = "Quantidade inválida",
+        invalid      = "Quantidade Inválida",
         withdrew     = "Você sacou $",
         withdrewg    = "Você sacou G",
         withc        = "Sacar Dinheiro",
@@ -205,13 +222,13 @@ TranslationBanking.Langs = {
         depoc        = "Depositar Dinheiro",
         depog        = "Depositar Ouro",
         namebank     = "Inventário do Banco",
-        limit        = "Você não pode carregar outros itens",
-        maxlimit     = "Você atingiu o máximo deste item",
-        upgradeitem  = "Melhorar Espaço no Cofre",
+        limit        = "Você não pode carregar mais itens",
+        maxlimit     = "Você atingiu o máximo do item",
+        upgradeitem  = "Aumentar Espaço do Cofre",
         upgradeitem2 = "Custo por espaço: $ ",
         nomoney      = "Você não tem dinheiro",
-        success      = "Você melhorou o Cofre pagando $ ",
-        maxslots     = "Você atingiu o número máximo de espaços: ",
+        success      = "Você aumentou o espaço do Cofre pagando $ ",
+        maxslots     = "Você atingiu o máximo de espaços ",
         maxitems     = "O limite para este item é: ",
         depoitem3    = "Você depositou ",
         of           = " de ",
@@ -221,19 +238,19 @@ TranslationBanking.Langs = {
         openHours    = "Horário de Funcionamento",
         amTimeZone   = "am",
         pmTimeZone   = "pm",
-        noaccmoney   = "You can't transfer that much money!",
-        transfer     = "You have transferred ",
-        to           = " to ",
-        transferred  = " successfully.",
-        bankacc      = "Additional Bank Accounts",
-        bankaccinfo  = "Here you have an overview of your bank accounts in other cities. You can make transfers to your account HERE.",
-        transferinfo = "You can have money transferred here. There is a 10% fee applied to each transfer!",
+        noaccmoney   = "Você não pode transferir tanto dinheiro!",
+        transfer     = "Você transferiu ",
+        to           = " para ",
+        transferred  = " com sucesso.",
+        bankacc      = "Contas Bancárias Adicionais",
+        bankaccinfo  = "Aqui você tem uma visão geral de suas contas bancárias em outras cidades. Você pode fazer transferências para sua conta AQUI.",
+        transferinfo = "Você pode transferir dinheiro aqui. Uma taxa de 10% é aplicada a cada transferência!",
         inputsLang   = {
             -- [ DEPOSIT CASH ]
             confirmCash = "Confirmar",               -- Nome do Botão
-            insertAmountCash = "inserir quantidade", -- Nome do Marcador de posição
+            insertAmountCash = "inserir quantidade", -- Nome do Placeholder
             depositCash = "DEPOSITAR DINHEIRO",      -- Cabeçalho do Botão
-            numOnlyCash = "apenas números",         -- Se a entrada não corresponder, mostrar esta mensagem
+            numOnlyCash = "apenas números",          -- se a entrada não corresponder, mostre esta mensagem
             -- [ DEPOSIT GOLD ]
             confirmGold = "Confirmar",
             insertAmountGold = "inserir quantidade",
@@ -252,19 +269,28 @@ TranslationBanking.Langs = {
             numOnlyGoldW = "apenas números",
             ------------------------------------
             -- [ MONEY TRANSFER ]
-            Transfer = "Transfer",
-            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
+            Transfer = "Transferir",
+            depositTransfer = "Quanto você gostaria de transferir para sua conta bancária AQUI?", -- Cabeçalho do Botão
             ------------------------------------
             -- [ UPGRADE SLOTS INV ]
             confirmUp = "Confirmar",
             insertAmountUp = "inserir quantidade",
             upgradeSlots = "AUMENTAR ESPAÇOS",
             numOnlyUp = "apenas números",
+        },
+        Webhooks     = {
+            LogTitle = "🏦 Registro de Atividades do Banco",
+            WithdrawLogDescription = "💸 **Jogador:** `%s`\n**Sacou:** `%s`\n**Do Banco:** `%s`",
+            DepositLogDescription = "💰 **Jogador:** `%s`\n**Depositou:** `%s`\n**No Banco:** `%s`",
+            TransferLogDescription =
+            "🔄 **Jogador:** `%s`\n**Transferiu:** `%s`\n**Do Banco:** `%s`\n**Para o Banco:** `%s`",
+            TakeLogDescription = "📤 **Jogador:** `%s`\n**Pegou:** `%s %s`\n**Do Banco:** `%s`",
+            MoveLogDescription = "📥 **Jogador:** `%s`\n**Moveu:** `%s %s`\n**Para o Banco:** `%s`"
         }
     },
-    Francais = {
-        openmenu     = "Parler à l'agent",
-        closemenu    = "The bank is currently closed",
+    French = {
+        openmenu     = "Parler au guichetier",
+        closemenu    = "La banque est actuellement fermée",
         bank         = "Bienvenue à",
         welcome      = "Bienvenue à la Banque",
         cashbalance  = "Argent : $",
@@ -278,7 +304,7 @@ TranslationBanking.Langs = {
         depocash2    = "Déposer votre argent",
         takegold2    = "Retirer votre or",
         depogold2    = "Déposer votre or",
-        depoitem     = "Utilisez votre Coffre",
+        depoitem     = "Utiliser votre coffre",
         depoitem2    = "Espace disponible : ",
         confirm      = "Confirmer",
         amount       = "Nombre d'emplacements",
@@ -291,14 +317,14 @@ TranslationBanking.Langs = {
         withg        = "Retirer de l'or",
         depoc        = "Déposer de l'argent",
         depog        = "Déposer de l'or",
-        namebank     = "Inventaire de la Banque",
-        limit        = "Vous ne pouvez pas transporter d'autres objets",
-        maxlimit     = "Vous avez atteint la limite de cet objet",
-        upgradeitem  = "Améliorer l'emplacement du Coffre",
-        upgradeitem2 = "Coût pour chaque emplacement : $",
+        namebank     = "Inventaire de la banque",
+        limit        = "Vous ne pouvez pas porter d'autres objets",
+        maxlimit     = "Vous avez atteint le maximum pour cet objet",
+        upgradeitem  = "Améliorer l'emplacement du coffre-fort",
+        upgradeitem2 = "Coût par emplacement : $ ",
         nomoney      = "Vous n'avez pas d'argent",
-        success      = "Vous avez amélioré le Coffre en payant $",
-        maxslots     = "Vous avez atteint le nombre maximum d'emplacements : ",
+        success      = "Vous avez amélioré le coffre-fort en payant $ ",
+        maxslots     = "Vous avez atteint le nombre maximum d'emplacements ",
         maxitems     = "La limite pour cet objet est de : ",
         depoitem3    = "Vous avez déposé ",
         of           = " de ",
@@ -306,54 +332,63 @@ TranslationBanking.Langs = {
         cant         = "Vous ne pouvez pas déposer cet objet",
         closed       = "La banque est actuellement fermée",
         openHours    = "Heures d'ouverture",
-        amTimeZone   = "matin",
-        pmTimeZone   = "après-midi",
-        noaccmoney   = "You can't transfer that much money!",
-        transfer     = "You have transferred ",
-        to           = " to ",
-        transferred  = " successfully.",
-        bankacc      = "Additional Bank Accounts",
-        bankaccinfo  = "Here you have an overview of your bank accounts in other cities. You can make transfers to your account HERE.",
-        transferinfo = "You can have money transferred here. There is a 10% fee applied to each transfer!",
+        amTimeZone   = "du matin",
+        pmTimeZone   = "de l'après-midi",
+        noaccmoney   = "Vous ne pouvez pas transférer autant d'argent !",
+        transfer     = "Vous avez transféré ",
+        to           = " à ",
+        transferred  = " avec succès.",
+        bankacc      = "Comptes bancaires supplémentaires",
+        bankaccinfo  = "Ici, vous avez un aperçu de vos comptes bancaires dans d'autres villes. Vous pouvez effectuer des transferts vers votre compte ICI.",
+        transferinfo = "Vous pouvez faire transférer de l'argent ici. Une commission de 10% est appliquée à chaque transfert !",
         inputsLang   = {
-            -- [ DÉPOSER DE L'ARGENT ]
+            -- [ DEPOSIT CASH ]
             confirmCash = "Confirmer",               -- Nom du bouton
-            insertAmountCash = "insérer le montant", -- Nom de l'espace réservé
-            depositCash = "DÉPOSER DE L'ARGENT",    -- En-tête du bouton
-            numOnlyCash = "nombres uniquement",      -- si la saisie ne correspond pas, afficher ce message
-            -- [ DÉPOSER DE L'OR ]
+            insertAmountCash = "insérer un montant", -- Nom de l'espace réservé
+            depositCash = "DÉPOSER DE L'ARGENT",     -- En-tête du bouton
+            numOnlyCash = "chiffres uniquement",     -- si l'entrée ne correspond pas, afficher ce message
+            -- [ DEPOSIT GOLD ]
             confirmGold = "Confirmer",
-            insertAmountGold = "insérer le montant",
+            insertAmountGold = "insérer un montant",
             depositGold = "DÉPOSER DE L'OR",
-            numOnlyGold = "nombres uniquement",
+            numOnlyGold = "chiffres uniquement",
             ------------------------------------
-            -- [ RETIRER DE L'ARGENT ]
+            -- [ WITHDRAW CASH ]
             confirmCashW = "Confirmer",
-            insertAmountCashW = "insérer le montant",
+            insertAmountCashW = "insérer un montant",
             withdrawCash = "RETIRER DE L'ARGENT",
-            numOnlyCashW = "nombres uniquement",
-            -- [ RETIRER DE L'OR ]
+            numOnlyCashW = "chiffres uniquement",
+            -- [ WITHDRAW GOLD ]
             confirmGoldW = "Confirmer",
-            insertAmountGoldW = "insérer le montant",
+            insertAmountGoldW = "insérer un montant",
             withdrawGold = "RETIRER DE L'OR",
-            numOnlyGoldW = "nombres uniquement",
+            numOnlyGoldW = "chiffres uniquement",
             ------------------------------------
             -- [ MONEY TRANSFER ]
-            Transfer = "Transfer",
-            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
+            Transfer = "Transférer",
+            depositTransfer = "Combien souhaitez-vous transférer vers votre compte bancaire ICI ?", -- En-tête du bouton
             ------------------------------------
-            -- [ AMÉLIORER LES EMPLACEMENTS DE L'INV ]
+            -- [ UPGRADE SLOTS INV ]
             confirmUp = "Confirmer",
-            insertAmountUp = "insérer le montant",
-            upgradeSlots = "UP SLOTS",
-            numOnlyUp = "nombres uniquement",
+            insertAmountUp = "insérer un montant",
+            upgradeSlots = "AUGMENTER LES EMPLACEMENTS",
+            numOnlyUp = "chiffres uniquement",
+        },
+        Webhooks     = {
+            LogTitle = "🏦 Journal d'activité de la banque",
+            WithdrawLogDescription = "💸 **Joueur :** `%s`\n**A retiré :** `%s`\n**De la banque :** `%s`",
+            DepositLogDescription = "💰 **Joueur :** `%s`\n**A déposé :** `%s`\n**À la banque :** `%s`",
+            TransferLogDescription =
+            "🔄 **Joueur :** `%s`\n**A transféré :** `%s`\n**De la banque :** `%s`\n**À la banque :** `%s`",
+            TakeLogDescription = "📤 **Joueur :** `%s`\n**A pris :** `%s %s`\n**De la banque :** `%s`",
+            MoveLogDescription = "📥 **Joueur :** `%s`\n**A déplacé :** `%s %s`\n**À la banque :** `%s`"
         }
     },
     German = {
-        openmenu     = "Mit dem Mitarbeiter sprechen",
-        closemenu    = "Die Bank hat aktuell geschlossen",
+        openmenu     = "Sprechen Sie mit dem Angestellten",
+        closemenu    = "Die Bank ist derzeit geschlossen",
         bank         = "Willkommen bei",
-        welcome      = "Willkommen in der Bank",
+        welcome      = "Willkommen bei der Bank",
         cashbalance  = "Geld: $",
         goldbalance  = "Gold: ",
         cashbalance2 = "Ihre Ersparnisse.",
@@ -365,10 +400,10 @@ TranslationBanking.Langs = {
         depocash2    = "Ihr Bargeld einzahlen",
         takegold2    = "Ihr Gold abheben",
         depogold2    = "Ihr Gold einzahlen",
-        depoitem     = "Verwenden Sie Ihren Safe",
+        depoitem     = "Verwenden Sie Ihr Schließfach",
         depoitem2    = "Verfügbarer Platz: ",
         confirm      = "Bestätigen",
-        amount       = "Anzahl der Plätze",
+        amount       = "Anzahl der Fächer",
         youdepo      = "Sie haben $ eingezahlt",
         youdepog     = "Sie haben G eingezahlt",
         invalid      = "Ungültiger Betrag",
@@ -378,69 +413,78 @@ TranslationBanking.Langs = {
         withg        = "Gold abheben",
         depoc        = "Bargeld einzahlen",
         depog        = "Gold einzahlen",
-        namebank     = "Bank Inventar",
-        limit        = "Sie können keine anderen Gegenstände tragen",
-        maxlimit     = "Sie haben das Maximum für diesen Gegenstand erreicht",
-        upgradeitem  = "Safe Box Slot erweitern",
-        upgradeitem2 = "Kosten pro Platz: $ ",
+        namebank     = "Bankinventar",
+        limit        = "Sie können keine weiteren Gegenstände tragen",
+        maxlimit     = "Sie haben das Maximum des Gegenstands erreicht",
+        upgradeitem  = "Schließfach-Slot erweitern",
+        upgradeitem2 = "Kosten pro Slot: $ ",
         nomoney      = "Sie haben kein Geld",
-        success      = "Sie haben den Safe erfolgreich erweitert und $ bezahlt",
-        maxslots     = "Sie haben die maximale Anzahl an Plätzen erreicht: ",
+        success      = "Sie haben das Schließfach erfolgreich mit $ erweitert",
+        maxslots     = "Sie haben die maximale Anzahl von Slots erreicht",
         maxitems     = "Das Limit für diesen Gegenstand ist: ",
-        depoitem3    = "Sie haben ",
+        depoitem3    = "Sie haben eingezahlt ",
         of           = " von ",
-        withitem     = "Sie haben ",
+        withitem     = "Sie haben abgehoben ",
         cant         = "Sie können diesen Gegenstand nicht einzahlen",
         closed       = "Die Bank ist derzeit geschlossen",
         openHours    = "Öffnungszeiten",
-        amTimeZone   = "vorm.",
-        pmTimeZone   = "nachm.",
-        noaccmoney   = "Soviel Geld kannst du nicht überweisen!",
-        transfer     = "Du hast ",
-        to           = " nach ",
-        transferred  = " überwiesen.",
-        bankacc      = "Weitere Bankkonten",
-        bankaccinfo  = "Hier hast du eine Übersicht, über deine Bankkonten in andern Städten, du kannst Überweisungen auf dein Konto HIER vornehmen.",
-        transferinfo = "Du kannst dir Geld hierher überweisen lassen, es fallen 10% Gebühren auf jede Überweisung an! Die Gebühren werden dem zu überweisenden Betrag abgezogen.",
+        amTimeZone   = "Uhr morgens",
+        pmTimeZone   = "Uhr nachmittags",
+        noaccmoney   = "Sie können nicht so viel Geld überweisen!",
+        transfer     = "Sie haben überwiesen ",
+        to           = " an ",
+        transferred  = " erfolgreich.",
+        bankacc      = "Zusätzliche Bankkonten",
+        bankaccinfo  = "Hier haben Sie einen Überblick über Ihre Bankkonten in anderen Städten. Sie können Überweisungen auf Ihr Konto HIER tätigen.",
+        transferinfo = "Sie können hier Geld überweisen. Es wird eine Gebühr von 10% pro Überweisung erhoben!",
         inputsLang   = {
-            -- [ GELD EINZAHLEN ]
-            confirmCash = "Bestätigen",          -- Button Name
+            -- [ DEPOSIT CASH ]
+            confirmCash = "Bestätigen",           -- Button Name
             insertAmountCash = "Betrag eingeben", -- Placeholder Name
-            depositCash = "GELD EINZAHLEN",       -- Überschrift des Buttons
-            numOnlyCash = "nur Zahlen",           -- wenn die Eingabe nicht passt, zeige diese Nachricht an
-            -- [ GOLD EINZAHLEN ]
+            depositCash = "BARGELD EINZAHLEN",    -- Header of Button
+            numOnlyCash = "nur Zahlen",           -- if input doesn't match show this message
+            -- [ DEPOSIT GOLD ]
             confirmGold = "Bestätigen",
             insertAmountGold = "Betrag eingeben",
             depositGold = "GOLD EINZAHLEN",
             numOnlyGold = "nur Zahlen",
             ------------------------------------
-            -- [ GELD ABHEBEN ]
+            -- [ WITHDRAW CASH ]
             confirmCashW = "Bestätigen",
             insertAmountCashW = "Betrag eingeben",
-            withdrawCash = "GELD ABHEBEN",
+            withdrawCash = "BARGELD ABHEBEN",
             numOnlyCashW = "nur Zahlen",
-            -- [ GOLD ABHEBEN ]
+            -- [ WITHDRAW GOLD ]
             confirmGoldW = "Bestätigen",
             insertAmountGoldW = "Betrag eingeben",
             withdrawGold = "GOLD ABHEBEN",
             numOnlyGoldW = "nur Zahlen",
             ------------------------------------
-            -- [ GELD ÜBERWEISUNG ]
+            -- [ MONEY TRANSFER ]
             Transfer = "Überweisung",
-            depositTransfer = "Welchen Betrag, darf ich auf ihr Bankkonto HIER überweisen?", -- Überschrift des Buttons
+            depositTransfer = "Wie viel möchten Sie auf Ihr Bankkonto HIER überweisen?", -- Button Header
             ------------------------------------
-            -- [ SLOTS ERWEITERN ]
+            -- [ UPGRADE SLOTS INV ]
             confirmUp = "Bestätigen",
             insertAmountUp = "Betrag eingeben",
-            upgradeSlots = "PLÄTZE ERWEITERN",
+            upgradeSlots = "SLOTS ERWEITERN",
             numOnlyUp = "nur Zahlen",
+        },
+        Webhooks     = {
+            LogTitle = "🏦 Bankaktivitätsprotokoll",
+            WithdrawLogDescription = "💸 **Spieler:** `%s`\n**Hat abgehoben:** `%s`\n**Von Bank:** `%s`",
+            DepositLogDescription = "💰 **Spieler:** `%s`\n**Hat eingezahlt:** `%s`\n**Zu Bank:** `%s`",
+            TransferLogDescription =
+            "🔄 **Spieler:** `%s`\n**Hat überwiesen:** `%s`\n**Von Bank:** `%s`\n**Zu Bank:** `%s`",
+            TakeLogDescription = "📤 **Spieler:** `%s`\n**Hat genommen:** `%s %s`\n**Von Bank:** `%s`",
+            MoveLogDescription = "📥 **Spieler:** `%s`\n**Hat bewegt:** `%s %s`\n**Zu Bank:** `%s`"
         }
     },
     Spanish = {
-        openmenu     = "Hablar con el empleado",
-        closemenu    = "El banco está actualmente cerrado",
+        openmenu     = "Habla con el asistente",
+        closemenu    = "El banco está cerrado actualmente",
         bank         = "Bienvenido a",
-        welcome      = "Bienvenido Al Banco",
+        welcome      = "Bienvenido al Banco",
         cashbalance  = "Dinero: $",
         goldbalance  = "Oro: ",
         cashbalance2 = "Tus Ahorros.",
@@ -448,11 +492,11 @@ TranslationBanking.Langs = {
         depocash     = "Depositar Dinero",
         takegold     = "Retirar Oro",
         depogold     = "Depositar Oro",
-        takecash2    = "Retirar Tu Dinero",
-        depocash2    = "Depositar Tu Dinero",
-        takegold2    = "Retirar Tu Oro",
-        depogold2    = "Depositar Tu Oro",
-        depoitem     = "Usar tu Caja Fuerte",
+        takecash2    = "Retira tu Dinero",
+        depocash2    = "Deposita tu Dinero",
+        takegold2    = "Retira tu Oro",
+        depogold2    = "Deposita tu Oro",
+        depoitem     = "Usa tu Caja Fuerte",
         depoitem2    = "Espacio Disponible: ",
         confirm      = "Confirmar",
         amount       = "Cantidad de espacios",
@@ -466,13 +510,13 @@ TranslationBanking.Langs = {
         depoc        = "Depositar Dinero",
         depog        = "Depositar Oro",
         namebank     = "Inventario del Banco",
-        limit        = "No puedes llevar otros objetos",
-        maxlimit     = "Has alcanzado el máximo de este objeto",
-        upgradeitem  = "Mejorar Espacios Caja Fuerte",
+        limit        = "No puedes llevar más objetos",
+        maxlimit     = "Has alcanzado el máximo del objeto",
+        upgradeitem  = "Mejorar Espacio de Caja Fuerte",
         upgradeitem2 = "Costo por cada espacio: $ ",
-        nomoney      = "No tienes suficiente dinero",
-        success      = "Has mejorado tu Caja Fuerte pagando $ ",
-        maxslots     = "Has alcanzado el máximo de espacios: ",
+        nomoney      = "No tienes dinero",
+        success      = "Has mejorado la Caja Fuerte pagando $ ",
+        maxslots     = "Has alcanzado los espacios máximos",
         maxitems     = "El límite para este objeto es: ",
         depoitem3    = "Has depositado ",
         of           = " de ",
@@ -482,133 +526,139 @@ TranslationBanking.Langs = {
         openHours    = "Horario de Apertura",
         amTimeZone   = "am",
         pmTimeZone   = "pm",
-        noaccmoney   = "You can't transfer that much money!",
-        transfer     = "You have transferred ",
-        to           = " to ",
-        transferred  = " successfully.",
-        bankacc      = "Additional Bank Accounts",
-        bankaccinfo  = "Here you have an overview of your bank accounts in other cities. You can make transfers to your account HERE.",
-        transferinfo = "You can have money transferred here. There is a 10% fee applied to each transfer!",
+        noaccmoney   = "¡No puedes transferir tanto dinero!",
+        transfer     = "Has transferido ",
+        to           = " a ",
+        transferred  = " exitosamente.",
+        bankacc      = "Cuentas Bancarias Adicionales",
+        bankaccinfo  = "Aquí tienes una visión general de tus cuentas bancarias en otras ciudades. Puedes hacer transferencias a tu cuenta AQUÍ.",
+        transferinfo = "Puedes recibir transferencias de dinero aquí. ¡Se aplica una tarifa del 10% a cada transferencia!",
         inputsLang   = {
-            -- [ DEPOSITAR DINERO ]
-            confirmCash = "Confirmar",             -- Nombre del Botón
-            insertAmountCash = "insertar cantidad", -- Nombre del Marcador de posición
-            depositCash = "DEPOSITAR DINERO",       -- Encabezado del Botón
-            numOnlyCash = "solo números",           -- Si la entrada no coincide, muestra este mensaje
-            -- [ DEPOSITAR ORO ]
+            -- [ DEPOSIT CASH ]
+            confirmCash = "Confirmar",            -- Nombre del botón
+            insertAmountCash = "insertar cantidad", -- Nombre del marcador de posición
+            depositCash = "DEPOSITAR DINERO",       -- Encabezado del botón
+            numOnlyCash = "solo números",       -- si la entrada no coincide, muestra este mensaje
+            -- [ DEPOSIT GOLD ]
             confirmGold = "Confirmar",
             insertAmountGold = "insertar cantidad",
             depositGold = "DEPOSITAR ORO",
             numOnlyGold = "solo números",
             ------------------------------------
-            -- [ RETIRAR DINERO ]
+            -- [ WITHDRAW CASH ]
             confirmCashW = "Confirmar",
             insertAmountCashW = "insertar cantidad",
             withdrawCash = "RETIRAR DINERO",
             numOnlyCashW = "solo números",
-            -- [ RETIRAR ORO ]
+            -- [ WITHDRAW GOLD ]
             confirmGoldW = "Confirmar",
             insertAmountGoldW = "insertar cantidad",
             withdrawGold = "RETIRAR ORO",
             numOnlyGoldW = "solo números",
             ------------------------------------
             -- [ MONEY TRANSFER ]
-            Transfer = "Transfer",
-            depositTransfer = "How much would you like to transfer to your bank account HERE?", -- Button Header
+            Transfer = "Transferir",
+            depositTransfer = "¿Cuánto te gustaría transferir a tu cuenta bancaria AQUÍ?", -- Encabezado del botón
             ------------------------------------
-            -- [ MEJORAR ESPACIOS INV ]
+            -- [ UPGRADE SLOTS INV ]
             confirmUp = "Confirmar",
             insertAmountUp = "insertar cantidad",
             upgradeSlots = "MEJORAR ESPACIOS",
             numOnlyUp = "solo números",
+        },
+        Webhooks = {
+            LogTitle = "🏦 Registro de Actividad Bancaria",
+            WithdrawLogDescription = "💸 **Jugador:** `%s`\n**Retiró:** `%s`\n**Del Banco:** `%s`",
+            DepositLogDescription = "💰 **Jugador:** `%s`\n**Depositó:** `%s`\n**Al Banco:** `%s`",
+            TransferLogDescription = "🔄 **Jugador:** `%s`\n**Transfirió:** `%s`\n**Del Banco:** `%s`\n**Al Banco:** `%s`",
+            TakeLogDescription = "📤 **Jugador:** `%s`\n**Tomó:** `%s %s`\n**Del Banco:** `%s`",
+            MoveLogDescription = "📥 **Jugador:** `%s`\n**Movió:** `%s %s`\n**Al Banco:** `%s`"
         }
     },
-	Romanian = {
-		openmenu     = "Vorbiti cu angajatul",
-		closemenu    = "Banca este închisă momentan",
-		bank         = "Bine ati venit la",
-		welcome      = "Bine ati venit la Banca",
-		cashbalance  = "Bani: $",
-		goldbalance  = "Aur: ",
-		cashbalance2 = "Conturile tale.",
-		takecash     = "Retrage bani",
-		depocash     = "Depune bani",
-		takegold     = "Retrage aur",
-		depogold     = "Depune aur",
-		takecash2    = "Retrage-ti banii",
-		depocash2    = "Depune-ti banii",
-		takegold2    = "Retrage-ti aurul",
-		depogold2    = "Depune-ti aurul",
-		depoitem     = "Folosește cutia ta de valori",
-		depoitem2    = "Spatiu disponibil: ",
-		confirm      = "Confirmă",
-		amount       = "Numărul de sloturi",
-		youdepo      = "Ai depus $",
-		youdepog     = "Ai depus G",
-		invalid      = "Sumă invalidă",
-		withdrew     = "Ai retras $",
-		withdrewg    = "Ai retras G",
-		withc        = "Retrage bani",
-		withg        = "Retrage aur",
-		depoc        = "Depune bani",
-		depog        = "Depune aur",
-		namebank     = "Inventarul băncii",
-		limit        = "Nu poti purta alte obiecte",
-		maxlimit     = "Ai atins limita maximă a obiectului",
-		upgradeitem  = "Upgrade Slot Cutie de Valori",
-		upgradeitem2 = "Cost pentru fiecare slot: $ ",
-		nomoney      = "Nu ai bani",
-		success      = "Ai upgrade-at cutia de valori, plătind $ ",
-		maxslots     = "Ai atins numărul maxim de sloturi: ",
-		maxitems     = "Limita pentru acest obiect este: ",
-		depoitem3    = "Ai depozitat ",
-		of           = " din ",
-		withitem     = "Ai retras ",
-		cant         = "Nu poti depune acest obiect",
-		closed       = "Banca este închisă momentan",
-		openHours    = "Orele de deschidere",
-		amTimeZone   = "am",
-		pmTimeZone   = "pm",
-		noaccmoney   = "Nu poti transfera atât de multi bani!",
-		transfer     = "Ai transferat ",
-		to           = " către ",
-		transferred  = " cu succes.",
-		bankacc      = "Conturi bancare suplimentare",
-		bankaccinfo  = "Aici ai o vedere de ansamblu a conturilor tale bancare în alte orașe. Puteti face transferuri către contul TĂU aici.",
-		transferinfo = "Puteti transfera bani aici. Se aplică o taxă de 10% la fiecare transfer!",
+    Romanian = {
+        openmenu     = "Vorbește cu funcționarul",
+        closemenu    = "Banca este închisă momentan",
+        bank         = "Bine ați venit la",
+        welcome      = "Bine ați venit la Bancă",
+        cashbalance  = "Bani: $",
+        goldbalance  = "Aur: ",
+        cashbalance2 = "Economii.",
+        takecash     = "Retrage Bani",
+        depocash     = "Depune Bani",
+        takegold     = "Retrage Aur",
+        depogold     = "Depune Aur",
+        takecash2    = "Retrage Banii Tăi",
+        depocash2    = "Depune Banii Tăi",
+        takegold2    = "Retrage Aurul Tău",
+        depogold2    = "Depune Aurul Tău",
+        depoitem     = "Folosește-ți Safebox-ul",
+        depoitem2    = "Spațiu Disponibil: ",
+        confirm      = "Confirmă",
+        amount       = "Număr de sloturi",
+        youdepo      = "Ai depus $",
+        youdepog     = "Ai depus G",
+        invalid      = "Sumă Invalidă",
+        withdrew     = "Ai retras $",
+        withdrewg    = "Ai retras G",
+        withc        = "Retrage Bani",
+        withg        = "Retrage Aur",
+        depoc        = "Depune Bani",
+        depog        = "Depune Aur",
+        namebank     = "Inventar Bancar",
+        limit        = "Nu poți purta alte obiecte",
+        maxlimit     = "Ai atins maximul pentru acest obiect",
+        upgradeitem  = "Upgrade Slot Safe Box",
+        upgradeitem2 = "Cost pentru fiecare slot: $ ",
+        nomoney      = "Nu ai bani",
+        success      = "Ai făcut upgrade la Safe Box plătind $ ",
+        maxslots     = "Ai atins numărul maxim de sloturi ",
+        maxitems     = "Limita pentru acest obiect este: ",
+        depoitem3    = "Ai depus ",
+        of           = " din ",
+        withitem     = "Ai retras ",
+        cant         = "Nu poți depune acest obiect",
+        closed       = "Banca este închisă momentan",
+        openHours    = "Program de Funcționare",
+        amTimeZone   = "am",
+        pmTimeZone   = "pm",
+        noaccmoney   = "Nu poți transfera atâția bani!",
+        transfer     = "Ai transferat ",
+        to           = " către ",
+        transferred  = " cu succes.",
+        bankacc      = "Conturi Bancare Adiționale",
+        bankaccinfo  = "Aici ai o prezentare generală a conturilor tale bancare din alte orașe. Poți face transferuri către contul tău AICI.",
+        transferinfo = "Poți avea bani transferați aici. Se aplică o taxă de 10% pentru fiecare transfer!",
         inputsLang   = {
-			 -- [ DEPOZITARE BANI ]
-			confirmCash = "Confirmă",             -- Numele Butonului
-			insertAmountCash = "introdu suma",     -- Numele de Afișare
-			depositCash = "DEPOZITEAZĂ BANI",      -- Antetul Butonului
-			numOnlyCash = "doar numere",           -- Mesaj afișat dacă input-ul nu este valid
-			-- [ DEPOZITARE AUR ]
-			confirmGold = "Confirmă",
-			insertAmountGold = "introdu suma",
-			depositGold = "DEPOZITEAZĂ AUR",
-			numOnlyGold = "doar numere",
-			------------------------------------
-			-- [ RETRAGERE BANI ]
-			confirmCashW = "Confirmă",
-			insertAmountCashW = "introdu suma",
-			withdrawCash = "RETRAGE BANI",
-			numOnlyCashW = "doar numere",
-			-- [ RETRAGERE AUR ]
-			confirmGoldW = "Confirmă",
-			insertAmountGoldW = "introdu suma",
-			withdrawGold = "RETRAGE AUR",
-			numOnlyGoldW = "doar numere",
-			------------------------------------
-			-- [ TRANSFER DE BANI ]
-			Transfer = "Transfer",
-			depositTransfer = "Cât dorești să transferi în contul tău bancar AICI?", -- Antetul Butonului
-			------------------------------------
-			-- [ UPGRADE SLOTURI INVENTAR ]
-			confirmUp = "Confirmă",
-			insertAmountUp = "introdu suma",
-			upgradeSlots = "UPGRADE SLOTURI",
-			numOnlyUp = "doar numere",
-
+            confirmCash = "Confirmă",
+            insertAmountCash = "introduceți suma",
+            depositCash = "DEPUNE BANI",
+            numOnlyCash = "doar numere",
+            confirmGold = "Confirmă",
+            insertAmountGold = "introduceți suma",
+            depositGold = "DEPUNE AUR",
+            numOnlyGold = "doar numere",
+            confirmCashW = "Confirmă",
+            insertAmountCashW = "introduceți suma",
+            withdrawCash = "RETRAGE BANI",
+            numOnlyCashW = "doar numere",
+            confirmGoldW = "Confirmă",
+            insertAmountGoldW = "introduceți suma",
+            withdrawGold = "RETRAGE AUR",
+            numOnlyGoldW = "doar numere",
+            Transfer = "Transfer",
+            depositTransfer = "Cât de mult doriți să transferați în contul dvs. bancar AICI?",
+            confirmUp = "Confirmă",
+            insertAmountUp = "introduceți suma",
+            upgradeSlots = "UPGRADE SLOTURI",
+            numOnlyUp = "doar numere",
+        },
+        Webhooks = {
+            LogTitle = "🏦 Jurnal de Activitate Bancară",
+            WithdrawLogDescription = "💸 **Jucător:** `%s`\n**A retras:** `%s`\n**De la Banca:** `%s`",
+            DepositLogDescription = "💰 **Jucător:** `%s`\n**A depus:** `%s`\n**La Banca:** `%s`",
+            TransferLogDescription = "🔄 **Jucător:** `%s`\n**A transferat:** `%s`\n**De la Banca:** `%s`\n**La Banca:** `%s`",
+            TakeLogDescription = "📤 **Jucător:** `%s`\n**A luat:** `%s %s`\n**De la Banca:** `%s`",
+            MoveLogDescription = "📥 **Jucător:** `%s`\n**A mutat:** `%s %s`\n**La Banca:** `%s`"
         }
-    },
+    }
 }
