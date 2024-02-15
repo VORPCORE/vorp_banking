@@ -11,13 +11,18 @@ shared_scripts {
 }
 
 client_scripts {
-    'client.lua'
+    'client/client.lua'
 }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
-    'service.lua',
-    'server.lua',
+    'server/service.lua',
+    'server/server.lua',
+}
+
+dependencies {
+	'vorp_core',
+	'vorp_inventory'
 }
 
 --dont touch
