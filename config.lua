@@ -3,13 +3,19 @@ Config                    = {}
 Config.Lang               = "English"
 
 Config.WithdrawLogWebhook = ""
+
 Config.DepositLogWebhook  = ""
+
 Config.TransferLogWebhook = ""
+
 Config.TakeLogWebhook     = ""
+
 Config.MoveLogWebhook     = ""
+
 Config.Key                = 0x760A9C6F --[G]
 
 Config.banktransfer       = true       -- if you want to use bank transfer
+
 Config.feeamount          = 0.9        -- 0.9 is 10% of the transferred amount, 0.5 is 50% of the transferred amount, 0.7 is 30% of the transferred amount
 
 Config.banks              = {
@@ -159,6 +165,8 @@ Config.banks              = {
 
     },
 }
+
+Config.UseDoorSystem      = true -- if false wont use door system bellow
 
 Config.Doors              = {
     [2642457609] = 0, -- Valentine bank, front entrance, left door

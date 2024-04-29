@@ -1,26 +1,13 @@
 local VORPcore = exports.vorp_core:GetCore()
-
 local prompts = GetRandomIntInRange(0, 0xffffff)
 local PromptGroup2 = GetRandomIntInRange(0, 0xffffff)
 local openmenu
 local CloseBanks
 local inmenu = false
-local bankinfo = {}
-local blips = {}
-
 local T = Translation.Langs[Config.Lang]
 
 TriggerEvent("menuapi:getData", function(call)
     MenuData = call
-end)
-
-AddEventHandler('menuapi:closemenu', function()
-    if inmenu then
-        inmenu = false
-        bankinfo = nil
-        ClearPedTasks(PlayerPedId())
-        DisplayRadar(true)
-    end
 end)
 
 AddEventHandler("onResourceStop", function(resourceName)
@@ -43,43 +30,41 @@ AddEventHandler("onResourceStop", function(resourceName)
 end)
 
 ---------------- BLIPS ---------------------
-function AddBlip(index)
+local function AddBlip(index)
     if Config.banks[index].blipAllowed then
-        Config.banks[index].BlipHandle = N_0x554d9d53f696d002(1664425300, Config.banks[index].x, Config.banks[index].y,
-            Config.banks[index].z)
-        SetBlipSprite(Config.banks[index].BlipHandle, Config.banks[index].blipsprite, 1)
-        SetBlipScale(Config.banks[index].BlipHandle, 0.2)
-        Citizen.InvokeNative(0x9CB1A1623062F402, Config.banks[index].BlipHandle, Config.banks[index].name)
+        local blip = N_0x554d9d53f696d002(1664425300, Config.banks[index].x, Config.banks[index].y, Config.banks[index].z)
+        SetBlipSprite(blip, Config.banks[index].blipsprite, true)
+        SetBlipScale(blip, 0.2)
+        Citizen.InvokeNative(0x9CB1A1623062F402, blip, Config.banks[index].name)
+        Config.banks[index].BlipHandle = blip
     end
 end
 
 ---------------- NPC ---------------------
-function LoadModel(model)
-    local model = GetHashKey(model)
-    RequestModel(model)
-    while not HasModelLoaded(model) do
-        RequestModel(model)
-        Citizen.Wait(100)
+local function LoadModel(model)
+    if not HasModelLoaded(model) then
+        RequestModel(model, false)
+        repeat Wait(0) until HasModelLoaded(model)
     end
 end
 
-function SpawnNPC(index)
+local function SpawnNPC(index)
     local v = Config.banks[index]
     LoadModel(v.NpcModel)
-    if v.NpcAllowed then
-        local npc = CreatePed(v.NpcModel, v.Nx, v.Ny, v.Nz, v.Nh, false, true, true, true)
-        Citizen.InvokeNative(0x283978A15512B2FE, npc, true)
-        SetEntityCanBeDamaged(npc, false)
-        SetEntityInvincible(npc, true)
-        Wait(1000)
-        TaskStandStill(npc, 10, -1)
-        -- FreezeEntityPosition(npc, true)
-        SetBlockingOfNonTemporaryEvents(npc, true)
-        Config.banks[index].NPC = npc
-    end
+    local npc = CreatePed(joaat(v.NpcModel), v.Nx, v.Ny, v.Nz, v.Nh, false, false, false, false)
+    repeat Wait(0) until DoesEntityExist(npc)
+    PlaceEntityOnGroundProperly(npc, true)
+    Citizen.InvokeNative(0x283978A15512B2FE, npc, true)
+    SetEntityCanBeDamaged(npc, false)
+    SetEntityInvincible(npc, true)
+    Wait(1000)
+    TaskStandStill(npc, -1)
+    SetBlockingOfNonTemporaryEvents(npc, true)
+    SetModelAsNoLongerNeeded(v.NpcModel)
+    Config.banks[index].NPC = npc
 end
 
-function PromptSetUp()
+local function PromptSetUp()
     local str = T.openmenu
     openmenu = PromptRegisterBegin()
     PromptSetControlAction(openmenu, Config.Key)
@@ -93,7 +78,7 @@ function PromptSetUp()
     PromptRegisterEnd(openmenu)
 end
 
-function PromptSetUp2()
+local function PromptSetUp2()
     local str = T.closemenu
     CloseBanks = PromptRegisterBegin()
     PromptSetControlAction(CloseBanks, Config.Key)
@@ -107,27 +92,41 @@ function PromptSetUp2()
     PromptRegisterEnd(CloseBanks)
 end
 
-RegisterNetEvent("vorp_bank:recinfo")
-AddEventHandler("vorp_bank:recinfo", function(data, name, allbanks)
-    bankinfo = data
-    Openbank(name, allbanks)
-end)
+local function getDistance(config)
+    local coords = GetEntityCoords(PlayerPedId())
+    local coords2 = vector3(config.x, config.y, config.z)
+    return #(coords - coords2)
+end
 
-RegisterNetEvent("vorp_bank:ready", function()
-    DisplayRadar(true)
-    inmenu = false
-    MenuData.CloseAll()
-    ClearPedTasks(PlayerPedId())
-end)
+local function CreateNpcByDistance(distance, index)
+    if distance <= 40 then
+        if not Config.banks[index].NPC then
+            SpawnNPC(index)
+        end
+    else
+        if Config.banks[index].NPC then
+            DeleteEntity(Config.banks[index].NPC)
+            DeletePed(Config.banks[index].NPC)
+            SetEntityAsNoLongerNeeded(Config.banks[index].NPC)
+            Config.banks[index].NPC = nil
+        end
+    end
+end
 
-Citizen.CreateThread(function()
+local function GetBankInfo(bankConfig)
+    local result = VORPcore.Callback.TriggerAwait("vorp_bank:getinfo", bankConfig.city)
+    Openbank(bankConfig.city, result[1], result[2])
+    TaskStandStill(PlayerPedId(), -1)
+    DisplayRadar(false)
+end
+
+CreateThread(function()
+    repeat Wait(0) until LocalPlayer.state.IsInSession
     PromptSetUp()
     PromptSetUp2()
     while true do
-        Citizen.Wait(0)
-        local sleep = true
+        local sleep = 1000
         local player = PlayerPedId()
-        local coords = GetEntityCoords(PlayerPedId())
         local hour = GetClockHours()
         local dead = IsEntityDead(player)
 
@@ -138,30 +137,30 @@ Citizen.CreateThread(function()
                         if not Config.banks[index].BlipHandle and bankConfig.blipAllowed then
                             AddBlip(index)
                         end
+
                         if Config.banks[index].BlipHandle then
                             Citizen.InvokeNative(0x662D364ABF16DE2F, Config.banks[index].BlipHandle,
                                 GetHashKey('BLIP_MODIFIER_MP_COLOR_10'))
                         end
+
                         if Config.banks[index].NPC then
                             DeleteEntity(Config.banks[index].NPC)
                             DeletePed(Config.banks[index].NPC)
                             SetEntityAsNoLongerNeeded(Config.banks[index].NPC)
                             Config.banks[index].NPC = nil
                         end
-                        local coordsDist = vector3(coords.x, coords.y, coords.z)
-                        local coordsStore = vector3(bankConfig.x, bankConfig.y, bankConfig.z)
-                        local distance = #(coordsDist - coordsStore)
-                        if distance <= bankConfig.distOpen then
-                            sleep = false
 
-                            local label2 = CreateVarString(10, 'LITERAL_STRING',
-                                T.openHours ..
-                                " " ..
+                        local distance = getDistance(bankConfig)
+
+                        if distance <= bankConfig.distOpen then
+                            sleep = 0
+                            local label2 = CreateVarString(10, 'LITERAL_STRING', T.openHours .. " " ..
                                 bankConfig.StoreOpen .. T.amTimeZone .. " - " .. bankConfig.StoreClose .. T.pmTimeZone)
+
                             PromptSetActiveGroupThisFrame(PromptGroup2, label2)
 
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, CloseBanks) then
-                                Wait(100)
+                                Wait(1000)
                                 VORPcore.NotifyRightTip(T.closed, 4000)
                             end
                         end
@@ -169,76 +168,62 @@ Citizen.CreateThread(function()
                         if not Config.banks[index].BlipHandle and bankConfig.blipAllowed then
                             AddBlip(index)
                         end
+
                         if Config.banks[index].BlipHandle then
                             Citizen.InvokeNative(0x662D364ABF16DE2F, Config.banks[index].BlipHandle,
                                 GetHashKey('BLIP_MODIFIER_MP_COLOR_32'))
                         end
-                        if not Config.banks[index].NPC and bankConfig.NpcAllowed then
-                            SpawnNPC(index)
-                        end
 
-                        local coordsDist = vector3(coords.x, coords.y, coords.z)
-                        local coordsStore = vector3(bankConfig.x, bankConfig.y, bankConfig.z)
-                        local distance = #(coordsDist - coordsStore)
-
+                        local distance = getDistance(bankConfig)
+                        CreateNpcByDistance(distance, index)
                         if distance <= bankConfig.distOpen then
-                            sleep = false
+                            sleep = 0
 
                             local label = CreateVarString(10, 'LITERAL_STRING', T.bank .. " " .. bankConfig.name)
                             PromptSetActiveGroupThisFrame(prompts, label)
 
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, openmenu) then
                                 inmenu = true
-
-                                TriggerServerEvent("vorp_bank:getinfo", bankConfig.city)
-                                Wait(400) -- needed
-                                TaskStandStill(PlayerPedId(), -1)
-                                DisplayRadar(false)
-                                --Openbank(bankConfig.name, index)
+                                GetBankInfo(bankConfig)
                             end
                         end
                     end
                 else
+                    local distance = getDistance(bankConfig)
                     if not Config.banks[index].BlipHandle and bankConfig.blipAllowed then
                         AddBlip(index)
                     end
-                    if not Config.banks[index].NPC and bankConfig.NpcAllowed then
-                        SpawnNPC(index)
-                    end
-                    local coordsDist = vector3(coords.x, coords.y, coords.z)
-                    local coordsStore = vector3(bankConfig.x, bankConfig.y, bankConfig.z)
-                    local distance = #(coordsDist - coordsStore)
+
+                    CreateNpcByDistance(distance, index)
 
                     if distance <= bankConfig.distOpen then
-                        sleep = false
-
+                        sleep = 0
                         local label = CreateVarString(10, 'LITERAL_STRING', T.bank .. " " .. bankConfig.name)
                         PromptSetActiveGroupThisFrame(prompts, label)
 
                         if Citizen.InvokeNative(0xC92AC953F0A982AE, openmenu) then
                             inmenu = true
-                            TriggerServerEvent("vorp_bank:getinfo", bankConfig.city)
-                            Wait(200)
-                            TaskStandStill(PlayerPedId(), -1)
-                            DisplayRadar(false)
-                            --Openbank(bankConfig.name, index)
+                            GetBankInfo(bankConfig)
                         end
                     end
                 end
             end
         end
-        if sleep then
-            Citizen.Wait(500)
-        end
+        Wait(sleep)
     end
 end)
 
-function Openbank(bankName, allbanks)
+local function CloseMenu()
+    MenuData.CloseAll()
+    inmenu = false
+    ClearPedTasks(PlayerPedId())
+    DisplayRadar(true)
+end
+
+function Openbank(bankName, bankinfo, allbanks)
     MenuData.CloseAll()
     if not bankinfo.money then
-        DisplayRadar(true)
-        ClearPedTasks(PlayerPedId())
-        inmenu = false
+        CloseMenu()
         return
     end
 
@@ -291,7 +276,7 @@ function Openbank(bankName, allbanks)
     end
 
 
-    MenuData.Open('default', GetCurrentResourceName(), 'menuapi',
+    MenuData.Open('default', GetCurrentResourceName(), 'Openbank' .. bankName,
         {
             title    = bankName,
             subtext  = T.welcome,
@@ -319,15 +304,11 @@ function Openbank(bankName, allbanks)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:depositcash", result, Config.banks[bankName].city, bankinfo)
-                        DisplayRadar(true)
-                        inmenu = false
-                        MenuData.CloseAll()
-                        ClearPedTasks(PlayerPedId())
+                        CloseMenu()
                     else
                         VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
-                TriggerEvent("vorp_bank:ready")
             end
             if (data.current.value == 'dgold') then
                 local myInput = {
@@ -349,15 +330,11 @@ function Openbank(bankName, allbanks)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:depositgold", result, Config.banks[bankName].city, bankinfo)
-                        DisplayRadar(true)
-                        inmenu = false
-                        MenuData.CloseAll()
-                        ClearPedTasks(PlayerPedId())
+                        CloseMenu()
                     else
                         VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
-                TriggerEvent("vorp_bank:ready")
             end
             if (data.current.value == 'wcash') then
                 local myInput = {
@@ -379,15 +356,11 @@ function Openbank(bankName, allbanks)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:withcash", result, Config.banks[bankName].city, bankinfo)
-                        DisplayRadar(true)
-                        inmenu = false
-                        MenuData.CloseAll()
-                        ClearPedTasks(PlayerPedId())
+                        CloseMenu()
                     else
                         VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
-                TriggerEvent("vorp_bank:ready")
             end
             if (data.current.value == 'wgold') then
                 local myInput = {
@@ -409,25 +382,19 @@ function Openbank(bankName, allbanks)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
                         TriggerServerEvent("vorp_bank:withgold", result, Config.banks[bankName].city, bankinfo)
-                        DisplayRadar(true)
-                        inmenu = false
-                        MenuData.CloseAll()
-                        ClearPedTasks(PlayerPedId())
+                        CloseMenu()
                     else
                         VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
-                TriggerEvent("vorp_bank:ready")
             end
             if (data.current.value == 'bitem') then
                 TriggerServerEvent("vorp_bank:ReloadBankInventory", Config.banks[bankName].city)
                 Wait(300)
                 TriggerEvent("vorp_inventory:OpenBankInventory", T.namebank, Config.banks[bankName].city, bankinfo.invspace)
-                menu.close()
-                DisplayRadar(true)
-                inmenu = false
-                ClearPedTasks(PlayerPedId())
+                CloseMenu()
             end
+
             if (data.current.value == 'upitem') then
                 local invspace = bankinfo.invspace
                 local maxslots = Config.banks[bankName].maxslots
@@ -450,27 +417,19 @@ function Openbank(bankName, allbanks)
                 TriggerEvent("vorpinputs:advancedInput", json.encode(myInput), function(cb)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
-                        TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, math.floor(result),
-                            Config.banks[bankName].city, invspace)
-                        DisplayRadar(true)
-                        inmenu = false
-                        MenuData.CloseAll()
-                        ClearPedTasks(PlayerPedId())
+                        TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, math.floor(result), Config.banks[bankName].city, invspace)
+                        CloseMenu()
                     else
                         VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
-                TriggerEvent("vorp_bank:ready")
             end
             if (data.current.value == 'others') then
                 Openallbanks(bankName, allbanks)
             end
         end,
         function(data, menu)
-            menu.close()
-            DisplayRadar(true)
-            inmenu = false
-            ClearPedTasks(PlayerPedId())
+            CloseMenu()
         end)
 end
 
@@ -480,11 +439,17 @@ function Openallbanks(bankName, allbanks)
 
     for _, bank in pairs(allbanks) do
         if bankName ~= bank.name then
-            table.insert(elements, { label = bank.name .. " : " .. bank.money .. "$", value = 'transfer', desc = T.transferinfo, info = bank.name })
+            table.insert(elements,
+                {
+                    label = bank.name .. " : " .. bank.money .. "$",
+                    value = 'transfer',
+                    desc = T.transferinfo,
+                    info = bank.name
+                })
         end
     end
 
-    MenuData.Open('default', GetCurrentResourceName(), 'menuapi',
+    MenuData.Open('default', GetCurrentResourceName(), 'Openallbanks' .. bankName,
         {
             title    = bankName,
             subtext  = T.welcome,
@@ -515,7 +480,6 @@ function Openallbanks(bankName, allbanks)
                         VORPcore.NotifyRightTip(T.invalid, 4000)
                     end
                 end)
-                TriggerEvent("vorp_bank:ready")
             end
         end,
         function(data, menu)
@@ -525,6 +489,11 @@ end
 
 -- open doors
 CreateThread(function()
+    if not Config.UseDoorSystem then
+        return
+    end
+    repeat Wait(0) until LocalPlayer.state.IsInSession
+
     for door, state in pairs(Config.Doors) do
         if not IsDoorRegisteredWithSystem(door) then
             Citizen.InvokeNative(0xD99229FE93B46286, door, 1, 1, 0, 0, 0, 0)
