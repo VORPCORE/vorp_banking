@@ -1,9 +1,10 @@
 fx_version "adamant"
-games { "rdr3" }
+game "rdr3"
 rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aware my resources *will* become incompatible once RedM ships.'
 
 author 'VORP edit by RobiZona#0001'
 description 'Bank system VORP'
+lua54 'yes'
 
 shared_scripts {
     'shared/language.lua',
@@ -21,8 +22,8 @@ server_scripts {
 }
 
 dependencies {
-	'vorp_core',
-	'vorp_inventory'
+    'vorp_core',
+    'vorp_inventory'
 }
 
 --dont touch

@@ -140,7 +140,7 @@ CreateThread(function()
 
                         if Config.banks[index].BlipHandle then
                             Citizen.InvokeNative(0x662D364ABF16DE2F, Config.banks[index].BlipHandle,
-                                GetHashKey('BLIP_MODIFIER_MP_COLOR_10'))
+                                joaat('BLIP_MODIFIER_MP_COLOR_10'))
                         end
 
                         if Config.banks[index].NPC then
@@ -171,7 +171,7 @@ CreateThread(function()
 
                         if Config.banks[index].BlipHandle then
                             Citizen.InvokeNative(0x662D364ABF16DE2F, Config.banks[index].BlipHandle,
-                                GetHashKey('BLIP_MODIFIER_MP_COLOR_32'))
+                                joaat('BLIP_MODIFIER_MP_COLOR_32'))
                         end
 
                         local distance = getDistance(bankConfig)
