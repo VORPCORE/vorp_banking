@@ -806,7 +806,7 @@ RegisterServerEvent("vorp_bank:MoveToBank", function(jsonData)
     end
 end)
 
-AddEventHandler("onPlayerDropped", function()
+AddEventHandler("playerDropped", function()
     local _source = source
     for key, value in pairs(lastMoney) do
         if key == _source then
