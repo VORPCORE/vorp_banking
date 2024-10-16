@@ -12,41 +12,36 @@ Config.TakeLogWebhook     = ""
 
 Config.MoveLogWebhook     = ""
 
-Config.Key                = 0x760A9C6F --[G]
+Config.Key                = 0x760A9C6F -- [G]
 
-Config.banktransfer       = true       -- if you want to use bank transfer
+Config.banktransfer       = true       -- If you want to use bank transfer
 
 Config.feeamount          = 0.9        -- 0.9 is 10% of the transferred amount, 0.5 is 50% of the transferred amount, 0.7 is 30% of the transferred amount
 
 Config.banks              = {
 
-    Valentine = {           -- names must be the same in databse BANKS TABLE
-        city = "Valentine", -- names must be the same in databse BANKS TABLE
+    Valentine = {           -- Names must be the same in databse BANKS TABLE
+        city = "Valentine", -- Names must be the same in databse BANKS TABLE
         name = "Valentine Bank",
-        x = -308.50,
-        y = 776.24,
-        z = 118.75,
+        BankLocation = {x = -308.02, y = 773.82, z = 116.7}, -- Bank Location (X, Y, Z)
         blipsprite = -2128054417,
         blipAllowed = true,
         NpcAllowed = true,
         NpcModel = "S_M_M_BankClerk_01",
-        Nx = -308.02,
-        Ny = 773.82,
-        Nz = 116.7,
-        Nh = 18.69,      --npc positions {x = -308.02, y = 773.82, z = 118.7}
+        NpcPosition = {x = -308.02, y = 773.82, z = 116.7, h = 18.69}, -- NPC Postition (X, Y, Z, H)
         StoreHoursAllowed = true,
         StoreOpen = 7,   -- am
         StoreClose = 22, -- pm
         distOpen = 1.5,
-        gold = true,     -- if you want deposit and withdraw gold
-        items = true,    -- if you want use safebox
-        upgrade = true,  -- if you want upgrade safebox
+        gold = true,     -- If you want deposit and withdraw gold
+        items = true,    -- If you want use safebox
+        upgrade = true,  -- If you want upgrade safebox
         costslot = 10,   -- choose price for upgrade + 1 slot
         maxslots = 100,  -- choose max slots for upgrade
 
         ---------------------
         --ONLY ONE CAN BE TRUE
-        useitemlimit = false,    -- if TRUE you can store any items and the items in the list will have a limit. can be weapons too if false will use without limit and you can ignore the list
+        useitemlimit = false,    -- if TRUE you can store any items and the items in the list will have a limit. Can be weapons too if false will use without limit and you can ignore the list
         usespecificitem = false, -- if TRUE only the items in the list will work any other items not in the list wont be able to store in the safebox SET THE ABOVE TO FALSE
         -----------------------------------------
 
@@ -59,18 +54,13 @@ Config.banks              = {
 
     Blackwater = {
         name = "Blackwater Bank",
-        x = -813.18,
-        y = -1277.60,
-        z = 43.68,
+        BankLocation = {x = -813.18, y = -1277.60, z = 43.68},
         city = "Blackwater",
         blipsprite = -2128054417,
         blipAllowed = true,
         NpcAllowed = true,
         NpcModel = "S_M_M_BankClerk_01",
-        Nx = -813.18,
-        Ny = -1275.42,
-        Nz = 42.64,
-        Nh = 176.86,     --npc positions
+        NpcPosition = {x = -813.18, y = -1275.42, z = 42.64, h = 176.86},
         StoreHoursAllowed = true,
         StoreOpen = 7,   -- am
         StoreClose = 21, -- pm
@@ -81,9 +71,9 @@ Config.banks              = {
         costslot = 10,
         maxslots = 100,
 
-        --------------------- ONLY 1 MUST BE TRUE or ALL 2 FALSE(no limits in bank)
-        useitemlimit = false,    -- if TRUE limit only items above
-        usespecificitem = false, -- if TRUE deposit only items above
+        --------------------- ONLY 1 MUST BE TRUE or ALL 2 FALSE(No Limits in Bank)
+        useitemlimit = false,    -- If TRUE limit only items above
+        usespecificitem = false, -- If TRUE deposit only items above
         -----------------------------------------
 
         itemlist = {
@@ -96,17 +86,12 @@ Config.banks              = {
     SaintDenis = {
         city = "SaintDenis",
         name = "Saint Denis Bank",
-        x = 2644.08,
-        y = -1292.21,
-        z = 52.29,
+        BankLocation = {x = 2644.08, y = -1292.21, z = 52.29},
         blipsprite = -2128054417,
         blipAllowed = true,
         NpcAllowed = true,
         NpcModel = "S_M_M_BankClerk_01",
-        Nx = 2645.12,
-        Ny = -1294.37,
-        Nz = 51.25,
-        Nh = 30.64,      --npc positions
+        NpcPosition = {x = 2645.12, y = -1294.37, z = 51.25, h = 30.64},
         StoreHoursAllowed = true,
         StoreOpen = 7,   -- am
         StoreClose = 23, -- pm
@@ -117,9 +102,9 @@ Config.banks              = {
         costslot = 10,
         maxslots = 100,
 
-        --------------------- ONLY 1 MUST BE TRUE or ALL 2 FALSE(no limits in bank)
-        useitemlimit = false,    -- if TRUE limit only items above
-        usespecificitem = false, -- if TRUE deposit only items above
+        --------------------- ONLY 1 MUST BE TRUE or ALL 2 FALSE(No Limits in Bank)
+        useitemlimit = false,    -- If TRUE limit only items above
+        usespecificitem = false, -- If TRUE deposit only items above
         -----------------------------------------
 
         itemlist = {
@@ -131,18 +116,13 @@ Config.banks              = {
 
     Rhodes = {
         name = "Rhodes Bank",
-        x = 1294.14,
-        y = -1303.06,
-        z = 77.04,
+        BankLocation = {x = 1294.14, y = -1303.06, z = 77.04},
         city = "Rhodes",
         blipsprite = -2128054417,
         blipAllowed = true,
         NpcAllowed = true,
         NpcModel = "S_M_M_BankClerk_01",
-        Nx = 1292.84,
-        Ny = -1304.74,
-        Nz = 76.04,
-        Nh = 327.08,     --npc positions
+        NpcPosition = {x = 1292.84, y = -1304.74, z = 76.04, h = 327.08},
         StoreHoursAllowed = true,
         StoreOpen = 7,   -- am
         StoreClose = 21, -- pm
@@ -153,9 +133,9 @@ Config.banks              = {
         costslot = 10,
         maxslots = 50,
 
-        --------------------- ONLY 1 MUST BE TRUE or ALL 2 FALSE(no limits in bank)
-        useitemlimit = false,    -- if TRUE limit only items above
-        usespecificitem = false, -- if TRUE deposit only items above
+        --------------------- ONLY 1 MUST BE TRUE or ALL 2 FALSE(No Limits in Bank)
+        useitemlimit = false,    -- If TRUE limit only items above
+        usespecificitem = false, -- If TRUE deposit only items above
         -----------------------------------------
 
         itemlist = {
