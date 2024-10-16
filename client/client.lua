@@ -32,7 +32,7 @@ end)
 ---------------- BLIPS ---------------------
 local function AddBlip(index)
     if Config.banks[index].blipAllowed then
-        local blip = N_0x554d9d53f696d002(1664425300, Config.banks[index].x, Config.banks[index].y, Config.banks[index].z)
+        local blip = N_0x554d9d53f696d002(1664425300, Config.banks[index].BankLocation.x, Config.banks[index].BankLocation.y, Config.banks[index].BankLocation.z)
         SetBlipSprite(blip, Config.banks[index].blipsprite, true)
         SetBlipScale(blip, 0.2)
         Citizen.InvokeNative(0x9CB1A1623062F402, blip, Config.banks[index].name)
@@ -51,7 +51,7 @@ end
 local function SpawnNPC(index)
     local v = Config.banks[index]
     LoadModel(v.NpcModel)
-    local npc = CreatePed(joaat(v.NpcModel), v.Nx, v.Ny, v.Nz, v.Nh, false, false, false, false)
+    local npc = CreatePed(joaat(v.NpcModel), v.NpcPosition.x, v.NpcPosition.y, v.NpcPosition.z, v.NpcPosition.h, false, false, false, false)
     repeat Wait(0) until DoesEntityExist(npc)
     PlaceEntityOnGroundProperly(npc, true)
     Citizen.InvokeNative(0x283978A15512B2FE, npc, true)
