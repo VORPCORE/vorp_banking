@@ -150,7 +150,7 @@ CreateThread(function()
                             Config.banks[index].NPC = nil
                         end
 
-                        local distance = getDistance(bankConfig)
+                        local distance = getDistance(bankConfig.BankLocation)
 
                         if distance <= bankConfig.distOpen then
                             sleep = 0
@@ -174,7 +174,7 @@ CreateThread(function()
                                 joaat('BLIP_MODIFIER_MP_COLOR_32'))
                         end
 
-                        local distance = getDistance(bankConfig)
+                        local distance = getDistance(bankConfig.BankLocation)
                         CreateNpcByDistance(distance, index)
                         if distance <= bankConfig.distOpen then
                             sleep = 0
@@ -189,7 +189,7 @@ CreateThread(function()
                         end
                     end
                 else
-                    local distance = getDistance(bankConfig)
+                    local distance = getDistance(bankConfig.BankLocation)
                     if not Config.banks[index].BlipHandle and bankConfig.blipAllowed then
                         AddBlip(index)
                     end
