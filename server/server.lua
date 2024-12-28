@@ -54,27 +54,31 @@ VORPcore.Callback.Register('vorp_bank:getinfo', function(source, cb, bankName)
         end)
 end)
 
-RegisterServerEvent('vorp_bank:UpgradeSafeBox', function(costlot, maxslots, slotsBought, name, currentspace)
-    local _source = source
-    local Character = VORPcore.getUser(_source).getUsedCharacter
+RegisterServerEvent('vorp_bank:UpgradeSafeBox', function(slotsToBuy, currentspace, bankName)
+    local _source        = source
+    local Character      = VORPcore.getUser(_source).getUsedCharacter
     local charidentifier = Character.charIdentifier
-    local money = Character.money
+    local money          = Character.money
 
-    local amountToPay = costlot * slotsBought
-    local FinalSlots = currentspace + slotsBought
+    local maxslots       = Config.banks[bankName].maxslots
+    local costslot       = Config.banks[bankName].costslot
+    local name           = Config.banks[bankName].city
+
+    local amountToPay    = costslot * slotsToBuy
+    local FinalSlots     = currentspace + slotsToBuy
 
     if money < amountToPay then
         return VORPcore.NotifyRightTip(_source, T.nomoney, 4000)
     end
 
     if FinalSlots > maxslots then
-        return VORPcore.NotifyRightTip(_source, T.maxslots .. " | " .. slotsBought .. " / " .. maxslots, 4000)
+        return VORPcore.NotifyRightTip(_source, T.maxslots .. " | " .. slotsToBuy .. " / " .. maxslots, 4000)
     end
 
     Character.removeCurrency(0, amountToPay)
     local Parameters = { ['charidentifier'] = charidentifier, ['invspace'] = FinalSlots, ['name'] = name }
     MySQL.update("UPDATE bank_users SET invspace=@invspace WHERE charidentifier=@charidentifier AND name = @name", Parameters)
-    VORPcore.NotifyRightTip(_source, T.success .. (costlot * slotsBought) .. " | " .. FinalSlots .. " / " .. maxslots, 4000)
+    VORPcore.NotifyRightTip(_source, T.success .. (costslot * slotsToBuy) .. " | " .. FinalSlots .. " / " .. maxslots, 4000)
 end)
 
 DiscordLogs = function(transactionAmount, bankName, playerName, transactionType, targetBankName, currencyType, itemName)
@@ -154,7 +158,7 @@ RegisterServerEvent('vorp_bank:depositcash', function(amount, bankName)
     local playerCash = playerCharacter.money
 
     if playerCash >= amount then
-        MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { characterId = characterId, bankName = bankName }, function(result)
+        MySQL.query("SELECT money FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { characterId = characterId, bankName = bankName }, function(result)
             if result[1] then
                 playerCharacter.removeCurrency(0, amount)
                 DiscordLogs(amount, bankName, playerCharacter.firstname .. ' ' .. playerCharacter.lastname, "deposit", "cash")
@@ -168,8 +172,7 @@ RegisterServerEvent('vorp_bank:depositcash', function(amount, bankName)
     end
 end)
 
-RegisterServerEvent('vorp_bank:depositgold')
-AddEventHandler('vorp_bank:depositgold', function(amount, bankName)
+RegisterServerEvent('vorp_bank:depositgold', function(amount, bankName)
     local _source = source
     local playerCharacter = VORPcore.getUser(_source).getUsedCharacter
     local characterId = playerCharacter.charIdentifier
@@ -187,14 +190,13 @@ end)
 
 local lastMoney = {}
 
-RegisterServerEvent('vorp_bank:withcash')
-AddEventHandler('vorp_bank:withcash', function(amount, bankName, bankinfo)
+RegisterServerEvent('vorp_bank:withcash', function(amount, bankName)
     local _source = source
     local Character = VORPcore.getUser(_source).getUsedCharacter
     local playerFullName = Character.firstname .. ' ' .. Character.lastname
     local characterId = Character.charIdentifier
 
-    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { characterId = characterId, bankName = bankName }, function(result)
+    MySQL.query("SELECT money FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { characterId = characterId, bankName = bankName }, function(result)
         if result[1] then
             local bankBalance = result[1].money
             if bankBalance >= amount then
@@ -213,8 +215,7 @@ AddEventHandler('vorp_bank:withcash', function(amount, bankName, bankinfo)
     end)
 end)
 
-RegisterServerEvent('vorp_bank:withgold')
-AddEventHandler('vorp_bank:withgold', function(amount, bankName)
+RegisterServerEvent('vorp_bank:withgold', function(amount, bankName)
     local _source = source
     local playerCharacter = VORPcore.getUser(_source).getUsedCharacter
     local playerFullName = playerCharacter.firstname .. ' ' .. playerCharacter.lastname
@@ -236,579 +237,41 @@ AddEventHandler('vorp_bank:withgold', function(amount, bankName)
     end)
 end)
 
-RegisterServerEvent("vorp_bank:find")
-AddEventHandler("vorp_bank:find", function(name)
-    local _source = source
-    MySQL.query('SELECT * FROM bank_users', {}, function(result)
-        local banklocations = {}
-        if result[1] then
-            for i = 1, #result, 1 do
-                banklocations[#banklocations + 1] = {
-                    id             = result[i].id,
-                    name           = result[i].name,
-                    identifier     = result[i].identifier,
-                    charidentifier = result[i].charidentifier,
-                    money          = result[i].money,
-                    gold           = result[i].gold,
-                    invspace       = result[i].invspace,
-                }
-            end
-            TriggerClientEvent("vorp_bank:findbank", _source, banklocations)
-        end
-    end)
-end)
 
+local function registerStorage(bankName, bankId, invspace)
+    local isRegistered = exports.vorp_inventory:isCustomInventoryRegistered(bankId)
+    if not isRegistered then
+        local data = {
+            id = bankId,
+            name = bankName,
+            limit = invspace,
+            acceptWeapons = Config.banks[bankName].canStoreWeapons,
+            shared = true,
+            ignoreItemStackLimit = true,
+            webhook = "", -- add here your webhook url for discord logging
+        }
+        exports.vorp_inventory:registerInventory(data)
+        Wait(200)
+    end
+end
 
---TODO add new api for inventory and remve this
-RegisterNetEvent("vorp_bank:ReloadBankInventory", function(bankName)
+RegisterServerEvent("vorp_banking:server:OpenBankInventory", function(bankName, invspace)
     local _source = source
-    local Character = VORPcore.getUser(_source).getUsedCharacter
+    local user = VORPcore.getUser(_source)
+    if not user then return end
+
+    local Character = user.getUsedCharacter
     local characterId = Character.charIdentifier
+    local bankId = "vorp_banking_" .. bankName .. "_" .. characterId
 
-    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @characterId AND name = @bankName ",
-        { ["@characterId"] = characterId, ["@bankName"] = bankName }, function(result)
-            if result[1].items then
-                local items = {}
-                local inv = json.decode(result[1].items)
-                if not inv then
-                    items.itemList = {}
-                    items.action = "setSecondInventoryItems"
-                    TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
-                else
-                    items.itemList = inv
-                    items.action = "setSecondInventoryItems"
-                    TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
-                end
-            end
-        end)
+    registerStorage(bankName, bankId, invspace)
+    exports.vorp_inventory:openInventory(_source, bankId)
 end)
 
-RegisterServerEvent("vorp_bank:TakeFromBank", function(jsonData)
-    local _source = source
-    if not inprocessing(_source) then
-        processinguser[#processinguser + 1] = _source
-        local notpass = false
-        local User = VORPcore.getUser(_source)
-        local Character = User.getUsedCharacter
-        local charidentifier = Character.charIdentifier
-        local data = json.decode(jsonData)
-        local name = data["bank"]
-        local item = data.item
-        local itemCount = ToInteger(data["number"])
-        local itemType = data.type
-
-        local itemMeta = data.item.metadata
-        local dataMeta = true
-        if itemMeta == nil then
-            itemMeta = {}
-        end
-
-        if itemCount and itemCount ~= 0 then
-            if item.count < itemCount then
-                VORPcore.NotifyRightTip(_source, T.invalid, 4000)
-                return trem(_source)
-            end
-        else
-            VORPcore.NotifyRightTip(_source, T.invalid, 4000)
-            return trem(_source)
-        end
-
-        if itemType == "item_weapon" then
-            exports.vorp_inventory:canCarryWeapons(_source, itemCount, function(canCarry)
-                if canCarry then
-                    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
-                        { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
-                            notpass = true
-                            if result[1].items then
-                                local items = {}
-                                local inv = json.decode(result[1].items)
-                                local foundItem = nil
-                                for k, v in pairs(inv) do
-                                    if v.name == item.name then
-                                        foundItem = v
-                                        if #foundItem > 1 then
-                                            if k == 1 then
-                                                foundItem = v
-                                            end
-                                        end
-                                    end
-                                end
-                                if foundItem then
-                                    local foundIndex2 = AnIndexOf(inv, foundItem)
-                                    foundItem.count = foundItem.count - itemCount
-                                    if 0 >= foundItem.count then
-                                        table.remove(inv, foundIndex2)
-                                    end
-                                    items.itemList = inv
-                                    items.action = "setSecondInventoryItems"
-                                    local weapId = foundItem.id
-                                    exports.vorp_inventory:giveWeapon(_source, weapId, _source, nil)
-                                    DiscordLogs(itemCount, name, Character.firstname .. ' ' .. Character.lastname, "take",
-                                        nil, nil, item.label)
-                                    Wait(200)
-                                    TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
-                                    MySQL.update(
-                                        "UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name",
-                                        {
-                                            ["@inv"] = json.encode(inv),
-                                            ["@charidentifier"] = charidentifier,
-                                            ["@name"] =
-                                                name
-                                        })
-                                end
-                            end
-                            notpass = false
-                        end)
-                    while notpass do
-                        Wait(500)
-                    end
-                else
-                    VORPcore.NotifyRightTip(_source, T.limit, 4000)
-                end
-            end, item.name)
-        else
-            if itemCount and itemCount ~= 0 then
-                if item.count < itemCount then
-                    VORPcore.NotifyRightTip(_source, T.invalid, 4000)
-                    return trem(_source)
-                end
-            else
-                VORPcore.NotifyRightTip(_source, T.invalid, 4000)
-                return trem(_source)
-            end
-            local count = exports.vorp_inventory:getItemCount(_source, nil, item.name, nil)
-
-            if (count + itemCount) > item.limit then
-                VORPcore.NotifyRightTip(_source, T.maxlimit, 4000)
-                return trem(_source)
-            end
-            exports.vorp_inventory:canCarryItems(_source, itemCount, function(canCarryItems)
-                exports.vorp_inventory:canCarryItem(_source, item.name, itemCount, function(canCarryItem)
-                    if canCarryItems and canCarryItem then
-                        MySQL.query(
-                            "SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
-                            { ["@charidentifier"] = charidentifier, ["@name"] = name }, function(result)
-                                notpass = true
-                                if result[1].items then
-                                    local items = {}
-                                    local inv = json.decode(result[1].items)
-                                    local foundItem, foundIndex = nil, nil
-
-                                    if next(itemMeta) ~= nil then
-                                        for k, v in pairs(inv) do
-                                            if v.name == item.name then -- se hanno stesso nome
-                                                for x, y in pairsByKeys(v.metadata) do
-                                                    for w, z in pairsByKeys(itemMeta) do
-                                                        if x == w and y == z then
-                                                            foundItem = v
-                                                        end
-                                                    end
-                                                end
-                                            end
-                                        end
-                                    else
-                                        for k, v in pairs(inv) do
-                                            if v.name == item.name then
-                                                if v.metadata == nil or next(v.metadata) == nil then
-                                                    foundItem = v
-                                                end
-                                            end
-                                        end
-                                    end
-
-                                    if foundItem then
-                                        local foundIndex2 = AnIndexOf(inv, foundItem)
-                                        foundItem.count = foundItem.count - itemCount
-                                        if 0 >= foundItem.count then
-                                            table.remove(inv, foundIndex2)
-                                        end
-
-                                        items.itemList = inv
-                                        items.action = "setSecondInventoryItems"
-
-                                        if dataMeta then
-                                            exports.vorp_inventory:addItem(_source, item.name, itemCount, itemMeta)
-                                        else
-                                            exports.vorp_inventory:addItem(_source, item.name, itemCount)
-                                        end
-                                        DiscordLogs(itemCount, name, Character.firstname .. ' ' .. Character.lastname,
-                                            "take", nil, nil, item.label)
-                                        TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source,
-                                            json.encode(items))
-                                        MySQL.update(
-                                            "UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name",
-                                            {
-                                                ["@inv"] = json.encode(inv),
-                                                ["@charidentifier"] = charidentifier,
-                                                ["@name"] = name
-                                            })
-                                    end
-                                end
-                                notpass = false
-                            end)
-                        while notpass do
-                            Wait(500)
-                        end
-                    else
-                        VORPcore.NotifyRightTip(_source, T.limit, 4000)
-                    end
-                end)
-            end)
-        end
-        trem(_source)
-    end
-end)
-
-RegisterServerEvent("vorp_bank:MoveToBank", function(jsonData)
-    local _source = source
-    if not inprocessing(_source) then
-        processinguser[#processinguser + 1] = _source
-        local notpass = false
-        local User = VORPcore.getUser(_source)
-        local Character = User.getUsedCharacter
-        local charidentifier = Character.charIdentifier
-        local data = json.decode(jsonData)
-        local bankName = data["bank"]
-        local item = data.item
-        local itemCount = ToInteger(data["number"])
-        local itemType = data["type"]
-        local itemDBCount = 1
-        local itemMeta = data.item.metadata
-        local dataMeta = true
-        if itemMeta == nil then
-            itemMeta = {}
-        end
-
-        for index, bankConfig in pairs(Config.banks) do
-            if bankConfig.city == bankName then
-                local existItem = checkLimit(bankConfig.itemlist, item.name)
-                if (existItem and bankConfig.useitemlimit) or (existItem and bankConfig.usespecificitem) then
-                    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
-                        { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
-                            if result[1].items ~= "[]" then
-                                local inv = json.decode(result[1].items)
-                                for k, v in pairs(inv) do
-                                    if v.name == item.name then
-                                        if itemType == "item_standard" then
-                                            itemDBCount = v.count + itemCount
-                                        elseif itemType == "item_weapon" then
-                                            itemDBCount = itemDBCount + itemCount
-                                        end
-                                    end
-                                end
-                            else
-                                itemDBCount = itemCount
-                            end
-                            local checkCount = checkCount(itemCount, itemDBCount, bankConfig.itemlist, item.name)
-                            if checkCount then
-                                local limite = checkLimite(bankConfig.itemlist, item.name)
-                                VORPcore.NotifyRightTip(_source, T.maxitems .. limite, 4000)
-                                return trem(_source)
-                            else
-                                if itemType ~= "item_weapon" then
-                                    local countin = exports.vorp_inventory:getItemCount(_source, nil, item.name, nil)
-                                    if itemCount > countin then
-                                        VORPcore.NotifyRightTip(_source, T.limit, 4000)
-                                        return trem(_source)
-                                    end
-                                end
-                                if itemType == "item_weapon" then
-                                    itemCount = 1
-                                    item.count = 1
-                                end
-                                if itemCount and itemCount ~= 0 then
-                                    if item.count < itemCount then
-                                        VORPcore.NotifyRightTip(_source, T.invalid, 4000)
-                                        return trem(_source)
-                                    end
-                                else
-                                    VORPcore.NotifyRightTip(_source, T.invalid, 4000)
-                                    return trem(_source)
-                                end
-                                MySQL.query(
-                                    "SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
-                                    { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
-                                        notpass = true
-
-                                        if result[1].items then
-                                            local space = result[1].invspace
-                                            local items = {}
-                                            local countDB = 0
-                                            local inv = json.decode(result[1].items)
-                                            local foundItem = nil
-
-                                            if next(itemMeta) ~= nil then
-                                                for k, v in pairs(inv) do
-                                                    if v.name == item.name then
-                                                        for x, y in pairsByKeys(v.metadata) do
-                                                            for w, z in pairsByKeys(itemMeta) do
-                                                                if x == w and y == z then
-                                                                    if itemType == "item_standard" then
-                                                                        foundItem = v
-                                                                    end
-                                                                end
-                                                            end
-                                                        end
-                                                    end
-                                                end
-                                            else
-                                                for k, v in pairs(inv) do
-                                                    if v.name == item.name then
-                                                        if v.metadata == nil or next(v.metadata) == nil then
-                                                            if itemType == "item_standard" then
-                                                                foundItem = v
-                                                            end
-                                                        end
-                                                    end
-                                                end
-                                            end
-
-                                            for _, k in pairs(inv) do
-                                                countDB = countDB + k.count
-                                            end
-                                            countDB = countDB + itemCount
-                                            if countDB > space then
-                                                VORPcore.NotifyRightTip(_source, T.maxslots, 4000)
-                                            else
-                                                if foundItem then
-                                                    foundItem.count = foundItem.count + itemCount
-                                                else
-                                                    if itemType == "item_standard" then
-                                                        if next(itemMeta) == nil then
-                                                            foundItem = {
-                                                                name = item.name,
-                                                                count = itemCount,
-                                                                label = item.label,
-                                                                type = item.type,
-                                                                limit = item.limit,
-                                                                metadata = {}
-                                                            }
-                                                            inv[#inv + 1] = foundItem
-                                                        else
-                                                            foundItem = {
-                                                                name = item.name,
-                                                                count = itemCount,
-                                                                label = item.label,
-                                                                type = item.type,
-                                                                limit = item.limit,
-                                                                id = item.id,
-                                                                metadata = itemMeta
-                                                            }
-                                                            inv[#inv + 1] = foundItem
-                                                        end
-                                                    else
-                                                        foundItem = {
-                                                            name = item.name,
-                                                            count = itemCount,
-                                                            label = item.label,
-                                                            type = item.type,
-                                                            limit = item.limit,
-                                                            id = item.id,
-                                                            serial_number = item.serial_number,
-                                                            custom_desc = item.custom_desc,
-                                                            custom_label = item.custom_label
-                                                        }
-                                                        table.insert(inv, foundItem)
-                                                    end
-                                                end
-                                                items.itemList = inv
-                                                items.action = "setSecondInventoryItems"
-                                                if itemType == "item_standard" then
-                                                    if dataMeta then
-                                                        exports.vorp_inventory:subItem(_source, item.name, itemCount,
-                                                            itemMeta)
-                                                        VORPcore.NotifyRightTip(_source,
-                                                            T.depoitem3 .. itemCount .. T.of .. item.label, 4000)
-                                                    else
-                                                        exports.vorp_inventory:subItem(_source, item.name, itemCount)
-                                                        VORPcore.NotifyRightTip(_source,
-                                                            T.depoitem3 .. itemCount .. T.of .. item.label, 4000)
-                                                    end
-                                                end
-                                                if itemType == "item_weapon" then
-                                                    local weapId = item.id
-                                                    exports.vorp_inventory:subWeapon(_source, weapId)
-                                                    VORPcore.NotifyRightTip(_source, T.depoitem3 .. item.label, 4000)
-                                                end
-                                                DiscordLogs(itemCount, bankName, Character.firstname .. ' ' .. Character
-                                                    .lastname, "move", nil, nil, item.label)
-                                                TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source,
-                                                    json.encode(items))
-                                                MySQL.update(
-                                                    "UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name",
-                                                    {
-                                                        ["@inv"] = json.encode(inv),
-                                                        ["@charidentifier"] = charidentifier,
-                                                        ["@name"] = bankName
-                                                    })
-                                            end
-                                        end
-                                        notpass = false
-                                    end)
-                                while notpass do
-                                    Wait(500)
-                                end
-                                trem(_source)
-                            end
-                        end)
-                elseif (bankConfig.useitemlimit and not bankConfig.usespecificitem) or (not bankConfig.useitemlimit and not bankConfig.usespecificitem) then
-                    if itemType ~= "item_weapon" then
-                        local countin = exports.vorp_inventory:getItemCount(_source, nil, item.name, nil)
-                        if itemCount > countin then
-                            VORPcore.NotifyRightTip(_source, T.limit, 4000)
-                            return trem(_source)
-                        end
-                    end
-
-                    if itemType == "item_weapon" then
-                        itemCount = 1
-                        item.count = 1
-                    end
-
-                    if itemCount and itemCount ~= 0 then
-                        if item.count < itemCount then
-                            VORPcore.NotifyRightTip(_source, T.invalid, 4000)
-                            return trem(_source)
-                        end
-                    else
-                        VORPcore.NotifyRightTip(_source, T.invalid, 4000)
-                        return trem(_source)
-                    end
-
-                    MySQL.query("SELECT * FROM bank_users WHERE charidentifier = @charidentifier AND name = @name",
-                        { ["@charidentifier"] = charidentifier, ["@name"] = bankName }, function(result)
-                            notpass = true
-                            if result[1].items then
-                                local space = result[1].invspace
-                                local items = {}
-                                local countDB = 0
-                                local inv = json.decode(result[1].items)
-                                local foundItem = nil
-
-                                if next(itemMeta) ~= nil then
-                                    for k, v in pairs(inv) do
-                                        if v.name == item.name then
-                                            for x, y in pairsByKeys(v.metadata) do
-                                                for w, z in pairsByKeys(itemMeta) do
-                                                    if x == w and y == z then
-                                                        if itemType == "item_standard" then
-                                                            foundItem = v
-                                                        end
-                                                    end
-                                                end
-                                            end
-                                        end
-                                    end
-                                else
-                                    for k, v in pairs(inv) do
-                                        if v.name == item.name then
-                                            if v.metadata == nil or next(v.metadata) == nil then
-                                                if itemType == "item_standard" then
-                                                    foundItem = v
-                                                end
-                                            end
-                                        end
-                                    end
-                                end
-
-                                for k, v in pairs(inv) do
-                                    countDB = countDB + v.count
-                                end
-
-                                countDB = countDB + itemCount
-                                if countDB > space then
-                                    VORPcore.NotifyRightTip(_source, T.maxslots, 4000)
-                                else
-                                    if foundItem then
-                                        foundItem.count = foundItem.count + itemCount
-                                    else
-                                        if itemType == "item_standard" then
-                                            if next(itemMeta) == nil then
-                                                foundItem = {
-                                                    name = item.name,
-                                                    count = itemCount,
-                                                    label = item.label,
-                                                    type = item.type,
-                                                    limit = item.limit,
-                                                    id = item.id,
-                                                    metadata = {}
-                                                }
-                                                inv[#inv + 1] = foundItem
-                                            else
-                                                foundItem = {
-                                                    name = item.name,
-                                                    count = itemCount,
-                                                    label = item.label,
-                                                    type = item.type,
-                                                    limit = item.limit,
-                                                    id = item.id,
-                                                    metadata = itemMeta
-                                                }
-                                                inv[#inv + 1] = foundItem
-                                            end
-                                        else
-                                            foundItem = {
-                                                name = item.name,
-                                                count = itemCount,
-                                                label = item.label,
-                                                type = item.type,
-                                                limit = item.limit,
-                                                id = item.id,
-                                                serial_number = item.serial_number,
-                                                custom_desc = item.custom_desc,
-                                                custom_label = item.custom_label
-                                            }
-                                            table.insert(inv, foundItem)
-                                        end
-                                    end
-                                    items.itemList = inv
-                                    items.action = "setSecondInventoryItems"
-                                    if itemType == "item_standard" then
-                                        if dataMeta then
-                                            exports.vorp_inventory:subItem(_source, item.name, itemCount, itemMeta)
-                                        else
-                                            exports.vorp_inventory:subItem(_source, item.name, itemCount)
-                                        end
-                                        VORPcore.NotifyRightTip(_source, T.depoitem3 .. itemCount .. T.of .. item.label,
-                                            4000)
-                                    end
-                                    if itemType == "item_weapon" then
-                                        local weapId = item.id
-                                        exports.vorp_inventory:subWeapon(_source, weapId)
-                                        VORPcore.NotifyRightTip(_source, T.depoitem3 .. item.label, 4000)
-                                    end
-                                    DiscordLogs(itemCount, bankName, Character.firstname .. ' ' .. Character.lastname,
-                                        "move",
-                                        nil, nil, item.label)
-                                    TriggerClientEvent("vorp_inventory:ReloadBankInventory", _source, json.encode(items))
-                                    MySQL.update(
-                                        "UPDATE bank_users SET items = @inv WHERE charidentifier = @charidentifier AND name = @name",
-                                        {
-                                            ["@inv"] = json.encode(inv),
-                                            ["@charidentifier"] = charidentifier,
-                                            ["@name"] =
-                                                bankName
-                                        })
-                                end
-                            end
-                            notpass = false
-                        end)
-                    while notpass do
-                        Wait(500)
-                    end
-                    trem(_source)
-                else
-                    VORPcore.NotifyRightTip(_source, T.cant, 4000)
-                    trem(_source)
-                end
-            end
-        end
-    end
-end)
 
 AddEventHandler("playerDropped", function()
     local _source = source
-    for key, value in pairs(lastMoney) do
+    for key, _ in pairs(lastMoney) do
         if key == _source then
             lastMoney[key] = nil
             break

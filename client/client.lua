@@ -5,14 +5,11 @@ local openmenu
 local CloseBanks
 local inmenu = false
 local T = Translation.Langs[Config.Lang]
-
-TriggerEvent("menuapi:getData", function(call)
-    MenuData = call
-end)
+local MenuData = exports.vorp_menus:GetMenuData()
 
 AddEventHandler("onResourceStop", function(resourceName)
     if resourceName == GetCurrentResourceName() then
-        for i, v in pairs(Config.banks) do
+        for _, v in pairs(Config.banks) do
             if v.BlipHandle then
                 RemoveBlip(v.BlipHandle)
             end
@@ -32,10 +29,10 @@ end)
 ---------------- BLIPS ---------------------
 local function AddBlip(index)
     if Config.banks[index].blipAllowed then
-        local blip = N_0x554d9d53f696d002(1664425300, Config.banks[index].BankLocation.x, Config.banks[index].BankLocation.y, Config.banks[index].BankLocation.z)
+        local blip = BlipAddForCoords(1664425300, Config.banks[index].BankLocation.x, Config.banks[index].BankLocation.y, Config.banks[index].BankLocation.z)
         SetBlipSprite(blip, Config.banks[index].blipsprite, true)
         SetBlipScale(blip, 0.2)
-        Citizen.InvokeNative(0x9CB1A1623062F402, blip, Config.banks[index].name)
+        SetBlipName(blip, Config.banks[index].name)
         Config.banks[index].BlipHandle = blip
     end
 end
@@ -66,30 +63,28 @@ end
 
 local function PromptSetUp()
     local str = T.openmenu
-    openmenu = PromptRegisterBegin()
-    PromptSetControlAction(openmenu, Config.Key)
-    str = CreateVarString(10, 'LITERAL_STRING', str)
-    PromptSetText(openmenu, str)
-    PromptSetEnabled(openmenu, 1)
-    PromptSetVisible(openmenu, 1)
-    PromptSetStandardMode(openmenu, 1)
-    PromptSetGroup(openmenu, prompts)
-    Citizen.InvokeNative(0xC5F428EE08FA7F2C, openmenu, true)
-    PromptRegisterEnd(openmenu)
+    openmenu = UiPromptRegisterBegin()
+    UiPromptSetControlAction(openmenu, Config.Key)
+    str = VarString(10, 'LITERAL_STRING', str)
+    UiPromptSetText(openmenu, str)
+    UiPromptSetEnabled(openmenu, true)
+    UiPromptSetVisible(openmenu, true)
+    UiPromptSetStandardMode(openmenu, true)
+    UiPromptSetGroup(openmenu, prompts, 0)
+    UiPromptRegisterEnd(openmenu)
 end
 
 local function PromptSetUp2()
     local str = T.closemenu
-    CloseBanks = PromptRegisterBegin()
-    PromptSetControlAction(CloseBanks, Config.Key)
-    str = CreateVarString(10, 'LITERAL_STRING', str)
-    PromptSetText(CloseBanks, str)
-    PromptSetEnabled(CloseBanks, 1)
-    PromptSetVisible(CloseBanks, 1)
-    PromptSetStandardMode(CloseBanks, 1)
-    PromptSetGroup(CloseBanks, PromptGroup2)
-    Citizen.InvokeNative(0xC5F428EE08FA7F2C, CloseBanks, true)
-    PromptRegisterEnd(CloseBanks)
+    CloseBanks = UiPromptRegisterBegin()
+    UiPromptSetControlAction(CloseBanks, Config.Key)
+    str = VarString(10, 'LITERAL_STRING', str)
+    UiPromptSetText(CloseBanks, str)
+    UiPromptSetEnabled(CloseBanks, true)
+    UiPromptSetVisible(CloseBanks, true)
+    UiPromptSetStandardMode(CloseBanks, true)
+    UiPromptSetGroup(CloseBanks, PromptGroup2, 0)
+    UiPromptRegisterEnd(CloseBanks)
 end
 
 local function getDistance(config)
@@ -105,9 +100,8 @@ local function CreateNpcByDistance(distance, index)
         end
     else
         if Config.banks[index].NPC then
-            DeleteEntity(Config.banks[index].NPC)
-            DeletePed(Config.banks[index].NPC)
             SetEntityAsNoLongerNeeded(Config.banks[index].NPC)
+            DeleteEntity(Config.banks[index].NPC)
             Config.banks[index].NPC = nil
         end
     end
@@ -121,26 +115,26 @@ local function GetBankInfo(bankConfig)
 end
 
 CreateThread(function()
-    repeat Wait(0) until LocalPlayer.state.IsInSession
+    repeat Wait(2000) until LocalPlayer.state.IsInSession
     PromptSetUp()
     PromptSetUp2()
+
     while true do
         local sleep = 1000
         local player = PlayerPedId()
-        local hour = GetClockHours()
         local dead = IsEntityDead(player)
 
         if not inmenu and not dead then
             for index, bankConfig in pairs(Config.banks) do
                 if bankConfig.StoreHoursAllowed then
+                    local hour = GetClockHours()
                     if hour >= bankConfig.StoreClose or hour < bankConfig.StoreOpen then
                         if not Config.banks[index].BlipHandle and bankConfig.blipAllowed then
                             AddBlip(index)
                         end
 
                         if Config.banks[index].BlipHandle then
-                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.banks[index].BlipHandle,
-                                joaat('BLIP_MODIFIER_MP_COLOR_10'))
+                            BlipAddModifier(Config.banks[index].BlipHandle, joaat('BLIP_MODIFIER_MP_COLOR_10'))
                         end
 
                         if Config.banks[index].NPC then
@@ -154,12 +148,10 @@ CreateThread(function()
 
                         if distance <= bankConfig.distOpen then
                             sleep = 0
-                            local label2 = CreateVarString(10, 'LITERAL_STRING', T.openHours .. " " ..
-                                bankConfig.StoreOpen .. T.amTimeZone .. " - " .. bankConfig.StoreClose .. T.pmTimeZone)
+                            local label2 = VarString(10, 'LITERAL_STRING', T.openHours .. " " .. bankConfig.StoreOpen .. T.amTimeZone .. " - " .. bankConfig.StoreClose .. T.pmTimeZone)
+                            UiPromptSetActiveGroupThisFrame(PromptGroup2, label2, 0, 0, 0, 0)
 
-                            PromptSetActiveGroupThisFrame(PromptGroup2, label2)
-
-                            if Citizen.InvokeNative(0xC92AC953F0A982AE, CloseBanks) then
+                            if UiPromptHasStandardModeCompleted(CloseBanks, 0) then
                                 Wait(1000)
                                 VORPcore.NotifyRightTip(T.closed, 4000)
                             end
@@ -170,8 +162,7 @@ CreateThread(function()
                         end
 
                         if Config.banks[index].BlipHandle then
-                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.banks[index].BlipHandle,
-                                joaat('BLIP_MODIFIER_MP_COLOR_32'))
+                            BlipAddModifier(Config.banks[index].BlipHandle, joaat('BLIP_MODIFIER_MP_COLOR_32'))
                         end
 
                         local distance = getDistance(bankConfig.BankLocation)
@@ -179,10 +170,10 @@ CreateThread(function()
                         if distance <= bankConfig.distOpen then
                             sleep = 0
 
-                            local label = CreateVarString(10, 'LITERAL_STRING', T.bank .. " " .. bankConfig.name)
-                            PromptSetActiveGroupThisFrame(prompts, label)
+                            local label = VarString(10, 'LITERAL_STRING', T.bank .. " " .. bankConfig.name)
+                            UiPromptSetActiveGroupThisFrame(prompts, label, 0, 0, 0, 0)
 
-                            if Citizen.InvokeNative(0xC92AC953F0A982AE, openmenu) then
+                            if UiPromptHasStandardModeCompleted(openmenu, 0) then
                                 inmenu = true
                                 GetBankInfo(bankConfig)
                             end
@@ -198,10 +189,10 @@ CreateThread(function()
 
                     if distance <= bankConfig.distOpen then
                         sleep = 0
-                        local label = CreateVarString(10, 'LITERAL_STRING', T.bank .. " " .. bankConfig.name)
-                        PromptSetActiveGroupThisFrame(prompts, label)
+                        local label = VarString(10, 'LITERAL_STRING', T.bank .. " " .. bankConfig.name)
+                        UiPromptSetActiveGroupThisFrame(prompts, label, 0, 0, 0, 0)
 
-                        if Citizen.InvokeNative(0xC92AC953F0A982AE, openmenu) then
+                        if UiPromptHasStandardModeCompleted(openmenu, 0) then
                             inmenu = true
                             GetBankInfo(bankConfig)
                         end
@@ -283,7 +274,7 @@ function Openbank(bankName, bankinfo, allbanks)
             align    = 'top-left',
             elements = elements,
         },
-        function(data, menu)
+        function(data, _)
             if (data.current.value == 'dcash') then
                 local myInput = {
                     type = "enableinput",                                               -- don't touch
@@ -389,16 +380,16 @@ function Openbank(bankName, bankinfo, allbanks)
                 end)
             end
             if (data.current.value == 'bitem') then
-                TriggerServerEvent("vorp_bank:ReloadBankInventory", Config.banks[bankName].city)
-                Wait(300)
-                TriggerEvent("vorp_inventory:OpenBankInventory", T.namebank, Config.banks[bankName].city, bankinfo.invspace)
-                CloseMenu()
+                if bankinfo.invspace > 0 then
+                    TriggerServerEvent("vorp_banking:server:OpenBankInventory", bankName, bankinfo.invspace)
+                    CloseMenu()
+                else
+                    VORPcore.NotifyRightTip(" you need to buy slots first", 4000)
+                end
             end
 
             if (data.current.value == 'upitem') then
                 local invspace = bankinfo.invspace
-                local maxslots = Config.banks[bankName].maxslots
-                local costslot = Config.banks[bankName].costslot
                 local myInput = {
                     type = "enableinput",                                               -- don't touch
                     inputType = "input",                                                -- input type
@@ -417,7 +408,7 @@ function Openbank(bankName, bankinfo, allbanks)
                 TriggerEvent("vorpinputs:advancedInput", json.encode(myInput), function(cb)
                     local result = tonumber(cb)
                     if result ~= nil and result > 0 then
-                        TriggerServerEvent("vorp_bank:UpgradeSafeBox", costslot, maxslots, math.floor(result), Config.banks[bankName].city, invspace)
+                        TriggerServerEvent("vorp_bank:UpgradeSafeBox", math.floor(result), invspace, bankName)
                         CloseMenu()
                     else
                         VORPcore.NotifyRightTip(T.invalid, 4000)
@@ -428,7 +419,7 @@ function Openbank(bankName, bankinfo, allbanks)
                 Openallbanks(bankName, allbanks)
             end
         end,
-        function(data, menu)
+        function()
             CloseMenu()
         end)
 end
@@ -456,7 +447,7 @@ function Openallbanks(bankName, allbanks)
             align    = 'top-left',
             elements = elements,
         },
-        function(data, menu)
+        function(data, _)
             if (data.current.value == 'transfer') then
                 local myInput = {
                     type = "enableinput",                                               -- don't touch
@@ -482,7 +473,7 @@ function Openallbanks(bankName, allbanks)
                 end)
             end
         end,
-        function(data, menu)
+        function()
             Openbank(bankName, allbanks)
         end)
 end
