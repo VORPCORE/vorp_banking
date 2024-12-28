@@ -5,7 +5,7 @@ local openmenu
 local CloseBanks
 local inmenu = false
 local T = Translation.Langs[Config.Lang]
-local MenuData = exports.vorp_menus:GetMenuData()
+local MenuData = exports.vorp_menu:GetMenuData()
 
 AddEventHandler("onResourceStop", function(resourceName)
     if resourceName == GetCurrentResourceName() then
