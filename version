@@ -1,3 +1,7 @@
+<1.7>
+- refactor server side code and client side code
+- changed storage system to use inventory exports to suppoort decay items (your players will loose items and weapons if you update, make sure to ask them to remove it before you update)
+- added webhook for storage 
 <1.6>
 - Everything made into the translation.
 - Bank transfer from bank to bank added.
