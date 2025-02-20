@@ -78,6 +78,8 @@ RegisterServerEvent('vorp_bank:UpgradeSafeBox', function(slotsToBuy, currentspac
     Character.removeCurrency(0, amountToPay)
     local Parameters = { ['charidentifier'] = charidentifier, ['invspace'] = FinalSlots, ['name'] = name }
     MySQL.update("UPDATE bank_users SET invspace=@invspace WHERE charidentifier=@charidentifier AND name = @name", Parameters)
+    local bankId = "vorp_banking_" .. bankName .. "_" .. charidentifier
+    exports.vorp_inventory:updateCustomInventorySlots(bankId, slotsToBuy)
     VORPcore.NotifyRightTip(_source, T.success .. (costslot * slotsToBuy) .. " | " .. FinalSlots .. " / " .. maxslots, 4000)
 end)
 
@@ -267,6 +269,8 @@ RegisterServerEvent("vorp_banking:server:OpenBankInventory", function(bankName, 
     registerStorage(bankName, bankId, invspace)
     exports.vorp_inventory:openInventory(_source, bankId)
 end)
+
+
 
 
 AddEventHandler("playerDropped", function()
