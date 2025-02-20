@@ -1,6 +1,23 @@
 local VORPcore = exports.vorp_core:GetCore()
 local T = Translation.Langs[Config.Lang]
 
+local function registerStorage(bankName, bankId, invspace)
+    local isRegistered = exports.vorp_inventory:isCustomInventoryRegistered(bankId)
+    if not isRegistered then
+        local data = {
+            id = bankId,
+            name = bankName,
+            limit = invspace,
+            acceptWeapons = Config.banks[bankName].canStoreWeapons,
+            shared = true,
+            ignoreItemStackLimit = true,
+            webhook = "", -- add here your webhook url for discord logging
+        }
+        exports.vorp_inventory:registerInventory(data)
+        Wait(200)
+    end
+end
+
 VORPcore.Callback.Register('vorp_bank:getinfo', function(source, cb, bankName)
     local _source = source
     local Character = VORPcore.getUser(_source).getUsedCharacter
@@ -79,6 +96,7 @@ RegisterServerEvent('vorp_bank:UpgradeSafeBox', function(slotsToBuy, currentspac
     local Parameters = { ['charidentifier'] = charidentifier, ['invspace'] = FinalSlots, ['name'] = name }
     MySQL.update("UPDATE bank_users SET invspace=@invspace WHERE charidentifier=@charidentifier AND name = @name", Parameters)
     local bankId = "vorp_banking_" .. bankName .. "_" .. charidentifier
+    registerStorage(bankName,bankId,currentspace)
     exports.vorp_inventory:updateCustomInventorySlots(bankId, FinalSlots)
     VORPcore.NotifyRightTip(_source, T.success .. (costslot * slotsToBuy) .. " | " .. FinalSlots .. " / " .. maxslots, 4000)
 end)
@@ -239,23 +257,6 @@ RegisterServerEvent('vorp_bank:withgold', function(amount, bankName)
     end)
 end)
 
-
-local function registerStorage(bankName, bankId, invspace)
-    local isRegistered = exports.vorp_inventory:isCustomInventoryRegistered(bankId)
-    if not isRegistered then
-        local data = {
-            id = bankId,
-            name = bankName,
-            limit = invspace,
-            acceptWeapons = Config.banks[bankName].canStoreWeapons,
-            shared = true,
-            ignoreItemStackLimit = true,
-            webhook = "", -- add here your webhook url for discord logging
-        }
-        exports.vorp_inventory:registerInventory(data)
-        Wait(200)
-    end
-end
 
 RegisterServerEvent("vorp_banking:server:OpenBankInventory", function(bankName, invspace)
     local _source = source
