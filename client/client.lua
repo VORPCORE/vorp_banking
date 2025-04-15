@@ -94,6 +94,7 @@ local function getDistance(config)
 end
 
 local function CreateNpcByDistance(distance, index)
+    if Config.banks[index].Npc.Allowed then
     if distance <= 40 then
         if not Config.banks[index].NPC then
             SpawnNPC(index)
@@ -104,6 +105,7 @@ local function CreateNpcByDistance(distance, index)
             DeleteEntity(Config.banks[index].NPC)
             Config.banks[index].NPC = nil
         end
+    end
     end
 end
 
