@@ -94,7 +94,7 @@ local function getDistance(config)
 end
 
 local function CreateNpcByDistance(distance, index)
-    if Config.banks[index].Npc.Allowed then
+    if Config.banks[index].NpcAllowed then
     if distance <= 40 then
         if not Config.banks[index].NPC then
             SpawnNPC(index)
