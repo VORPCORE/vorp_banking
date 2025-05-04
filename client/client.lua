@@ -383,7 +383,7 @@ function Openbank(bankName, bankinfo, allbanks)
             end
             if (data.current.value == 'bitem') then
                 if bankinfo.invspace > 0 then
-                    TriggerServerEvent("vorp_banking:server:OpenBankInventory", bankName, bankinfo.invspace)
+                    TriggerServerEvent("vorp_banking:server:OpenBankInventory", bankName)
                     CloseMenu()
                 else
                     VORPcore.NotifyRightTip(" you need to buy slots first", 4000)

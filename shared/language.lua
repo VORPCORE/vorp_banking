@@ -54,6 +54,8 @@ Translation.Langs = {
         bankacc      = "Additional Bank Accounts",
         bankaccinfo  = "Here you have an overview of your bank accounts in other cities. You can make transfers to your account HERE.",
         transferinfo = "You can have money transferred here. There is a 10% fee applied to each transfer!",
+        invOpenFail  = "Failed to Access the Safebox! Buy Slots First.",
+        notnear     =  "You are not near the bank!",
         inputsLang   = {
             -- [ DEPOSIT CASH ]
             confirmCash = "Confirm",            -- Button Name
@@ -149,6 +151,8 @@ Translation.Langs = {
         bankacc      = "Contas Bancárias Adicionais",
         bankaccinfo  = "Aqui tem uma visão geral das suas contas bancárias noutras cidades. Pode fazer transferências para a sua conta AQUI.",
         transferinfo = "Pode receber transferências aqui. Aplica-se uma taxa de 10% a cada transferência!",
+        invOpenFail  = "Falha ao acessar o Safebox",
+        notnear     =  "Não está perto do banco!",
         inputsLang   = {
             -- [ DEPOSITAR DINHEIRO ]
             confirmCash = "Confirmar",             -- Nome do Botão
@@ -245,6 +249,8 @@ Translation.Langs = {
         bankacc      = "Contas Bancárias Adicionais",
         bankaccinfo  = "Aqui você tem uma visão geral de suas contas bancárias em outras cidades. Você pode fazer transferências para sua conta AQUI.",
         transferinfo = "Você pode transferir dinheiro aqui. Uma taxa de 10% é aplicada a cada transferência!",
+        invOpenFail  = "Falha ao acessar o Safebox",
+        notnear     =  "Você não está perto do banco!",
         inputsLang   = {
             -- [ DEPOSIT CASH ]
             confirmCash = "Confirmar",               -- Nome do Botão
@@ -341,6 +347,8 @@ Translation.Langs = {
         bankacc      = "Comptes bancaires supplémentaires",
         bankaccinfo  = "Ici, vous avez un aperçu de vos comptes bancaires dans d'autres villes. Vous pouvez effectuer des transferts vers votre compte ICI.",
         transferinfo = "Vous pouvez faire transférer de l'argent ici. Une commission de 10% est appliquée à chaque transfert !",
+        invOpenFail  = "Échec de l'accès au coffre-fort",
+        notnear     =  "Vous n'êtes pas près de la banque !",
         inputsLang   = {
             -- [ DEPOSIT CASH ]
             confirmCash = "Confirmer",               -- Nom du bouton
@@ -437,6 +445,8 @@ Translation.Langs = {
         bankacc      = "Zusätzliche Bankkonten",
         bankaccinfo  = "Hier haben Sie einen Überblick über Ihre Bankkonten in anderen Städten. Sie können Überweisungen auf Ihr Konto HIER tätigen.",
         transferinfo = "Sie können hier Geld überweisen. Es wird eine Gebühr von 10% pro Überweisung erhoben!",
+        invOpenFail  = "Zugriff auf das Schließfach fehlgeschlagen",
+        notnear     =  "Sie sind nicht in der Nähe der Bank!",
         inputsLang   = {
             -- [ DEPOSIT CASH ]
             confirmCash = "Bestätigen",           -- Button Name
@@ -533,6 +543,8 @@ Translation.Langs = {
         bankacc      = "Cuentas Bancarias Adicionales",
         bankaccinfo  = "Aquí tienes una visión general de tus cuentas bancarias en otras ciudades. Puedes hacer transferencias a tu cuenta AQUÍ.",
         transferinfo = "Puedes recibir transferencias de dinero aquí. ¡Se aplica una tarifa del 10% a cada transferencia!",
+        invOpenFail  = "Error al acceder a la Caja Fuerte",
+        notnear     =  "¡No estás cerca del banco!",
         inputsLang   = {
             -- [ DEPOSIT CASH ]
             confirmCash = "Confirmar",            -- Nombre del botón
@@ -575,7 +587,7 @@ Translation.Langs = {
             MoveLogDescription = "📥 **Jugador:** `%s`\n**Movió:** `%s %s`\n**Al Banco:** `%s`"
         }
     },
-        Italiano = {
+    Italiano = {
         openmenu     = "Parla con il banchiere",
         closemenu    = "La banca è attualmente chiusa",
         bank         = "Benvenuto in",
@@ -628,6 +640,8 @@ Translation.Langs = {
         bankacc      = "Conti Bancari Aggiuntivi",
         bankaccinfo  = "Qui hai una panoramica dei tuoi conti bancari in altre città. Puoi fare trasferimenti sul tuo conto QUI.",
         transferinfo = "Puoi effettuare trasferimento quì. Viene applicata una commissione del 10% su ogni trasferimento!",
+        invOpenFail  = "Errore durante l'accesso alla Cassaforte",
+        notnear     =  "Non sei vicino alla banca!",
         inputsLang   = {
             -- [ DEPOSIT CASH ]
             confirmCash = "Conferma",            -- Nome del pulsante
@@ -723,6 +737,8 @@ Translation.Langs = {
         bankacc      = "Conturi Bancare Adiționale",
         bankaccinfo  = "Aici ai o prezentare generală a conturilor tale bancare din alte orașe. Poți face transferuri către contul tău AICI.",
         transferinfo = "Poți avea bani transferați aici. Se aplică o taxă de 10% pentru fiecare transfer!",
+        invOpenFail  = "Eroare la accesarea Safe Box-ului",
+        notnear     =  "Nu ești aproape de bancă!",
         inputsLang   = {
             confirmCash = "Confirmă",
             insertAmountCash = "introduceți suma",

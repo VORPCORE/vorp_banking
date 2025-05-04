@@ -18,6 +18,19 @@ local function registerStorage(bankName, bankId, invspace)
     end
 end
 
+local function IsNearBank(source, bankName)
+    local playerPed = GetPlayerPed(source)
+    local playerCoords = GetEntityCoords(playerPed)
+    local bankLocation = Config.banks[bankName].BankLocation
+    local distance = #(playerCoords - vector3(bankLocation.x, bankLocation.y, bankLocation.z))
+
+    if distance <= Config.banks[bankName].distOpen + 10.0 then -- Adjusted Distance check to make sure it's within range (if any bank is facing issue then you can increase this value)
+        return true
+    else
+        return false
+    end
+end
+
 VORPcore.Callback.Register('vorp_bank:getinfo', function(source, cb, bankName)
     local _source = source
     local Character = VORPcore.getUser(_source).getUsedCharacter
@@ -84,6 +97,10 @@ RegisterServerEvent('vorp_bank:UpgradeSafeBox', function(slotsToBuy, currentspac
     local amountToPay    = costslot * slotsToBuy
     local FinalSlots     = currentspace + slotsToBuy
 
+    if not IsNearBank(_source, bankName) then
+        return VORPcore.NotifyRightTip(_source, T.notnear, 4000)
+    end
+
     if money < amountToPay then
         return VORPcore.NotifyRightTip(_source, T.nomoney, 4000)
     end
@@ -96,7 +113,7 @@ RegisterServerEvent('vorp_bank:UpgradeSafeBox', function(slotsToBuy, currentspac
     local Parameters = { ['charidentifier'] = charidentifier, ['invspace'] = FinalSlots, ['name'] = name }
     MySQL.update("UPDATE bank_users SET invspace=@invspace WHERE charidentifier=@charidentifier AND name = @name", Parameters)
     local bankId = "vorp_banking_" .. bankName .. "_" .. charidentifier
-    registerStorage(bankName,bankId,currentspace)
+    registerStorage(bankName, bankId, currentspace)
     exports.vorp_inventory:updateCustomInventorySlots(bankId, FinalSlots)
     VORPcore.NotifyRightTip(_source, T.success .. (costslot * slotsToBuy) .. " | " .. FinalSlots .. " / " .. maxslots, 4000)
 end)
@@ -134,6 +151,10 @@ RegisterServerEvent('vorp_bank:transfer', function(amount, fromBank, toBank)
     local Character = VORPcore.getUser(_source).getUsedCharacter
     local playerFullName = Character.firstname .. ' ' .. Character.lastname
     local characterId = Character.charIdentifier
+
+    if not IsNearBank(_source, fromBank) then
+        return VORPcore.NotifyRightTip(_source, T.notnear, 4000)
+    end
 
     local queryResult = MySQL.query.await("SELECT * FROM bank_users WHERE charidentifier = @characterId;", { characterId = characterId })
     local bankAccounts = {}
@@ -177,6 +198,10 @@ RegisterServerEvent('vorp_bank:depositcash', function(amount, bankName)
     local characterId = playerCharacter.charIdentifier
     local playerCash = playerCharacter.money
 
+    if not IsNearBank(_source, bankName) then
+        return VORPcore.NotifyRightTip(_source, T.notnear, 4000)
+    end
+
     if playerCash >= amount then
         MySQL.query("SELECT money FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { characterId = characterId, bankName = bankName }, function(result)
             if result[1] then
@@ -198,6 +223,10 @@ RegisterServerEvent('vorp_bank:depositgold', function(amount, bankName)
     local characterId = playerCharacter.charIdentifier
     local playerGold = playerCharacter.gold
 
+    if not IsNearBank(_source, bankName) then
+        return VORPcore.NotifyRightTip(_source, T.notnear, 4000)
+    end
+
     if playerGold >= amount then
         playerCharacter.removeCurrency(1, amount)
         MySQL.update("UPDATE bank_users SET gold = gold + @amount WHERE charidentifier = @characterId AND name = @bankName", { characterId = characterId, amount = amount, bankName = bankName })
@@ -215,6 +244,10 @@ RegisterServerEvent('vorp_bank:withcash', function(amount, bankName)
     local Character = VORPcore.getUser(_source).getUsedCharacter
     local playerFullName = Character.firstname .. ' ' .. Character.lastname
     local characterId = Character.charIdentifier
+
+    if not IsNearBank(_source, bankName) then
+        return VORPcore.NotifyRightTip(_source, T.notnear, 4000)
+    end
 
     MySQL.query("SELECT money FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { characterId = characterId, bankName = bankName }, function(result)
         if result[1] then
@@ -241,6 +274,10 @@ RegisterServerEvent('vorp_bank:withgold', function(amount, bankName)
     local playerFullName = playerCharacter.firstname .. ' ' .. playerCharacter.lastname
     local characterId = playerCharacter.charIdentifier
 
+    if not IsNearBank(_source, bankName) then
+        return VORPcore.NotifyRightTip(_source, T.notnear, 4000)
+    end
+
     MySQL.query("SELECT gold FROM bank_users WHERE charidentifier = @characterId AND name = @bankName", { characterId = characterId, bankName = bankName }, function(result)
         if result[1] then
             local bankGold = result[1].gold
@@ -258,7 +295,7 @@ RegisterServerEvent('vorp_bank:withgold', function(amount, bankName)
 end)
 
 
-RegisterServerEvent("vorp_banking:server:OpenBankInventory", function(bankName, invspace)
+RegisterServerEvent("vorp_banking:server:OpenBankInventory", function(bankName)
     local _source = source
     local user = VORPcore.getUser(_source)
     if not user then return end
@@ -267,12 +304,22 @@ RegisterServerEvent("vorp_banking:server:OpenBankInventory", function(bankName, 
     local characterId = Character.charIdentifier
     local bankId = "vorp_banking_" .. bankName .. "_" .. characterId
 
-    registerStorage(bankName, bankId, invspace)
-    exports.vorp_inventory:openInventory(_source, bankId)
+    if not IsNearBank(_source, bankName) then
+        return VORPcore.NotifyRightTip(_source, T.notnear, 4000)
+    end
+
+    -- Check database for invSpace server side.
+    MySQL.scalar('SELECT `invspace` FROM `bank_users` WHERE `charidentifier` = @characterId AND `name` = @bankName LIMIT 1', {
+        characterId = characterId, bankName = bankName
+    }, function(invSpace)
+        if invSpace then
+            registerStorage(bankName, bankId, invSpace)
+            exports.vorp_inventory:openInventory(_source, bankId)
+        else
+            VORPcore.NotifyRightTip(_source, T.invOpenFail, 4000)
+        end
+    end)
 end)
-
-
-
 
 AddEventHandler("playerDropped", function()
     local _source = source
