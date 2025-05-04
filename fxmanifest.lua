@@ -2,7 +2,7 @@ fx_version "cerulean"
 game "rdr3"
 rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aware my resources *will* become incompatible once RedM ships.'
 
-author 'VORP edit by RobiZona#0001'
+author '@outsider | Inital Author : RobiZona#0001'
 
 description 'Bank system VORP'
 lua54 'yes'
@@ -23,7 +23,7 @@ server_scripts {
 }
 
 --dont touch
-version '1.7'
+version '1.8'
 vorp_checker 'yes'
 vorp_name '^4Resource version Check^3'
 vorp_github 'https://github.com/VORPCORE/vorp_banking'
