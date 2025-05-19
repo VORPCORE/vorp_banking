@@ -152,7 +152,7 @@ RegisterServerEvent('vorp_bank:transfer', function(amount, fromBank, toBank)
     local playerFullName = Character.firstname .. ' ' .. Character.lastname
     local characterId = Character.charIdentifier
 
-    if not IsNearBank(_source, fromBank) then
+    if not IsNearBank(_source, toBank) then
         return VORPcore.NotifyRightTip(_source, T.notnear, 4000)
     end
 
